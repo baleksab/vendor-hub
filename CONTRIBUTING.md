@@ -81,7 +81,7 @@ Breaking changes use `!` after the scope (`feat(shell)!: ...`) and a `BREAKING C
 - The PR title follows the commit format, because we **squash merge** and the title becomes the commit on `main`.
 - Fill in the PR template. Link the issue with `Closes #<number>`.
 - Mark it as a draft while it's still in progress.
-- CI and local checks must pass before review: `pnpm check`, `pnpm format:check` and `pnpm test`. CI (`.github/workflows/ci.yml`) runs exactly these three on every PR and on pushes to `main`.
+- CI and local checks must pass before review: `pnpm check`, `pnpm format:check` and `pnpm test`. CI (`.github/workflows/unit-tests.yml`) runs exactly these three on every PR and on pushes to `main`.
 - Add screenshots or a short recording for visible UI changes.
 - Address review comments with new commits, don't force-push over a review in progress. Squash happens on merge.
 - At least one approval is needed. The author merges after approval, once checks are green.

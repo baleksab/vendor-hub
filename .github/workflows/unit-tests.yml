@@ -1,4 +1,4 @@
-name: ci
+name: unit tests
 
 on:
   pull_request:
@@ -6,14 +6,15 @@ on:
     branches: [main]
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: unit-tests-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
-  ci:
+  unit-tests:
+    name: unit tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
