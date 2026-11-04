@@ -8,5 +8,5 @@
     "moduleResolution": "NodeNext",
     "erasableSyntaxOnly": true
   },
-  "include": ["src", "env.ts", "vitest.config.ts"]
+  "include": ["src", "env.ts", "vitest.config.ts", "vitest.e2e.config.ts", "drizzle.config.ts"]
 }

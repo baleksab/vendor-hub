@@ -15,3 +15,4 @@ pnpm-debug.log*
 # Anything that could hold secrets stays out:
 .env.*.local
 .env.secret*
+!.env.secret.example

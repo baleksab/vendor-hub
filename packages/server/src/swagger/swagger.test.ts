@@ -1,14 +1,13 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 
-import { buildApp } from "../app.ts";
+import { buildTestApp } from "../testing/build-test-app.ts";
 
 describe("GET /swagger/schema.json", () => {
   let app: FastifyInstance;
 
   beforeAll(async () => {
-    app = await buildApp({ logger: false });
-    await app.ready();
+    ({ app } = await buildTestApp());
   });
 
   afterAll(async () => {
