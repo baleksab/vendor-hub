@@ -21,6 +21,7 @@ Other useful commands:
 | `pnpm format`            | format with oxfmt         |
 | `pnpm format:check`      | verify formatting         |
 | `pnpm build`             | build remotes, then shell |
+| `pnpm test`              | unit tests (Vitest)       |
 
 A husky pre-commit hook runs lint and typecheck. Don't bypass it with `--no-verify`. If it fails, fix the cause.
 
@@ -29,7 +30,7 @@ A husky pre-commit hook runs lint and typecheck. Don't bypass it with `--no-veri
 1. Open or pick an issue. For anything bigger than a small fix, agree on the approach in the issue first.
 2. Branch from `main`.
 3. Make small, focused commits.
-4. Run `pnpm check` and `pnpm format:check` locally.
+4. Run `pnpm check`, `pnpm format:check` and `pnpm test` locally.
 5. Open a pull request to `main`.
 
 `main` is protected: no direct pushes, every change goes through a PR.
@@ -80,7 +81,7 @@ Breaking changes use `!` after the scope (`feat(shell)!: ...`) and a `BREAKING C
 - The PR title follows the commit format, because we **squash merge** and the title becomes the commit on `main`.
 - Fill in the PR template. Link the issue with `Closes #<number>`.
 - Mark it as a draft while it's still in progress.
-- CI and local checks must pass before review: `pnpm check` and `pnpm format:check`.
+- CI and local checks must pass before review: `pnpm check`, `pnpm format:check` and `pnpm test`. CI (`.github/workflows/checks.yml`) runs format, lint, typecheck, build and unit tests as separate jobs on every PR and on pushes to `main`.
 - Add screenshots or a short recording for visible UI changes.
 - Address review comments with new commits, don't force-push over a review in progress. Squash happens on merge.
 - At least one approval is needed. The author merges after approval, once checks are green.
