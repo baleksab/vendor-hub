@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping out. This repo is a pnpm monorepo for a microfrontend setup: `packages/shell` (React Router 8 SSR host) the remotes in `packages/*` (Module Federation, client-only) and `packages/server` (Fastify REST API). Read [`ARCHITECTURE.md`](ARCHITECTURE.md) first, and the `ARCHITECTURE.md` of the package you touch.
+Thanks for helping out. This repo is a pnpm monorepo for a microfrontend setup: `packages/shell` (React Router 8 SSR host) the remotes in `packages/*` (Module Federation, client-only) `packages/server` (Fastify REST API) and `packages/types` (API types generated from the server's OpenAPI document). Read [`ARCHITECTURE.md`](ARCHITECTURE.md) first, and the `ARCHITECTURE.md` of the package you touch.
 
 ## Getting started
 
@@ -15,14 +15,15 @@ pnpm check    # lint + typecheck + build
 
 Other useful commands:
 
-| Command                  | What it does                 |
-| ------------------------ | ---------------------------- |
-| `pnpm lint` / `lint:fix` | oxlint (type-aware)          |
-| `pnpm typecheck`         | typecheck all packages       |
-| `pnpm format`            | format with oxfmt            |
-| `pnpm format:check`      | verify formatting            |
-| `pnpm build`             | build remotes, shell, server |
-| `pnpm test`              | unit tests (Vitest)          |
+| Command                  | What it does                                  |
+| ------------------------ | --------------------------------------------- |
+| `pnpm lint` / `lint:fix` | oxlint (type-aware)                           |
+| `pnpm typecheck`         | typecheck all packages                        |
+| `pnpm format`            | format with oxfmt                             |
+| `pnpm format:check`      | verify formatting                             |
+| `pnpm build`             | build remotes, shell, server                  |
+| `pnpm test`              | unit tests (Vitest)                           |
+| `pnpm types:generate`    | regenerate API types (server must be running) |
 
 A husky pre-commit hook runs lint and typecheck. Don't bypass it with `--no-verify`. If it fails, fix the cause.
 
@@ -63,7 +64,7 @@ We use [Conventional Commits](https://www.conventionalcommits.org/).
 
 **Types:** `feat`, `fix`, `refactor`, `perf`, `docs`, `test`, `build`, `ci`, `chore`, `revert`.
 
-**Scopes:** `shell`, `remotes`, `server`, `deps`, `repo` (root config, tooling, CI). For a change to one specific remote, use its package name as the scope instead of `remotes`.
+**Scopes:** `shell`, `remotes`, `server`, `types`, `deps`, `repo` (root config, tooling, CI). For a change to one specific remote, use its package name as the scope instead of `remotes`.
 
 Rules for the summary: imperative mood ("add", not "added"), lowercase, no trailing period, up to about 72 characters.
 
@@ -101,6 +102,10 @@ These come from the repo's architecture and are checked in review.
 - **The shell owns the Mantine theme and CSS.** Embedded remotes use Mantine components without a provider or Mantine CSS.
 - **Lint config.** Root `.oxlintrc.json` has only shared rules. Each package extends it and enables its own plugins.
 - **Lockfile.** Commit `pnpm-lock.yaml` changes together with the dependency change that caused them, and never edit it by hand.
+
+## API changes
+
+Every route declares its Zod schemas, because they are the source of the OpenAPI document (Swagger UI at `/docs`, JSON at `/swagger/schema.json`). When you change a route schema, start the server (`pnpm server:dev`), run `pnpm types:generate` and commit the changed `packages/types/src/generated/schema.gen.ts` together with the change. `pnpm --filter @vendor-hub/types types:check` verifies that the committed file is up to date. Never edit the generated file by hand.
 
 ## Code style
 

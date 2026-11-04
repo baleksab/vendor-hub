@@ -11,8 +11,11 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@fastify/swagger": "catalog:",
+    "@fastify/swagger-ui": "catalog:",
     "fastify": "catalog:",
     "fastify-type-provider-zod": "catalog:",
+    "openapi-types": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {

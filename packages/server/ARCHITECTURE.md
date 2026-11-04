@@ -1,6 +1,6 @@
 # Architecture: `@mfe/server`
 
-A REST API in Node 24 + TypeScript on Fastify 5. `fastify-type-provider-zod` makes one Zod schema the source for validation, the handler's TypeScript types and the serialized response. So far it has only the skeleton and `GET /health`. Users, auth, Postgres and Swagger are not implemented yet.
+A REST API in Node 24 + TypeScript on Fastify 5. `fastify-type-provider-zod` makes one Zod schema the source for validation, the handler's TypeScript types and the serialized response. So far it has only the skeleton and `GET /health`. Users, auth and Postgres are not implemented yet.
 
 ## Layout
 
@@ -9,6 +9,9 @@ packages/server/
 ├── src/
 │   ├── main.ts               reads env, builds the app, listens, closes on SIGINT/SIGTERM
 │   ├── app.ts                buildApp(): composition root, Zod compilers, registers routes
+│   ├── swagger/
+│   │   ├── swagger.controller.ts  Swagger UI at /docs, GET /swagger/schema.json
+│   │   └── swagger.test.ts
 │   └── health/
 │       ├── health.schemas.ts     HealthResponse (Zod) + inferred type
 │       ├── health.controller.ts  GET /health
@@ -28,6 +31,10 @@ packages/server/
 ## TypeScript setup
 
 `tsconfig.base.json` is browser-oriented, so this package overrides `lib` (no DOM), `jsx`, `module` and `moduleResolution` (`NodeNext`), and turns on `erasableSyntaxOnly`. The build config enables emit with `rewriteRelativeImportExtensions`, so `./x.ts` imports become `./x.js` in `dist`. Output lands in `dist/src/main.js` because `env.ts` sits outside `src`.
+
+## OpenAPI
+
+`@fastify/swagger` is registered in `buildApp()` before the routes, with `jsonSchemaTransform` and `jsonSchemaTransformObject` from `fastify-type-provider-zod`, so the Zod schemas of every route become an OpenAPI 3.1 document. `swagger.controller.ts` serves it as JSON at `GET /swagger/schema.json` and Swagger UI (`@fastify/swagger-ui`) at `/docs`. Both are operational like `/health`: not versioned and hidden from the document itself. `@vendor-hub/types` generates its types from the JSON endpoint.
 
 ## Testing
 
