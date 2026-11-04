@@ -10,6 +10,7 @@ body:
         - shell
         - remotes
         - server
+        - types
         - root / tooling
         - not sure
     validations:

@@ -27,6 +27,7 @@ body:
         - shell
         - remotes
         - server
+        - types
         - root / tooling
         - new package
         - not sure

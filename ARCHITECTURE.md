@@ -7,7 +7,8 @@ projekat/
 ├── packages/
 │   ├── shell/          host app, React Router 8 framework mode, SSR
 │   ├── remote-test/    test remote, Vite + Module Federation, client-only
-│   └── server/         REST API, Fastify + Zod (not part of the microfrontend runtime)
+│   ├── server/         REST API, Fastify + Zod (not part of the microfrontend runtime)
+│   └── types/          API types generated from the server's OpenAPI document (@vendor-hub/types)
 ├── pnpm-workspace.yaml workspace + dependency catalog
 ├── tsconfig.base.json  shared compiler options
 ├── .oxlintrc.json      shared lint rules
@@ -25,10 +26,14 @@ The remote's manifest URL is not hardcoded in the shell. The root loader reads i
 
 ## Boundaries
 
-- **The server is a separate process.** It does not take part in Module Federation. The shell does not call it yet. It runs on its own with `pnpm server:dev` and is not started by `pnpm dev`.
+- **The server is a separate process.** It does not take part in Module Federation. The shell does not call it yet, it only imports its API types. It runs on its own with `pnpm server:dev` and is not started by `pnpm dev`.
 - **Only the shell is SSR.** Remotes are client bundles and never run on the server. This also keeps the door open for non-React remotes.
 - **Shell and remotes know each other only through** the manifest URL, the exposed module names and the shared module list.
 - **Root has only framework-agnostic tooling** (`typescript`, `oxlint`, `oxlint-tsgolint`, `oxfmt`, `husky`). Everything tied to React, Vite, Tailwind or the router lives in the package that uses it.
+
+## API contract
+
+The server's Zod schemas are the single source of truth. `@fastify/swagger` turns them into an OpenAPI 3.1 document (`/swagger/schema.json`, Swagger UI at `/docs`), `openapi-typescript` turns that into `packages/types` (`@vendor-hub/types`), and the shell uses those types as a devDependency with `import type` only. The generated file is committed and regenerated with `pnpm types:generate` while the server is running.
 
 ## UI: Mantine
 
@@ -61,6 +66,7 @@ No hosts, ports or URLs in code. Each package has `.env` (keys with empty values
 | ------------------------------ | ---------------------------------------- |
 | `pnpm dev`                     | shell and remote dev servers in parallel |
 | `pnpm server:dev`              | API server dev (isolated from `dev`)     |
+| `pnpm types:generate`          | regenerate API types (server must run)   |
 | `pnpm build`                   | remote, then shell, then server          |
 | `pnpm test`                    | Vitest in shell and server               |
 | `pnpm lint` / `lint:fix`       | oxlint                                   |

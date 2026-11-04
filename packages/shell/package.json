@@ -27,6 +27,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@vendor-hub/types": "workspace:*",
     "tailwindcss": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"

@@ -63,3 +63,4 @@ CI (`.github/workflows/checks.yml`) runs format, lint, typecheck, build and unit
 - React Router packages are pinned here and must all match.
 - `react` and `react-dom` stay `singleton` in the `shared` config in `remote.ts`.
 - Nothing in the shell may assume a remote runs on the server.
+- API types come from `@vendor-hub/types`, a devDependency used with `import type` only, so nothing from it ends up in the bundle.

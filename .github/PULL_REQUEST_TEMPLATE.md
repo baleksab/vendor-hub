@@ -17,6 +17,7 @@ Closes #
 - [ ] `shell`
 - [ ] `remotes`
 - [ ] `server`
+- [ ] `types`
 - [ ] root / tooling
 
 ## Checklist
@@ -27,6 +28,7 @@ Closes #
 - [ ] New dependencies use `catalog:` (no versions in package `package.json`, except React Router)
 - [ ] No hardcoded hosts, ports or URLs; new env keys are added to the package's `env.ts` and `.env` / `.env.local`
 - [ ] No secrets in committed files
+- [ ] If the API changed: `pnpm types:generate` was run (server running) and the `packages/types` diff is committed
 - [ ] Docs updated (`ARCHITECTURE.md` / `CLAUDE.md`) if architecture or rules changed
 
 ## Screenshots / notes for reviewers
