@@ -25,3 +25,4 @@ catalog:
   oxlint: 1.90.0
   oxlint-tsgolint: 7.0.2005
   husky: 9.1.7
+  lint-staged: 17.6.0
