@@ -56,7 +56,7 @@ A new remote means: a new entry in `remotes` in `remote.ts`, a manifest URL key 
 
 Unit tests use Vitest and live next to the code as `app/**/*.test.ts`. For now they cover only pure logic (i18n), with no DOM and no React rendering. `vitest.config.ts` is a separate file on purpose, so tests do not load the `reactRouter()` plugin and do not need `.env` (`env.ts` throws on a missing key). Do not import `env.ts` from code under test.
 
-CI (`.github/workflows/unit-tests.yml`) runs `pnpm format:check`, `pnpm check` and `pnpm test` on every PR and on pushes to `main`.
+CI (`.github/workflows/checks.yml`) runs format, lint, typecheck, build and unit tests as separate jobs on every PR and on pushes to `main`.
 
 ## Rules specific to this package
 
