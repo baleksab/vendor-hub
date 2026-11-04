@@ -14,13 +14,13 @@ pnpm check    # lint + typecheck + build
 
 Other useful commands:
 
-| Command                 | What it does                              |
-| ----------------------- | ----------------------------------------- |
-| `pnpm lint` / `lint:fix` | oxlint (type-aware)                      |
-| `pnpm typecheck`        | typecheck all packages                    |
-| `pnpm format`           | format with oxfmt                         |
-| `pnpm format:check`     | verify formatting                         |
-| `pnpm build`            | build remotes, then shell                 |
+| Command                  | What it does              |
+| ------------------------ | ------------------------- |
+| `pnpm lint` / `lint:fix` | oxlint (type-aware)       |
+| `pnpm typecheck`         | typecheck all packages    |
+| `pnpm format`            | format with oxfmt         |
+| `pnpm format:check`      | verify formatting         |
+| `pnpm build`             | build remotes, then shell |
 
 A husky pre-commit hook runs lint and typecheck. Don't bypass it with `--no-verify`. If it fails, fix the cause.
 
