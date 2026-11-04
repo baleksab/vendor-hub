@@ -8,6 +8,7 @@
     "env.ts",
     "vite.config.ts",
     "react-router.config.ts",
+    "vitest.config.ts",
     "app/**/*",
     ".react-router/types/**/*"
   ]
