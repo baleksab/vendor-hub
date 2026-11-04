@@ -1,0 +1,22 @@
+{
+  "name": "@mfe/server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --env-file=.env --env-file=.env.local src/main.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node --env-file=.env --env-file=.env.local dist/src/main.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "fastify": "catalog:",
+    "fastify-type-provider-zod": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "vitest": "catalog:"
+  }
+}

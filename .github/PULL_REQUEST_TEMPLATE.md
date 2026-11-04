@@ -16,6 +16,7 @@ Closes #
 
 - [ ] `shell`
 - [ ] `remotes`
+- [ ] `server`
 - [ ] root / tooling
 
 ## Checklist

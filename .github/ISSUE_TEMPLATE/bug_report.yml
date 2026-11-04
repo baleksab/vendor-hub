@@ -9,6 +9,7 @@ body:
       options:
         - shell
         - remotes
+        - server
         - root / tooling
         - not sure
     validations:

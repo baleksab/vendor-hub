@@ -26,6 +26,7 @@ body:
       options:
         - shell
         - remotes
+        - server
         - root / tooling
         - new package
         - not sure
