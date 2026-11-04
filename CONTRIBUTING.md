@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping out. This repo is a pnpm monorepo for a microfrontend setup: `packages/shell` (React Router 8 SSR host) and the remotes in `packages/*` (Module Federation, client-only). Read [`ARCHITECTURE.md`](ARCHITECTURE.md) first, and the `ARCHITECTURE.md` of the package you touch.
+Thanks for helping out. This repo is a pnpm monorepo for a microfrontend setup: `packages/shell` (React Router 8 SSR host) the remotes in `packages/*` (Module Federation, client-only) and `packages/server` (Fastify REST API). Read [`ARCHITECTURE.md`](ARCHITECTURE.md) first, and the `ARCHITECTURE.md` of the package you touch.
 
 ## Getting started
 
@@ -9,19 +9,20 @@ Requirements: Node 24 (see `.nvmrc`) and the pnpm version from `packageManager` 
 ```sh
 pnpm install
 pnpm dev      # shell and remotes in parallel
+pnpm server:dev  # API server (not started by pnpm dev)
 pnpm check    # lint + typecheck + build
 ```
 
 Other useful commands:
 
-| Command                  | What it does              |
-| ------------------------ | ------------------------- |
-| `pnpm lint` / `lint:fix` | oxlint (type-aware)       |
-| `pnpm typecheck`         | typecheck all packages    |
-| `pnpm format`            | format with oxfmt         |
-| `pnpm format:check`      | verify formatting         |
-| `pnpm build`             | build remotes, then shell |
-| `pnpm test`              | unit tests (Vitest)       |
+| Command                  | What it does                 |
+| ------------------------ | ---------------------------- |
+| `pnpm lint` / `lint:fix` | oxlint (type-aware)          |
+| `pnpm typecheck`         | typecheck all packages       |
+| `pnpm format`            | format with oxfmt            |
+| `pnpm format:check`      | verify formatting            |
+| `pnpm build`             | build remotes, shell, server |
+| `pnpm test`              | unit tests (Vitest)          |
 
 A husky pre-commit hook runs lint and typecheck. Don't bypass it with `--no-verify`. If it fails, fix the cause.
 
@@ -62,7 +63,7 @@ We use [Conventional Commits](https://www.conventionalcommits.org/).
 
 **Types:** `feat`, `fix`, `refactor`, `perf`, `docs`, `test`, `build`, `ci`, `chore`, `revert`.
 
-**Scopes:** `shell`, `remotes`, `deps`, `repo` (root config, tooling, CI). For a change to one specific remote, use its package name as the scope instead of `remotes`.
+**Scopes:** `shell`, `remotes`, `server`, `deps`, `repo` (root config, tooling, CI). For a change to one specific remote, use its package name as the scope instead of `remotes`.
 
 Rules for the summary: imperative mood ("add", not "added"), lowercase, no trailing period, up to about 72 characters.
 

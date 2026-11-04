@@ -1,6 +1,6 @@
 # Architecture: `@mfe/server`
 
-A REST API in Node 24 + TypeScript on Fastify 5. `fastify-type-provider-zod` makes one Zod schema the source for validation, the handler's TypeScript types and the serialized response. This is the first step of plan 005: skeleton and `GET /health`. Users, auth, Postgres and Swagger are planned in `claude/plans/005-backend-server.md`.
+A REST API in Node 24 + TypeScript on Fastify 5. `fastify-type-provider-zod` makes one Zod schema the source for validation, the handler's TypeScript types and the serialized response. So far it has only the skeleton and `GET /health`. Users, auth, Postgres and Swagger are not implemented yet.
 
 ## Layout
 
