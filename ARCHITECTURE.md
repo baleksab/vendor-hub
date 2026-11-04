@@ -1,12 +1,13 @@
 # Architecture: monorepo
 
-A microfrontend setup in a pnpm workspace. One host (the shell) renders the page on the server and loads independently built remotes in the browser through Module Federation.
+A microfrontend setup in a pnpm workspace, plus a REST API server. One host (the shell) renders the page on the server and loads independently built remotes in the browser through Module Federation.
 
 ```
 projekat/
 ├── packages/
 │   ├── shell/          host app, React Router 8 framework mode, SSR
-│   └── remote-test/    test remote, Vite + Module Federation, client-only
+│   ├── remote-test/    test remote, Vite + Module Federation, client-only
+│   └── server/         REST API, Fastify + Zod (not part of the microfrontend runtime)
 ├── pnpm-workspace.yaml workspace + dependency catalog
 ├── tsconfig.base.json  shared compiler options
 ├── .oxlintrc.json      shared lint rules
@@ -24,6 +25,7 @@ The remote's manifest URL is not hardcoded in the shell. The root loader reads i
 
 ## Boundaries
 
+- **The server is a separate process.** It does not take part in Module Federation. The shell does not call it yet. It runs on its own with `pnpm server:dev` and is not started by `pnpm dev`.
 - **Only the shell is SSR.** Remotes are client bundles and never run on the server. This also keeps the door open for non-React remotes.
 - **Shell and remotes know each other only through** the manifest URL, the exposed module names and the shared module list.
 - **Root has only framework-agnostic tooling** (`typescript`, `oxlint`, `oxlint-tsgolint`, `oxfmt`, `husky`). Everything tied to React, Vite, Tailwind or the router lives in the package that uses it.
@@ -43,7 +45,7 @@ The remote's manifest URL is not hardcoded in the shell. The root loader reads i
 
 ## Configuration
 
-No hosts, ports or URLs in code. Each package has `.env` (keys with empty values and comments, documents the contract) and `.env.local` (committed local values, never secrets), read through that package's `env.ts`, which throws on a missing key. Ports are changed in `.env.local` files only: the shell's manifest URL and origin, and the remote's public origin and allowed CORS origins.
+No hosts, ports or URLs in code. Each package has `.env` (keys with empty values and comments, documents the contract) and `.env.local` (committed local values, never secrets; secrets go to the gitignored `.env.secret`), read through that package's `env.ts`, which throws on a missing key. Ports are changed in `.env.local` files only: the shell's manifest URL and origin, and the remote's public origin and allowed CORS origins.
 
 ## Tooling
 
@@ -58,7 +60,9 @@ No hosts, ports or URLs in code. Each package has `.env` (keys with empty values
 | Script                         | What it does                             |
 | ------------------------------ | ---------------------------------------- |
 | `pnpm dev`                     | shell and remote dev servers in parallel |
-| `pnpm build`                   | remote first, then shell                 |
+| `pnpm server:dev`              | API server dev (isolated from `dev`)     |
+| `pnpm build`                   | remote, then shell, then server          |
+| `pnpm test`                    | Vitest in shell and server               |
 | `pnpm lint` / `lint:fix`       | oxlint                                   |
 | `pnpm typecheck`               | typecheck in every package               |
 | `pnpm check`                   | lint + typecheck + build                 |

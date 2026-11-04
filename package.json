@@ -2,8 +2,9 @@
   "name": "mfe-monorepo",
   "private": true,
   "scripts": {
-    "dev": "pnpm -r --parallel dev",
-    "build": "pnpm --filter @mfe/remote-test build && pnpm --filter @mfe/shell build",
+    "dev": "pnpm --filter \"!@mfe/server\" -r --parallel dev",
+    "server:dev": "pnpm --filter @mfe/server dev",
+    "build": "pnpm --filter @mfe/remote-test build && pnpm --filter @mfe/shell build && pnpm --filter @mfe/server build",
     "lint": "oxlint --type-aware",
     "lint:fix": "oxlint --type-aware --fix",
     "format": "oxfmt",

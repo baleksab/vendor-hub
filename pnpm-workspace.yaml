@@ -27,3 +27,6 @@ catalog:
   oxlint-tsgolint: 7.0.2005
   husky: 9.1.7
   lint-staged: 17.6.0
+  fastify: 5.12.8
+  fastify-type-provider-zod: 7.0.0
+  zod: 4.6.7
