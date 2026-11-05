@@ -1,4 +1,4 @@
-import type { components } from "./generated/schema.gen.ts";
+import type { components, paths } from "./generated/schema.gen.ts";
 
 export type * from "./generated/schema.gen.ts";
 
@@ -16,3 +16,15 @@ export type MyVendorsResponse = Schemas["MyVendorsResponse"];
 export type PublicVendorResponse = Schemas["PublicVendorResponse"];
 export type VendorListResponse = Schemas["VendorListResponse"];
 export type VendorListItemResponse = Schemas["VendorListItemResponse"];
+
+export type UpdateUserRequest = Schemas["UpdateUserRequest"];
+export type UserListResponse = Schemas["UserListResponse"];
+export type UserListQuery = NonNullable<paths["/api/v1/users"]["get"]["parameters"]["query"]>;
+
+export type Locale = "en" | "sr";
+
+export type UserAdministratorProps = {
+  locale: Locale;
+  apiBaseUrl: string;
+  onUnauthorized: () => void;
+};

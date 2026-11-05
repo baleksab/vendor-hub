@@ -1,6 +1,6 @@
 import { redirect } from "react-router";
 
-import { ApiError } from "../api/ApiError";
+import { ApiError } from "@vendor-hub/api-client";
 import { getCurrentUser } from "../api/endpoints/users.server";
 import type { UserResponse } from "@vendor-hub/types";
 import { loginPath, requestTarget, safeRedirectTo } from "./safeRedirect";

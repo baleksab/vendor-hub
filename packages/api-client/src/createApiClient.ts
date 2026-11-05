@@ -3,7 +3,7 @@ import createClient, { type ClientOptions } from "openapi-fetch";
 import type { paths } from "@vendor-hub/types";
 import { fromResponse, networkError } from "./ApiError";
 
-const REQUEST_TIMEOUT_MS = 10_000;
+export const REQUEST_TIMEOUT_MS = 10_000;
 
 type ResultLike<Data> = Promise<{ data?: Data; error?: unknown; response: Response }>;
 

@@ -1,9 +1,11 @@
 import { NavLink as MantineNavLink } from "@mantine/core";
 import { Link, useMatch } from "react-router";
 
-type Props = { to: string; label: string; onNavigate?: () => void };
+import { NavIcon, type NavIconName } from "../NavIcon/NavIcon";
 
-export function NavLink({ to, label, onNavigate }: Props) {
+type Props = { to: string; label: string; icon: NavIconName; onNavigate?: () => void };
+
+export function NavLink({ to, label, icon, onNavigate }: Props) {
   const active = useMatch({ path: to, end: to === "/" }) !== null;
 
   return (
@@ -11,6 +13,7 @@ export function NavLink({ to, label, onNavigate }: Props) {
       component={Link}
       to={to}
       label={label}
+      leftSection={<NavIcon name={icon} />}
       active={active}
       aria-current={active ? "page" : undefined}
       onClick={onNavigate}

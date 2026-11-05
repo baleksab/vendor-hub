@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 
@@ -9,10 +9,21 @@ import { defineConfig, loadEnv } from "vite";
 import { readShellEnv } from "./env.ts";
 
 function installedVersion(packageName: string): string {
-  const entry = createRequire(import.meta.url).resolve(packageName);
-  const manifest = join(dirname(entry), "..", "package.json");
+  let directory = dirname(createRequire(import.meta.url).resolve(packageName));
 
-  return JSON.parse(readFileSync(manifest, "utf8")).version;
+  while (true) {
+    const manifest = join(directory, "package.json");
+
+    if (existsSync(manifest)) {
+      const content = JSON.parse(readFileSync(manifest, "utf8"));
+
+      if (content.name === packageName) {
+        return content.version;
+      }
+    }
+
+    directory = dirname(directory);
+  }
 }
 
 export default defineConfig(({ mode }) => {
@@ -21,6 +32,7 @@ export default defineConfig(({ mode }) => {
   return {
     define: {
       MANTINE_VERSION: JSON.stringify(installedVersion("@mantine/core")),
+      REACT_ROUTER_VERSION: JSON.stringify(installedVersion("react-router")),
     },
     optimizeDeps: { include: ["@mantine/core", "@mantine/hooks", "@module-federation/runtime"] },
     plugins: [tailwindcss(), reactRouter()],

@@ -1,4 +1,4 @@
-import { unwrap } from "../createApiClient";
+import { unwrap } from "@vendor-hub/api-client";
 import { createServerApi } from "../createServerApi.server";
 
 export async function loadCountries(): Promise<string[]> {

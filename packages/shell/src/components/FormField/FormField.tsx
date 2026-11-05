@@ -1,60 +1,14 @@
-import { PasswordInput, Select, TextInput, Textarea } from "@mantine/core";
+import { FormField as UiFormField } from "@vendor-hub/ui";
+import type { ComponentProps } from "react";
 
 import { isMessageKey } from "../../i18n";
 import { useT } from "../../i18n/LocaleProvider";
 
-type Option = { value: string; label: string };
+type Props = Omit<ComponentProps<typeof UiFormField>, "errorText"> & { error?: string };
 
-type Props = {
-  name: string;
-  label: string;
-  error?: string;
-  defaultValue?: string;
-  kind?: "text" | "password" | "select" | "textarea";
-  type?: "text" | "email" | "tel";
-  autoComplete?: string;
-  description?: string;
-  options?: Option[];
-  placeholder?: string;
-};
-
-export function FormField({
-  name,
-  label,
-  error,
-  defaultValue,
-  kind = "text",
-  type = "text",
-  autoComplete,
-  description,
-  options,
-  placeholder,
-}: Props) {
+export function FormField({ error, ...props }: Props) {
   const t = useT();
+  const errorText = error !== undefined && isMessageKey(error) ? t(error) : error;
 
-  const common = {
-    name,
-    id: name,
-    label,
-    description,
-    error: error !== undefined && isMessageKey(error) ? t(error) : error,
-    defaultValue,
-    autoComplete,
-    withAsterisk: true,
-    size: "md",
-  } as const;
-
-  if (kind === "select") {
-    return <Select {...common} data={options ?? []} placeholder={placeholder} searchable />;
-  }
-
-  if (kind === "textarea") {
-    return <Textarea {...common} autosize minRows={4} />;
-  }
-
-  if (kind === "password") {
-    return <PasswordInput {...common} />;
-  }
-
-  return <TextInput {...common} type={type} />;
+  return <UiFormField {...props} errorText={errorText} />;
 }

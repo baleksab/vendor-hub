@@ -18,6 +18,9 @@ Closes #
 - [ ] `remotes`
 - [ ] `server`
 - [ ] `types`
+- [ ] `api-client`
+- [ ] `ui`
+- [ ] `user-administrator`
 - [ ] `infra` (nginx, docker compose)
 - [ ] root / tooling
 

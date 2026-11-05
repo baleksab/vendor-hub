@@ -43,7 +43,7 @@ export default function BecomeVendor({ actionData }: Route.ComponentProps) {
   const fields = actionData?.fields;
 
   return (
-    <Stack component="section" gap="md" py={{ base: "md", sm: "xl" }} maw={560} mx="auto">
+    <Stack component="section" gap="md" maw={560} mx="auto">
       <Title order={1}>{t("becomeVendor.title")}</Title>
 
       <Form method="post" noValidate>

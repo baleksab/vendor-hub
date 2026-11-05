@@ -18,7 +18,7 @@ export function meta({ matches }: Route.MetaArgs) {
 
 export default function Home() {
   return (
-    <Stack gap={64} py={{ base: "lg", sm: 56 }}>
+    <Stack gap={64}>
       <Hero />
       <Features />
       <Steps />

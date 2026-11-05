@@ -7,7 +7,7 @@ export function VendorSiteContent({ vendor }: { vendor: PublicVendorResponse }) 
   const t = useT();
 
   return (
-    <Stack component="section" gap="lg" py={{ base: "lg", sm: "xl" }} maw={720}>
+    <Stack component="section" gap="lg" maw={720}>
       <Stack gap="xs">
         <Title order={1} fz={{ base: 32, sm: 44 }}>
           {vendor.name}

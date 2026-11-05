@@ -173,6 +173,9 @@ catalogs:
     '@mantine/core':
       specifier: 9.7.4
       version: 9.7.4
+    '@mantine/form':
+      specifier: 9.7.4
+      version: 9.7.4
     '@mantine/hooks':
       specifier: 9.7.4
       version: 9.7.4
@@ -188,6 +191,9 @@ catalogs:
     '@tailwindcss/vite':
       specifier: 4.3.3
       version: 4.3.3
+    '@tanstack/react-query':
+      specifier: 5.105.1
+      version: 5.105.1
     '@types/node':
       specifier: 24.19.2
       version: 24.19.2
@@ -294,6 +300,25 @@ importers:
         specifier: 'catalog:'
         version: 7.0.2
 
+  packages/api-client:
+    dependencies:
+      openapi-fetch:
+        specifier: 'catalog:'
+        version: 0.17.0
+      zod:
+        specifier: 'catalog:'
+        version: 4.6.7
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.19.2
+      '@vendor-hub/types':
+        specifier: workspace:*
+        version: link:../types
+      vitest:
+        specifier: 'catalog:'
+        version: 5.1.0(@types/node@24.19.2)(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+
   packages/remote-test:
     dependencies:
       '@mantine/core':
@@ -397,12 +422,15 @@ importers:
       '@react-router/serve':
         specifier: 8.5.1
         version: 8.5.1(react-router@8.5.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(supports-color@10.2.2)(typescript@7.0.2)
+      '@vendor-hub/api-client':
+        specifier: workspace:*
+        version: link:../api-client
+      '@vendor-hub/ui':
+        specifier: workspace:*
+        version: link:../ui
       isbot:
         specifier: 5.2.2
         version: 5.2.2
-      openapi-fetch:
-        specifier: 'catalog:'
-        version: 0.17.0
       react:
         specifier: 'catalog:'
         version: 19.3.1
@@ -455,6 +483,85 @@ importers:
       typescript:
         specifier: catalog:generator
         version: 5.9.3
+
+  packages/ui:
+    devDependencies:
+      '@mantine/core':
+        specifier: 'catalog:'
+        version: 9.7.4(@mantine/hooks@9.7.4(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@mantine/hooks':
+        specifier: 'catalog:'
+        version: 9.7.4(react@19.3.1)
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.3.0(@types/react@19.3.0)
+      react:
+        specifier: 'catalog:'
+        version: 19.3.1
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.3.1(react@19.3.1)
+
+  packages/user-administrator:
+    dependencies:
+      '@mantine/core':
+        specifier: 'catalog:'
+        version: 9.7.4(@mantine/hooks@9.7.4(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@mantine/form':
+        specifier: 'catalog:'
+        version: 9.7.4(react@19.3.1)
+      '@mantine/hooks':
+        specifier: 'catalog:'
+        version: 9.7.4(react@19.3.1)
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.105.1(@types/react@19.3.0)(react@19.3.1)
+      '@vendor-hub/api-client':
+        specifier: workspace:*
+        version: link:../api-client
+      '@vendor-hub/ui':
+        specifier: workspace:*
+        version: link:../ui
+      react:
+        specifier: 'catalog:'
+        version: 19.3.1
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.3.1(react@19.3.1)
+      react-router:
+        specifier: 8.5.1
+        version: 8.5.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+    devDependencies:
+      '@module-federation/vite':
+        specifier: 'catalog:'
+        version: 1.23.7(typescript@7.0.2)(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+      '@tailwindcss/vite':
+        specifier: 'catalog:'
+        version: 4.3.3(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.19.2
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.3.0(@types/react@19.3.0)
+      '@vendor-hub/types':
+        specifier: workspace:*
+        version: link:../types
+      '@vitejs/plugin-react':
+        specifier: 'catalog:'
+        version: 6.1.2(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.3
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
 
 packages:
 
@@ -1064,6 +1171,11 @@ packages:
       react: ^19.2.0
       react-dom: ^19.2.0
 
+  '@mantine/form@9.7.4':
+    resolution: {integrity: sha512-p8cImC+VgKKKRc6HJGlFtGAKNbKyHtKyDIgNJeoqUBQ1beUfQlEh0I6lmTmWCzGlijVUE+GdNJWveNr0PQKRIw==}
+    peerDependencies:
+      react: ^19.2.0
+
   '@mantine/hooks@9.7.4':
     resolution: {integrity: sha512-j6Xf9Sc1fhhGEKXg6BZA2geyP/Czqvo6Rsi0IduOCWgwl/MAAJbKRjRc7xe2+9vePLdfqLZqRIAOY5rta88uNA==}
     peerDependencies:
@@ -1635,6 +1747,9 @@ packages:
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
 
+  '@standard-schema/spec@1.1.0':
+    resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
+
   '@tailwindcss/node@4.3.3':
     resolution: {integrity: sha512-/T8IKEsf9VTU6tLjgC7+sv2mOPtQxzE2jMw7u4Tt40Tx+QSZxpzh95/H6cMKoja9XuW7iMdLJYBB0o9G1CaAgg==}
 
@@ -1728,6 +1843,18 @@ packages:
     resolution: {integrity: sha512-yYU8cogLeSh/ms2jh8Fj7jaba/EWa7Ja6GoUqYZaraEuCI5YS6ms6ObZgjjedm+jm6XZjdNRWBpPP6Z86oOxcw==}
     peerDependencies:
       vite: ^5.2.0 || ^6 || ^7 || ^8
+
+  '@tanstack/query-core@5.105.1':
+    resolution: {integrity: sha512-B/rNlZoZ54w1dlddiUt9oEe1SLM+37c00SKLJEg9YH+7as3Y54P81o9Fh+2ujZ36tXPnQJ5oVe7AcyEWkyFhPg==}
+
+  '@tanstack/react-query@5.105.1':
+    resolution: {integrity: sha512-qcu+/+PtBOjW8qU4/0l47QVmNG7hPOWsCLzP0bTRhE1X7HYa757C4732wXTUH0QhCjTV1yedX8onsCiEwlNYrA==}
+    peerDependencies:
+      '@types/react': ^18 || ^19
+      react: ^18 || ^19
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
 
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
@@ -2468,6 +2595,10 @@ packages:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
     engines: {node: '>=6'}
     hasBin: true
+
+  klona@2.0.6:
+    resolution: {integrity: sha512-dhG34DXATL5hSxJbIexCft8FChFXtmskoZYnoPWjXQuebWYCNkVeV3KkGegCK9CP1oswI/vQibS2GY7Em/sJJA==}
+    engines: {node: '>= 8'}
 
   light-my-request@6.8.0:
     resolution: {integrity: sha512-5Q8PjoSEdtGIB8fikZsTem5vgRo4F2mR6vUKTDW/H1g6MtAt8e3duQbg/QxL5yzg6BZhor2KOUm3hhWMWLTZwg==}
@@ -3800,6 +3931,13 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
 
+  '@mantine/form@9.7.4(react@19.3.1)':
+    dependencies:
+      '@standard-schema/spec': 1.1.0
+      fast-deep-equal: 3.1.3
+      klona: 2.0.6
+      react: 19.3.1
+
   '@mantine/hooks@9.7.4(react@19.3.1)':
     dependencies:
       react: 19.3.1
@@ -4180,6 +4318,8 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.1': {}
 
+  '@standard-schema/spec@1.1.0': {}
+
   '@tailwindcss/node@4.3.3':
     dependencies:
       '@jridgewell/remapping': 2.3.5
@@ -4247,6 +4387,15 @@ snapshots:
       '@tailwindcss/oxide': 4.3.3
       tailwindcss: 4.3.3
       vite: 8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
+
+  '@tanstack/query-core@5.105.1': {}
+
+  '@tanstack/react-query@5.105.1(@types/react@19.3.0)(react@19.3.1)':
+    dependencies:
+      '@tanstack/query-core': 5.105.1
+      react: 19.3.1
+    optionalDependencies:
+      '@types/react': 19.3.0
 
   '@types/chai@5.2.3':
     dependencies:
@@ -4888,6 +5037,8 @@ snapshots:
   json-schema-traverse@1.0.0: {}
 
   json5@2.2.3: {}
+
+  klona@2.0.6: {}
 
   light-my-request@6.8.0:
     dependencies:

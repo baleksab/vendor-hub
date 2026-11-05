@@ -1,6 +1,6 @@
 import { data } from "react-router";
 
-import { ApiError } from "../../api/ApiError";
+import { ApiError } from "@vendor-hub/api-client";
 import { getVendorBySlug } from "../../api/endpoints/vendors.server";
 import { createPageMeta } from "../../seo/createMeta";
 import { pageMeta, readRootData } from "../../seo/pageMeta";

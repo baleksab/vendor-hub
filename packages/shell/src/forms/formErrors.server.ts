@@ -1,7 +1,7 @@
 import { data } from "react-router";
 import type { ZodError } from "zod";
 
-import { ApiError, networkError } from "../api/ApiError";
+import { ApiError, networkError } from "@vendor-hub/api-client";
 import { describeError, type ErrorContext } from "./describeError";
 
 export type FormErrors = {

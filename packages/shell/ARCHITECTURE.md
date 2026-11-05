@@ -16,11 +16,12 @@ packages/shell/
 │   │   ├── BecomeVendor/   vendor registration form, becomeVendorAction.server.ts, noindex
 │   │   ├── Login/          login form, loginAction.server.ts, noindex
 │   │   ├── Register/       registration form, registerAction.server.ts, countries from the API, noindex
-│   │   ├── RemoteTest/     components/ (RemoteSlot, RemoteErrorBoundary, RemoteFallback), loadWidget.ts
+│   │   ├── RemoteTest/     loads `remote-test/Widget`
+│   │   ├── Admin/          `/admin/*`, loader allows administrators only, mounts the user-administrator remote, noindex
 │   │   └── NotFound/       splat route, 404 + noindex
-│   ├── components/         shared: AppLayout, NavLink, LanguageSwitcher, UserMenu, FormField, FormAlert
+│   ├── components/         shared: AppLayout, NavLink, LanguageSwitcher, UserMenu, FormField, FormAlert, RemoteSlot, RemoteErrorBoundary, RemoteFallback
 │   ├── hooks/              shared: useIsClient, useSession
-│   ├── api/                typed openapi-fetch clients, `unwrap`, ApiError, problem+json schema
+│   ├── api/                createServerApi (client from `@vendor-hub/api-client`)
 │   │   └── endpoints/      one `*.server.ts` per resource (auth, users, countries, vendors), the only place that knows API paths
 │   ├── forms/              shared form helpers: readValues, invalid, failed, FormErrors, describeError, common Zod fields
 │   ├── auth/               session cookie, getSession/requireUser, signIn, same-origin check, safeRedirect
@@ -28,10 +29,10 @@ packages/shell/
 │   ├── vendor/             vendorPaths.ts (`/vendors` and `vendorPath(slug)`), myVendors.server.ts (per-request cache), vendorList.server.ts (vendor list page)
 │   ├── env.server.ts       cached env for server-only code
 │   ├── seo/                createPageMeta, pageMeta, buildRobots, buildSitemap, indexablePages
-│   ├── routes/             resource routes only: locale.ts, logout.ts, robots.txt.ts, sitemap.xml.ts
+│   ├── proxy/              forwardApiRequest.server.ts, proxyAllowlist.ts
+│   ├── routes/             resource routes only: locale.ts, logout.ts, apiProxy.ts, robots.txt.ts, sitemap.xml.ts
 │   ├── i18n/               locales, messages (en, sr), createT, LocaleProvider, server-side resolveLocale
-│   ├── remote.ts           Module Federation runtime instance
-│   ├── theme.ts            Mantine theme
+│   ├── remote.ts           Module Federation runtime instance, loadRemoteModule
 │   ├── globals.d.ts        MANTINE_VERSION global
 │   └── app.css             layer order, Tailwind, Mantine CSS
 ├── public/                 favicon.svg
@@ -46,7 +47,7 @@ packages/shell/
 ## Server side
 
 - `root.tsx` has the `loader` that reads env with `getEnv()` (cached `readShellEnv(process.env)`) and returns the locale, the public origin, the remote manifest URL, the current user and the vendors of that user (`GET /vendors/me`, cached per request, `null` if the call fails). Env is read on the server only; the client gets the URL as loader data.
-- `Layout` renders the HTML document with `mantineHtmlProps`, `ColorSchemeScript` in `<head>` and `MantineProvider` (theme from `src/theme.ts`) around the children. Mantine is server-rendered; its CSS is static, so SSR needs no style extraction.
+- `Layout` renders the HTML document with `mantineHtmlProps`, `ColorSchemeScript` in `<head>` and `MantineProvider` (theme from `@vendor-hub/ui`) around the children. Mantine is server-rendered; its CSS is static, so SSR needs no style extraction.
 - `Layout` renders the HTML document. SSR output includes the route markup and, for remote routes, a skeleton.
 - `pnpm build` produces `build/`; `pnpm start` runs `scripts/start.mjs`, which checks the env keys and maps `SHELL_HOST`/`SHELL_PORT` to the `HOST`/`PORT` that `react-router-serve` expects.
 
@@ -63,19 +64,23 @@ browser --(HttpOnly cookie, same origin)--> shell server --(Authorization: Beare
 - The cookie (`auth/sessionCookie.server.ts`) is `HttpOnly`, `SameSite=Lax`, `Path=/`, `Secure` from env, with `Max-Age` from `expiresIn`. It holds the signed JWT as is, the shell cannot verify it, only the API does.
 - CSRF: `assertSameOrigin` requires `Origin` equal to `SHELL_ORIGIN` on every non-GET request to these actions, on top of `SameSite=Lax`.
 - `getSession(request)` (`auth/session.server.ts`) calls `GET /api/v1/users/me` once per request and clears the cookie if the API answers `401`. The root loader returns the `user`, so the first paint already has the right header, and `useSession` just reads it. `requireUser` redirects to `/login?redirectTo=...`, `redirectIfAuthenticated` is used by the login and register loaders. `redirectTo` is accepted only as a same-origin relative path (`auth/safeRedirect.ts`). The target is built with `requestTarget`, which strips the `.data` suffix and `_routes` param that single fetch adds to client-side navigation requests.
-- There is no client-side API client and no data library: everything that needs the API runs in loaders and actions on the server. A client-side client (and a proxy that adds the token from the cookie) is added when a remote needs to call the API.
+- Pages of the shell have no client-side API client: everything they need runs in loaders and actions on the server. Remotes that must call the API from the browser use the API proxy below.
 
-API calls use `openapi-fetch` with the `paths` type generated into `@vendor-hub/types`, so paths, methods, bodies and responses are checked by `tsc`. `createServerApi(token?)` builds the client, and every call is wrapped in `unwrap` (`api/createApiClient.ts`). Calls are defined once per resource in `api/endpoints/*.server.ts`, and actions and loaders use those functions instead of building requests themselves.
+### API proxy
 
-API errors go through `ApiError` (`api/ApiError.ts`): `unwrap` turns every failed call (HTTP error or network failure) into `status`, `kind`, `title`, `detail` and `fieldErrors` parsed from `application/problem+json`. `describeError` (`forms/describeError.ts`) maps them to i18n keys for the forms (wrong credentials never say which field was wrong, a duplicate email lands on the email field).
+`routes/apiProxy.ts` is registered as `api/v1/*` and handles every method through `proxy/forwardApiRequest.server.ts`. It answers `404` for anything outside the allowlist (`proxy/proxyAllowlist.ts`: `GET` and `PATCH` on `/api/v1/users` and `/api/v1/users/:id`, and `GET /api/v1/countries`), checks the `Origin` on non-GET requests (`assertSameOrigin`), answers `401` without a session cookie, and forwards method, path, query and body to `API_URL` with `Authorization: Bearer <token>` from the cookie. The `Cookie` header and other request headers are not forwarded, the response keeps only the status and `Content-Type`, and a failed upstream call becomes `502`. Adding a path to the allowlist is a deliberate change.
+
+API calls use `openapi-fetch` with the `paths` type generated into `@vendor-hub/types`, so paths, methods, bodies and responses are checked by `tsc`. `createServerApi(token?)` builds the client, and every call is wrapped in `unwrap` (`@vendor-hub/api-client`). Calls are defined once per resource in `api/endpoints/*.server.ts`, and actions and loaders use those functions instead of building requests themselves.
+
+API errors go through `ApiError` (`@vendor-hub/api-client`): `unwrap` turns every failed call (HTTP error or network failure) into `status`, `kind`, `title`, `detail` and `fieldErrors` parsed from `application/problem+json`. `describeError` (`forms/describeError.ts`) maps them to i18n keys for the forms (wrong credentials never say which field was wrong, a duplicate email lands on the email field).
 
 Forms are a plain `<Form method="post">` with Mantine inputs. The action validates with the Zod schema next to the page (`pages/Login/loginSchema.ts`, `pages/Register/registerSchema.ts`) (messages are i18n keys) and returns `{ form, fields, values }`, which the page shows under the inputs (passwords are never sent back). The forms work without JavaScript. The register form takes its country list from the public `GET /api/v1/countries` (loaded in the route loader, retry with `useRevalidator`), labels come from `Intl.DisplayNames` in the UI language.
 
 ## Layout and pages
 
-`AppLayout` wraps the `Outlet` in a Mantine `AppShell` with a left sidebar, like a chat app. The sidebar has the title, the `NavLink`s (active state from `useMatch`) and, at the bottom, the `LanguageSwitcher` and the `UserMenu` (log in / register buttons, or an avatar with the user name and a log out item). Below `sm` the sidebar is hidden and opens full width from a sticky top bar, closing again on navigation. Content sits in a centered `Container`.
+`AppLayout` wraps the `Outlet` in a Mantine `AppShell` with a left sidebar, like a chat app. The sidebar has the title, the `NavLink`s (active state from `useMatch`) and, at the bottom, the `LanguageSwitcher` and the `UserMenu` (log in / register buttons, or an avatar with the user name and a log out item). Below `sm` the sidebar is hidden and opens full width from a sticky top bar, closing again on navigation. Content sits in a centered `Container` that owns the page padding (`py` `lg`, `56` from `sm`), so pages do not add their own vertical padding.
 
-`theme.ts` follows the GitHub (Primer) design system: a blue primary color, GitHub gray and dark scales, the system font stack with 14px body text, weight 600 headings, a 6px radius and flat bordered cards. Sizes are compact from `sm` up (44px touch targets below). `cssVariablesResolver` sets the dark-scheme border color.
+The theme (`@vendor-hub/ui`, `src/theme.ts`) follows the GitHub (Primer) design system: a blue primary color, GitHub gray and dark scales, the system font stack with 14px body text, weight 600 headings, a 6px radius and flat bordered cards. Sizes are compact from `sm` up (44px touch targets below). `cssVariablesResolver` sets the dark-scheme border color.
 
 ## SEO
 
@@ -89,15 +94,19 @@ New language: add `messages/<code>.ts`, register it in `catalogs` in `i18n/index
 
 ## Loading a remote
 
-`src/remote.ts` creates one `@module-federation/runtime` instance (`createInstance`) with the list of remotes and the `shared` config. It does not use the `@module-federation/vite` plugin. `react`, `react-dom`, `@mantine/core` and `@mantine/hooks` are provided as `singleton` with the shell's own copy. The Mantine version comes from the `MANTINE_VERSION` global, which `vite.config.ts` fills from the installed package.
+`src/remote.ts` creates one `@module-federation/runtime` instance (`createInstance`) with the list of remotes and the `shared` config. It does not use the `@module-federation/vite` plugin. `react`, `react-dom`, `react-router`, `@mantine/core` and `@mantine/hooks` are provided as `singleton` with the shell's own copy. `react-router` is shared so that the `<Routes>` of a remote follow the shell's router. The Mantine and React Router versions come from the `MANTINE_VERSION` and `REACT_ROUTER_VERSION` globals, which `vite.config.ts` fills from the installed packages.
 
-`pages/RemoteTest/RemoteTest.tsx` does the loading (`components/RemoteSlot.tsx`, `loadWidget.ts`):
+`RemoteTest` and `Admin` do the loading with `loadRemoteModule` (`remote.ts`, caches the promise per module) inside `components/RemoteSlot` (error boundary + `Suspense`):
 
 1. `useIsClient` (`hooks/useIsClient`, built on `useSyncExternalStore`) is `false` on the server and during hydration, so the server and the first client render both show a skeleton. No hydration mismatch.
-2. After hydration the route calls `loadRemote("remote-test/Widget")` and caches the promise per manifest URL.
+2. After hydration the route calls `loadRemoteModule` for the module (`remote-test/Widget`, `user-administrator/UserAdministrator`).
 3. The module is read with `use()` inside `Suspense`, wrapped in an error boundary that shows a message if the remote cannot be loaded.
 
-A new remote means: a new entry in `remotes` in `remote.ts`, a manifest URL key in `env.ts` and the env files, and a route that loads it the same way.
+A new remote means: a new entry in `remotes` and `RemoteName` in `remote.ts`, a manifest URL key in `env.ts`, the env files and `scripts/start.mjs`, and a route that loads it the same way.
+
+### Administration
+
+`Admin` (`/admin/*`) has a loader that calls `requireUser` and throws `403` when the user is not an administrator (`shouldRevalidate` is `false`, so navigating inside the remote does not call the API again). The component renders `user-administrator/UserAdministrator` with `locale`, `apiBaseUrl` (the shell origin) and `onUnauthorized`, which sends the user to `/login?redirectTo=...`. The "Administration" link in the sidebar is shown to administrators only. The authorization itself is enforced by the API.
 
 ## Tests
 
@@ -108,7 +117,7 @@ CI (`.github/workflows/checks.yml`) runs format, lint, typecheck, build and unit
 ## Rules specific to this package
 
 - React Router packages are pinned here and must all match.
-- `react` and `react-dom` stay `singleton` in the `shared` config in `remote.ts`.
+- `react`, `react-dom` and `react-router` stay `singleton` in the `shared` config in `remote.ts`.
 - Nothing in the shell may assume a remote runs on the server.
 - API types come from `@vendor-hub/types`, a devDependency used with `import type` only, so nothing from it ends up in the bundle.
 

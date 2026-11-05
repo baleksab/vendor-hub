@@ -62,7 +62,7 @@ export default function Register({ actionData }: Route.ComponentProps) {
   }, [countries, locale]);
 
   return (
-    <Stack component="section" gap="md" py={{ base: "md", sm: "xl" }} maw={560} mx="auto">
+    <Stack component="section" gap="md" maw={560} mx="auto">
       <Title order={1}>{t("register.title")}</Title>
 
       {countries === null ? (

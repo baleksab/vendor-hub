@@ -1,8 +1,7 @@
 import type { PasswordHasher } from "../auth/password.service.ts";
 import { BadRequestError, NotFoundError } from "../shared/errors.ts";
-import type { Page } from "../shared/pagination.ts";
 import type { User, UserPatch } from "./user.ts";
-import type { CreateUserRequest, UpdateUserRequest } from "./users.schemas.ts";
+import type { CreateUserRequest, ListUsersQuery, UpdateUserRequest } from "./users.schemas.ts";
 import type { UsersRepository } from "./users.repository.ts";
 
 export class UsersService {
@@ -34,8 +33,8 @@ export class UsersService {
     return user;
   }
 
-  async list(page: Page): Promise<{ items: User[]; total: number }> {
-    return this.repository.list(page);
+  async list(query: ListUsersQuery): Promise<{ items: User[]; total: number }> {
+    return this.repository.list(query);
   }
 
   async update(id: string, request: UpdateUserRequest, actorId?: string): Promise<User> {

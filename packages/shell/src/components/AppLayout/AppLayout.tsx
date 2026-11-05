@@ -6,6 +6,7 @@ import { Link, useLocation } from "react-router";
 import { useSession } from "../../hooks/useSession/useSession";
 import { useT } from "../../i18n/LocaleProvider";
 import { LanguageSwitcher } from "../LanguageSwitcher/LanguageSwitcher";
+import type { NavIconName } from "../NavIcon/NavIcon";
 import { NavLink } from "../NavLink/NavLink";
 import { UserMenu } from "../UserMenu/UserMenu";
 
@@ -24,16 +25,20 @@ export function AppLayout({ children }: { children: ReactNode }) {
     closeMobile();
   }, [location.key, closeMobile]);
 
-  const { vendors } = useSession();
+  const { user, vendors } = useSession();
 
-  const links = [
-    { to: "/", label: t("nav.home") },
-    { to: "/vendors", label: t("nav.vendors") },
-    { to: "/remote-test", label: t("nav.remoteTest") },
+  const links: { to: string; label: string; icon: NavIconName }[] = [
+    { to: "/", label: t("nav.home"), icon: "home" },
+    { to: "/vendors", label: t("nav.vendors"), icon: "vendors" },
+    { to: "/remote-test", label: t("nav.remoteTest"), icon: "remoteTest" },
   ];
 
   if (vendors === null || vendors.owned === null) {
-    links.push({ to: "/become-vendor", label: t("nav.becomeVendor") });
+    links.push({ to: "/become-vendor", label: t("nav.becomeVendor"), icon: "becomeVendor" });
+  }
+
+  if (user?.role === "administrator") {
+    links.push({ to: "/admin/users", label: t("nav.administration"), icon: "administration" });
   }
 
   return (
@@ -95,7 +100,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </Anchor>
         </Group>
 
-        <Container size="md" px="md">
+        <Container
+          size="md"
+          px="md"
+          py={{ base: "lg", sm: 56 }}
+          display="flex"
+          mih={{ base: `calc(100dvh - ${TOP_BAR_HEIGHT}px)`, sm: "100dvh" }}
+          style={{ flexDirection: "column" }}
+        >
           {children}
         </Container>
       </AppShell.Main>

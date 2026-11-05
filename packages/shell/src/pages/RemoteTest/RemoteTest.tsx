@@ -1,13 +1,17 @@
 import { Text, Title } from "@mantine/core";
+import { use, type ComponentType } from "react";
 import { useRouteLoaderData } from "react-router";
 
+import { RemoteFallback } from "../../components/RemoteFallback/RemoteFallback";
+import { RemoteSlot } from "../../components/RemoteSlot/RemoteSlot";
 import { useIsClient } from "../../hooks/useIsClient/useIsClient";
 import { useT } from "../../i18n/LocaleProvider";
+import { loadRemoteModule, type RemoteManifestUrls } from "../../remote";
 import type { loader as rootLoader } from "../../root";
 import { pageMeta } from "../../seo/pageMeta";
 import type { Route } from "./+types/RemoteTest";
-import { RemoteFallback } from "./components/RemoteFallback";
-import { RemoteSlot } from "./components/RemoteSlot";
+
+type WidgetModule = { default: ComponentType };
 
 export function meta({ matches }: Route.MetaArgs) {
   return pageMeta(matches, {
@@ -15,6 +19,14 @@ export function meta({ matches }: Route.MetaArgs) {
     descriptionKey: "seo.remoteTest.description",
     path: "/remote-test",
   });
+}
+
+function RemoteWidget({ manifestUrls }: { manifestUrls: RemoteManifestUrls }) {
+  const { default: Widget } = use(
+    loadRemoteModule<WidgetModule>(manifestUrls, "remote-test/Widget"),
+  );
+
+  return <Widget />;
 }
 
 export default function RemoteTest() {
@@ -32,7 +44,12 @@ export default function RemoteTest() {
       </Text>
 
       {isClient && data ? (
-        <RemoteSlot manifestUrl={data.remoteTestManifestUrl} />
+        <RemoteSlot
+          errorTitle={t("remoteTest.error.title")}
+          errorMessage={t("remoteTest.error.message")}
+        >
+          <RemoteWidget manifestUrls={data.remoteManifestUrls} />
+        </RemoteSlot>
       ) : (
         <RemoteFallback />
       )}

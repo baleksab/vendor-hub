@@ -7,8 +7,11 @@ projekat/
 ├── packages/
 │   ├── shell/          host app, React Router 8 framework mode, SSR
 │   ├── remote-test/    test remote, Vite + Module Federation, client-only
+│   ├── user-administrator/ remote with the admin user pages (TanStack Query, React Router routes)
 │   ├── server/         REST API, Fastify + Zod (not part of the microfrontend runtime)
 │   └── types/          API types generated from the server's OpenAPI document (@vendor-hub/types)
+│   ├── api-client/     shared typed fetch client, unwrap, ApiError (@vendor-hub/api-client)
+│   └── ui/             Mantine theme, design tokens, common components (@vendor-hub/ui)
 ├── infra/nginx/        nginx template for the site (docker compose service)
 ├── pnpm-workspace.yaml workspace + dependency catalog
 ├── tsconfig.base.json  shared compiler options
@@ -21,9 +24,18 @@ projekat/
 
 1. The browser requests a page from the shell. The shell renders HTML on the server (SSR). Routes that need a remote render a skeleton on the server.
 2. After hydration the shell loads the remote's `mf-manifest.json` through `@module-federation/runtime`, then the exposed module, and renders it in place of the skeleton.
-3. `react`, `react-dom`, `@mantine/core` and `@mantine/hooks` are `singleton` shared modules: the shell provides its copy, the remote uses it. There is exactly one React and one Mantine at runtime, so remote components see the shell's `MantineProvider` (theme and color scheme).
+3. `react`, `react-dom`, `react-router`, `@mantine/core` and `@mantine/hooks` are `singleton` shared modules: the shell provides its copy, the remote uses it. There is exactly one React and one Mantine at runtime, so remote components see the shell's `MantineProvider` (theme and color scheme).
 
-The remote's manifest URL is not hardcoded in the shell. The root loader reads it from env and passes it to the client.
+The remotes' manifest URLs are not hardcoded in the shell. The root loader reads them from env and passes them to the client.
+
+## Administration
+
+```
+browser --> nginx --> shell /admin/users   (loader: administrators only) --> user-administrator remote (client)
+browser --> nginx --> shell /api/v1/users  (proxy: adds Bearer from the HttpOnly cookie) --> API
+```
+
+The `user-administrator` remote is mounted at `admin/*`. It calls the shell's own origin, and a resource route `api/v1/*` forwards an allowlisted set of paths (`/users` and the public `GET /countries`) to the API with the token from the cookie, so the JWT never reaches client JS and no CORS is needed. Authorization stays in the API.
 
 ## Vendor sites
 
@@ -46,7 +58,7 @@ The server's Zod schemas are the single source of truth. `@fastify/swagger` turn
 
 ## UI: Mantine
 
-- The shell owns the theme (`src/theme.ts`), the `MantineProvider`, `ColorSchemeScript` and the global Mantine CSS (`@mantine/core/styles.layer.css`).
+- The theme lives in `@vendor-hub/ui` (`src/theme.ts`) and the shell applies it in its `MantineProvider`; the shell owns the `MantineProvider`, `ColorSchemeScript` and the global Mantine CSS (`@mantine/core/styles.layer.css`).
 - An embedded remote uses Mantine components without its own provider and without importing Mantine CSS. Only a remote's standalone entry (`main.tsx`) adds a provider and the CSS.
 - Tailwind stays for layout. Both CSS files declare `@layer theme, base, mantine, components, utilities;` so utilities can override Mantine.
 - `@mantine/core` and `@mantine/hooks` must always have the same version (catalog).
@@ -59,7 +71,7 @@ The server's Zod schemas are the single source of truth. `@fastify/swagger` turn
 
 ## Configuration
 
-No hosts, ports or URLs in code. Each package has `.env` (keys with empty values and comments, documents the contract) and `.env.local` (committed local values, never secrets; secrets go to the gitignored `.env.secret`), read through that package's `env.ts`, which throws on a missing key. Ports are changed in `.env.local` files only: the shell's manifest URL and origin, and the remote's public origin and allowed CORS origins.
+No hosts, ports or URLs in code. Each package has `.env` (keys with empty values and comments, documents the contract) and `.env.local` (committed local values, never secrets; secrets go to the gitignored `.env.secret`), read through that package's `env.ts`, which throws on a missing key. Ports are changed in `.env.local` files only: the shell's manifest URLs and origin, and each remote's public origin and allowed CORS origins.
 
 ## Tooling
 
@@ -78,8 +90,8 @@ No hosts, ports or URLs in code. Each package has `.env` (keys with empty values
 | `pnpm db:up` / `db:down`       | start / stop Postgres (Docker Compose)   |
 | `pnpm db:reset`                | stop Postgres and delete its volume      |
 | `pnpm types:generate`          | regenerate API types (server must run)   |
-| `pnpm build`                   | remote, then shell, then server          |
-| `pnpm test`                    | Vitest in shell and server               |
+| `pnpm build`                   | remotes, then shell, then server         |
+| `pnpm test`                    | Vitest in shell, server and api-client   |
 | `pnpm lint` / `lint:fix`       | oxlint                                   |
 | `pnpm typecheck`               | typecheck in every package               |
 | `pnpm check`                   | lint + typecheck + build                 |

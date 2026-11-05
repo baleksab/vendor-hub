@@ -142,6 +142,25 @@ describe("users and auth routes", () => {
     expect(get.statusCode).toBe(200);
   });
 
+  it("filters the list by search, role and country", async () => {
+    const headers = await adminBearer();
+
+    await register({ ...validUser, email: "milica@example.com", firstName: "Milica" });
+    await register({ ...validUser, email: "petar@example.com", firstName: "Petar" });
+
+    const bySearch = await app.inject({ method: "GET", url: "/api/v1/users?search=mili", headers });
+    const byRole = await app.inject({
+      method: "GET",
+      url: "/api/v1/users?role=administrator",
+      headers,
+    });
+    const byCountry = await app.inject({ method: "GET", url: "/api/v1/users?country=DE", headers });
+
+    expect(bySearch.json().meta.total).toBe(1);
+    expect(byRole.json().meta.total).toBe(1);
+    expect(byCountry.json().meta.total).toBe(0);
+  });
+
   it("patches one field and leaves the others unchanged", async () => {
     const headers = await adminBearer();
     const target = (await register({ ...validUser, email: "other@example.com" })).json();

@@ -17,6 +17,8 @@ import {
   useRouteLoaderData,
 } from "react-router";
 
+import { cssVariablesResolver, theme } from "@vendor-hub/ui";
+
 import { getEnv } from "./env.server";
 import { getSession } from "./auth/session.server";
 import type { Route } from "./+types/root";
@@ -25,7 +27,6 @@ import { AppLayout } from "./components/AppLayout/AppLayout";
 import { LOCALES } from "./i18n/locales";
 import { LocaleProvider, useT } from "./i18n/LocaleProvider";
 import { resolveLocale } from "./i18n/server";
-import { cssVariablesResolver, theme } from "./theme";
 import { loadMyVendors } from "./vendor/myVendors.server";
 
 export function links(): Route.LinkDescriptors {
@@ -43,7 +44,10 @@ export async function loader({ request }: Route.LoaderArgs) {
     {
       locale,
       origin: env.origin,
-      remoteTestManifestUrl: env.remoteTestManifestUrl,
+      remoteManifestUrls: {
+        "remote-test": env.remoteTestManifestUrl,
+        "user-administrator": env.userAdministratorManifestUrl,
+      },
       user: session?.user ?? null,
       vendors,
     },

@@ -1,4 +1,4 @@
-import { ApiError } from "../api/ApiError";
+import { ApiError } from "@vendor-hub/api-client";
 
 export type ErrorContext = "login" | "register" | "vendor" | "generic";
 

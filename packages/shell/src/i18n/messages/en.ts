@@ -111,6 +111,12 @@ export const en = {
   "vendors.error": "Could not load the vendors.",
   "vendors.pagination": "Vendor pages",
   "nav.becomeVendor": "Become a vendor",
+  "nav.administration": "User Administration",
+  "remote.loading": "Module is loading...",
+  "admin.error.title": "Error",
+  "admin.error.message": "Could not load the administration.",
+  "seo.admin.title": "Administration",
+  "seo.admin.description": "Manage the users of Vendor Hub.",
   "validation.tooShort": "This value is too short.",
   "validation.slug":
     "Use 3 to 40 lowercase letters, digits or single hyphens, not at the start or end.",

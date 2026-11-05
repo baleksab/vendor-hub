@@ -1,6 +1,6 @@
 import { ConflictError } from "../shared/errors.ts";
-import type { Page } from "../shared/pagination.ts";
 import type { NewUser, User, UserCredentials, UserPatch } from "../users/user.ts";
+import type { ListUsersQuery } from "../users/users.schemas.ts";
 import type { UsersRepository } from "../users/users.repository.ts";
 
 type StoredUser = User & { passwordHash: string; isDeleted: boolean };
@@ -31,12 +31,21 @@ export class InMemoryUsersRepository implements UsersRepository {
     return row && this.toUser(row);
   }
 
-  async list(page: Page): Promise<{ items: User[]; total: number }> {
-    const live = this.live();
+  async list(query: ListUsersQuery): Promise<{ items: User[]; total: number }> {
+    const search = query.search?.toLowerCase();
+    const matching = this.live().filter(
+      (row) =>
+        (search === undefined ||
+          `${row.email} ${row.firstName} ${row.lastName}`.toLowerCase().includes(search)) &&
+        (query.role === undefined || row.role === query.role) &&
+        (query.country === undefined || row.country === query.country),
+    );
 
     return {
-      items: live.slice(page.offset, page.offset + page.limit).map((row) => this.toUser(row)),
-      total: live.length,
+      items: matching
+        .slice(query.offset, query.offset + query.limit)
+        .map((row) => this.toUser(row)),
+      total: matching.length,
     };
   }
 

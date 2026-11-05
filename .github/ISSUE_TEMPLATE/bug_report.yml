@@ -11,6 +11,9 @@ body:
         - remotes
         - server
         - types
+        - api-client
+        - ui
+        - user-administrator
         - infra
         - root / tooling
         - not sure

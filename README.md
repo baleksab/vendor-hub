@@ -22,13 +22,16 @@ SSR serves the public side (fast first paint, SEO for storefronts and products).
                                     └──► server (REST API) ──► PostgreSQL
 ```
 
-| Part    | Package             | Role                                                          |
-| ------- | ------------------- | ------------------------------------------------------------- |
-| Shell   | `packages/shell`    | SSR host: landing page, storefronts, checkout, loads remotes  |
-| Remotes | `packages/remote-*` | Vendor admin panel and statistics (Module Federation, client) |
-| API     | `packages/server`   | REST API and business rules (Fastify, Zod, Postgres)          |
-| Types   | `packages/types`    | API types generated from the server's OpenAPI document        |
-| Proxy   | nginx               | Reverse proxy in front of the shell                           |
+| Part    | Package                       | Role                                                          |
+| ------- | ----------------------------- | ------------------------------------------------------------- |
+| Shell   | `packages/shell`              | SSR host: landing page, storefronts, checkout, loads remotes  |
+| Remotes | `packages/remote-*`           | Vendor admin panel and statistics (Module Federation, client) |
+| API     | `packages/server`             | REST API and business rules (Fastify, Zod, Postgres)          |
+| Types   | `packages/types`              | API types generated from the server's OpenAPI document        |
+| Client  | `packages/api-client`         | Shared typed fetch client (`openapi-fetch`) and `ApiError`    |
+| UI      | `packages/ui`                 | Shared Mantine theme, design tokens and common components     |
+| Admin   | `packages/user-administrator` | Remote with the user administration pages                     |
+| Proxy   | nginx                         | Reverse proxy in front of the shell                           |
 
 Each vendor owns a path (`/vendors/<slug>`), and `/vendors` lists them all. Everything is served from one domain, so adding a vendor never changes the nginx config. The domain is configuration, like every other host and port.
 
@@ -67,15 +70,17 @@ pnpm nginx:up       # nginx on port 80, open http://vendorhub.localhost
 
 `*.localhost` resolves to `127.0.0.1` in Chrome, Firefox and Safari, so no hosts file or DNS setup is needed.
 
-nginx (`infra/nginx`) sends `vendorhub.localhost` to the shell. `pnpm nginx:down` stops it. Its settings are in `infra/nginx/.env.local`; changing the domain or port also means changing `SHELL_ORIGIN` (shell) and `REMOTE_TEST_ALLOWED_ORIGINS` (remote). nginx is optional: without it the shell is also reachable on `localhost:4100`.
+nginx (`infra/nginx`) sends `vendorhub.localhost` to the shell. `pnpm nginx:down` stops it. Its settings are in `infra/nginx/.env.local`; changing the domain or port also means changing `SHELL_ORIGIN` (shell) and `REMOTE_TEST_ALLOWED_ORIGINS` and `USER_ADMINISTRATOR_ALLOWED_ORIGINS` (remotes). nginx is optional: without it the shell is also reachable on `localhost:4100`.
 
-| Service       | URL                                                             |
-| ------------- | --------------------------------------------------------------- |
-| Shell         | `http://vendorhub.localhost` (nginx), upstream `localhost:4100` |
-| Vendor site   | `http://vendorhub.localhost/vendors/<slug>` (nginx)             |
-| Remote (test) | `http://localhost:4101`                                         |
-| API           | `http://localhost:4200` (docs `/docs`)                          |
-| Postgres      | `localhost:5433`                                                |
+| Service             | URL                                                             |
+| ------------------- | --------------------------------------------------------------- |
+| Shell               | `http://vendorhub.localhost` (nginx), upstream `localhost:4100` |
+| Vendor site         | `http://vendorhub.localhost/vendors/<slug>` (nginx)             |
+| Remote (test)       | `http://localhost:4101`                                         |
+| Remote (user admin) | `http://localhost:4102`                                         |
+| Admin pages         | `http://vendorhub.localhost/admin/users` (administrators only)  |
+| API                 | `http://localhost:4200` (docs `/docs`)                          |
+| Postgres            | `localhost:5433`                                                |
 
 Ports are changed only in the `.env.local` files. The shell needs the API running for login and registration, so start `pnpm server:dev` first (the shell's `API_URL` points at it).
 
@@ -98,16 +103,16 @@ Ports are changed only in the `.env.local` files. The shell needs the API runnin
 
 ## Project status
 
-| Area                                   | State                       |
-| -------------------------------------- | --------------------------- |
-| Monorepo, SSR shell, Module Federation | done (test remote only)     |
-| API server, OpenAPI, users and login   | done                        |
-| Shell login, registration, session     | done                        |
-| Vendors, roles, vendor pages           | in progress (server, shell) |
-| Catalog, cart, orders, payment         | planned                     |
-| Admin and statistics remotes, reports  | planned                     |
-| Full-stack `docker compose up`         | planned                     |
-| Specialist track                       | undecided                   |
+| Area                                   | State                                   |
+| -------------------------------------- | --------------------------------------- |
+| Monorepo, SSR shell, Module Federation | done (test remote, user administration) |
+| API server, OpenAPI, users and login   | done                                    |
+| Shell login, registration, session     | done                                    |
+| Vendors, roles, vendor pages           | in progress (server, shell)             |
+| Catalog, cart, orders, payment         | planned                                 |
+| Admin and statistics remotes, reports  | planned                                 |
+| Full-stack `docker compose up`         | planned                                 |
+| Specialist track                       | undecided                               |
 
 ## Documentation
 

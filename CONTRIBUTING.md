@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping out. This repo is a pnpm monorepo for a microfrontend setup: `packages/shell` (React Router 8 SSR host) the remotes in `packages/*` (Module Federation, client-only) `packages/server` (Fastify REST API) and `packages/types` (API types generated from the server's OpenAPI document). Read [`ARCHITECTURE.md`](ARCHITECTURE.md) first, and the `ARCHITECTURE.md` of the package you touch.
+Thanks for helping out. This repo is a pnpm monorepo for a microfrontend setup: `packages/shell` (React Router 8 SSR host) the remotes in `packages/*` (Module Federation, client-only) `packages/server` (Fastify REST API), `packages/types` (API types generated from the server's OpenAPI document), `packages/api-client` (shared fetch client) and `packages/ui` (shared theme and components). Read [`ARCHITECTURE.md`](ARCHITECTURE.md) first, and the `ARCHITECTURE.md` of the package you touch.
 
 ## Getting started
 
@@ -67,7 +67,7 @@ We use [Conventional Commits](https://www.conventionalcommits.org/).
 
 **Types:** `feat`, `fix`, `refactor`, `perf`, `docs`, `test`, `build`, `ci`, `chore`, `revert`.
 
-**Scopes:** `shell`, `remotes`, `server`, `types`, `deps`, `infra` (nginx, docker compose), `repo` (root config, tooling, CI). For a change to one specific remote, use its package name as the scope instead of `remotes`.
+**Scopes:** `shell`, `remotes`, `server`, `types`, `api-client`, `ui`, `user-administrator`, `deps`, `infra` (nginx, docker compose), `repo` (root config, tooling, CI). For a change to one specific remote, use its package name as the scope instead of `remotes`.
 
 Rules for the summary: imperative mood ("add", not "added"), lowercase, no trailing period, up to about 72 characters.
 
@@ -101,9 +101,10 @@ These come from the repo's architecture and are checked in review.
 - **Root has only framework-agnostic devDependencies** (`typescript`, `oxlint`, `oxlint-tsgolint`, `oxfmt`, `husky`). No react, vite, tailwind or router there.
 - **No magic values.** No hosts, ports or URLs in code, configs or scripts. They come from the package's `.env` / `.env.local` through its `env.ts`, which throws on a missing key. No fallbacks.
 - **No secrets in committed env files.** `.env.local` is committed on purpose, so it holds non-secret local values only. Secrets go to the gitignored `.env.secret`; copy `.env.secret.example` to create it.
+- **Browser API calls go through the shell proxy.** The token stays in an HttpOnly cookie. A new path for remotes is added to the allowlist in `packages/shell/src/proxy/proxyAllowlist.ts` on purpose.
 - **Only the shell is SSR.** Remotes load client-side after hydration.
-- **Shared singletons.** `react`, `react-dom`, `@mantine/core` and `@mantine/hooks` stay `singleton` in every `shared` config, and the two Mantine packages share one version.
-- **The shell owns the Mantine theme and CSS.** Embedded remotes use Mantine components without a provider or Mantine CSS.
+- **Shared singletons.** `react`, `react-dom`, `@mantine/core` and `@mantine/hooks` stay `singleton` in every `shared` config, and the two Mantine packages share one version. `react-router` is a singleton too in every remote that uses it, with the same version as the shell.
+- **The theme lives in `@vendor-hub/ui`, the shell applies it.** Embedded remotes use Mantine components without a provider or Mantine CSS.
 - **Lint config.** Root `.oxlintrc.json` has only shared rules. Each package extends it and enables its own plugins.
 - **Lockfile.** Commit `pnpm-lock.yaml` changes together with the dependency change that caused them, and never edit it by hand.
 

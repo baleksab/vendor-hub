@@ -38,7 +38,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
     : "/register";
 
   return (
-    <Stack component="section" gap="md" py={{ base: "md", sm: "xl" }} maw={420} mx="auto">
+    <Stack component="section" gap="md" maw={420} mx="auto">
       <Title order={1}>{t("login.title")}</Title>
 
       {searchParams.has("registered") && <Alert color="green">{t("login.registered")}</Alert>}
