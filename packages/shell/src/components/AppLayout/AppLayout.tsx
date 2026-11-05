@@ -53,15 +53,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         bg="light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8))"
       >
         <Group justify="space-between" wrap="nowrap" mb="md">
-          <Anchor
-            component={Link}
-            to="/"
-            fw={500}
-            fz="xl"
-            ff="heading"
-            c="inherit"
-            underline="never"
-          >
+          <Anchor component={Link} to="/" fw={500} fz="xl" c="inherit" underline="never">
             {t("app.title")}
           </Anchor>
           <Burger opened onClick={closeSidebar} size={44} aria-label={t("nav.close")} />
@@ -91,15 +83,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           bg="var(--mantine-color-body)"
         >
           <Burger opened={false} onClick={openMobile} size={44} aria-label={t("nav.menu")} />
-          <Anchor
-            component={Link}
-            to="/"
-            fw={500}
-            fz="lg"
-            ff="heading"
-            c="inherit"
-            underline="never"
-          >
+          <Anchor component={Link} to="/" fw={500} fz="lg" c="inherit" underline="never">
             {t("app.title")}
           </Anchor>
         </Group>
