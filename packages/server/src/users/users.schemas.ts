@@ -64,7 +64,15 @@ export const UserListResponse = z
   })
   .meta({ id: "UserListResponse" });
 
-export const ListUsersQuery = PaginationQuery;
+const SEARCH_MAX_LENGTH = 100;
+
+export const ListUsersQuery = PaginationQuery.extend({
+  search: z.string().trim().min(1).max(SEARCH_MAX_LENGTH).optional(),
+  role: UserRoleSchema.optional(),
+  country: country.optional(),
+});
+
+export type ListUsersQuery = z.infer<typeof ListUsersQuery>;
 
 export const UserIdParams = z.object({ id: z.uuid() });
 

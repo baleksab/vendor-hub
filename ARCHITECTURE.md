@@ -35,7 +35,7 @@ browser --> nginx --> shell /admin/users   (loader: administrators only) --> use
 browser --> nginx --> shell /api/v1/users  (proxy: adds Bearer from the HttpOnly cookie) --> API
 ```
 
-The `user-administrator` remote is mounted at `admin/*`. It calls the shell's own origin, and a resource route `api/v1/*` forwards an allowlisted set of paths (`/users`) to the API with the token from the cookie, so the JWT never reaches client JS and no CORS is needed. Authorization stays in the API.
+The `user-administrator` remote is mounted at `admin/*`. It calls the shell's own origin, and a resource route `api/v1/*` forwards an allowlisted set of paths (`/users` and the public `GET /countries`) to the API with the token from the cookie, so the JWT never reaches client JS and no CORS is needed. Authorization stays in the API.
 
 ## Vendor sites
 

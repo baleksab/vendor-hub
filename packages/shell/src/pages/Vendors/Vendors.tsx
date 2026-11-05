@@ -44,7 +44,7 @@ export default function Vendors({ loaderData }: Route.ComponentProps) {
   const t = useT();
 
   return (
-    <Stack gap="lg" py={{ base: "lg", sm: "xl" }}>
+    <Stack gap="lg">
       <Title order={1}>{t("vendors.title")}</Title>
       <VendorList vendors={loaderData.vendors} />
     </Stack>

@@ -1,33 +1,84 @@
-import { Anchor, Badge, Pagination, Skeleton, Stack, Table, Text } from "@mantine/core";
+import {
+  Anchor,
+  Avatar,
+  Badge,
+  Button,
+  Group,
+  Pagination,
+  Paper,
+  Select,
+  SimpleGrid,
+  Skeleton,
+  Stack,
+  Table,
+  Text,
+  TextInput,
+} from "@mantine/core";
+import { useDebouncedCallback } from "@mantine/hooks";
+import type { UserListQuery } from "@vendor-hub/types";
 import { EmptyState, ErrorAlert, PageHeader } from "@vendor-hub/ui";
+import { useState } from "react";
 import { Link, useSearchParams } from "react-router";
 
+import { useLocale } from "../../context/LocaleContext";
 import { useT } from "../../context/MessagesContext";
+import { useCountries } from "../../hooks/useCountries";
 import { useUsers } from "../../hooks/useUsers";
 import { userPath } from "../../paths";
+import { PAGE_SIZES, hasActiveFilters, readFilters, writeFilters, type Filters } from "./filters";
 
-const PAGE_SIZE = 20;
-const SKELETON_ROWS = 5;
-const SKELETON_HEIGHT = 36;
+type CountryCode = NonNullable<UserListQuery["country"]>;
 
-function readPage(raw: string | null): number {
-  const page = Number(raw);
-
-  return Number.isInteger(page) && page >= 1 ? page : 1;
-}
+const SEARCH_DEBOUNCE_MS = 300;
+const SKELETON_ROWS = 6;
+const SKELETON_HEIGHT = 44;
+const TABLE_MIN_WIDTH = 640;
+const AVATAR_SIZE = 36;
+const PLACEHOLDER_OPACITY = 0.55;
 
 export default function UserList() {
   const t = useT();
+  const locale = useLocale();
+  const { options: countryOptions, countryName } = useCountries();
   const [searchParams, setSearchParams] = useSearchParams();
-  const page = readPage(searchParams.get("page"));
-  const { data, isPending, isError, refetch } = useUsers({
-    limit: PAGE_SIZE,
-    offset: (page - 1) * PAGE_SIZE,
+  const filters = readFilters(searchParams);
+  const [searchInput, setSearchInput] = useState(filters.search);
+  const knownCountry = countryOptions.some((option) => option.value === filters.country)
+    ? (filters.country as CountryCode)
+    : undefined;
+  const { data, isPending, isError, isPlaceholderData, refetch } = useUsers({
+    limit: filters.pageSize,
+    offset: (filters.page - 1) * filters.pageSize,
+    search: filters.search === "" ? undefined : filters.search,
+    role: filters.role ?? undefined,
+    country: knownCountry,
   });
 
-  const handlePageChange = (next: number) => {
-    setSearchParams(next === 1 ? {} : { page: String(next) });
+  const dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
+
+  const applyFilters = (patch: Partial<Filters>) => {
+    setSearchParams(writeFilters({ ...filters, page: 1, ...patch }), { replace: true });
   };
+
+  const commitSearch = useDebouncedCallback((value: string) => {
+    applyFilters({ search: value.trim() });
+  }, SEARCH_DEBOUNCE_MS);
+
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value);
+    commitSearch(value);
+  };
+
+  const resetFilters = () => {
+    commitSearch.cancel();
+    setSearchInput("");
+    applyFilters({ search: "", role: null, country: null });
+  };
+
+  const roleOptions = [
+    { value: "administrator", label: t("role.administrator") },
+    { value: "regular", label: t("role.regular") },
+  ];
 
   const header = (
     <PageHeader
@@ -36,21 +87,54 @@ export default function UserList() {
     />
   );
 
-  if (isPending) {
-    return (
-      <Stack gap="xs">
-        {header}
-        {Array.from({ length: SKELETON_ROWS }, (_, index) => (
-          <Skeleton key={index} height={SKELETON_HEIGHT} />
-        ))}
-      </Stack>
-    );
-  }
+  const filterBar = (
+    <Paper withBorder radius="md" p="md">
+      <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md" verticalSpacing="sm">
+        <TextInput
+          label={t("users.search.label")}
+          placeholder={t("users.search.placeholder")}
+          value={searchInput}
+          onChange={(event) => handleSearchChange(event.currentTarget.value)}
+          type="search"
+          autoComplete="off"
+        />
+        <Select
+          label={t("users.filter.role")}
+          placeholder={t("users.filter.any")}
+          data={roleOptions}
+          value={filters.role}
+          onChange={(value) =>
+            applyFilters({ role: value === "administrator" || value === "regular" ? value : null })
+          }
+          clearable
+        />
+        <Select
+          label={t("users.filter.country")}
+          placeholder={t("users.filter.any")}
+          data={countryOptions}
+          value={filters.country}
+          onChange={(value) => applyFilters({ country: value })}
+          searchable
+          clearable
+        />
+        <Group align="flex-end" justify="flex-end">
+          <Button
+            variant="default"
+            onClick={resetFilters}
+            disabled={!hasActiveFilters(filters) && searchInput === ""}
+          >
+            {t("users.filter.reset")}
+          </Button>
+        </Group>
+      </SimpleGrid>
+    </Paper>
+  );
 
   if (isError) {
     return (
       <Stack>
         {header}
+        {filterBar}
         <ErrorAlert
           title={t("users.error.title")}
           message={t("users.error.message")}
@@ -61,59 +145,122 @@ export default function UserList() {
     );
   }
 
-  const pageCount = Math.max(1, Math.ceil(data.meta.total / PAGE_SIZE));
+  if (isPending) {
+    return (
+      <Stack gap="md">
+        {header}
+        {filterBar}
+        <Stack gap="xs">
+          {Array.from({ length: SKELETON_ROWS }, (_, index) => (
+            <Skeleton key={index} height={SKELETON_HEIGHT} />
+          ))}
+        </Stack>
+      </Stack>
+    );
+  }
+
+  const { total } = data.meta;
+  const pageCount = Math.max(1, Math.ceil(total / filters.pageSize));
+  const from = (filters.page - 1) * filters.pageSize + 1;
+  const to = Math.min(total, filters.page * filters.pageSize);
+  const filtered = hasActiveFilters(filters);
 
   return (
     <Stack gap="md">
       {header}
+      {filterBar}
 
       {data.data.length === 0 ? (
-        <EmptyState title={t("users.empty.title")} description={t("users.empty.description")} />
+        <Paper withBorder radius="md" p="md">
+          <EmptyState
+            title={filtered ? t("users.emptyFiltered.title") : t("users.empty.title")}
+            description={
+              filtered ? t("users.emptyFiltered.description") : t("users.empty.description")
+            }
+          />
+        </Paper>
       ) : (
-        <Table.ScrollContainer minWidth={560}>
-          <Table highlightOnHover verticalSpacing="sm">
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>{t("users.col.name")}</Table.Th>
-                <Table.Th>{t("users.col.email")}</Table.Th>
-                <Table.Th>{t("users.col.role")}</Table.Th>
-                <Table.Th>{t("users.col.country")}</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {data.data.map((user) => (
-                <Table.Tr key={user.id}>
-                  <Table.Td>
-                    <Anchor component={Link} to={userPath(user.id)} fw={500}>
-                      {user.firstName} {user.lastName}
-                    </Anchor>
-                  </Table.Td>
-                  <Table.Td>
-                    <Text size="sm">{user.email}</Text>
-                  </Table.Td>
-                  <Table.Td>
-                    <Badge
-                      variant={user.role === "administrator" ? "filled" : "light"}
-                      color={user.role === "administrator" ? "primer" : "gray"}
-                    >
-                      {t(`role.${user.role}`)}
-                    </Badge>
-                  </Table.Td>
-                  <Table.Td>{user.country}</Table.Td>
+        <Paper
+          withBorder
+          radius="md"
+          style={{ overflow: "hidden", opacity: isPlaceholderData ? PLACEHOLDER_OPACITY : 1 }}
+        >
+          <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH}>
+            <Table highlightOnHover verticalSpacing="sm" horizontalSpacing="md">
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>{t("users.col.user")}</Table.Th>
+                  <Table.Th>{t("users.col.role")}</Table.Th>
+                  <Table.Th>{t("users.col.country")}</Table.Th>
+                  <Table.Th>{t("users.col.created")}</Table.Th>
                 </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-        </Table.ScrollContainer>
+              </Table.Thead>
+              <Table.Tbody>
+                {data.data.map((user) => (
+                  <Table.Tr key={user.id}>
+                    <Table.Td>
+                      <Group gap="sm" wrap="nowrap">
+                        <Avatar size={AVATAR_SIZE} radius="xl" color="primer">
+                          {user.firstName.charAt(0)}
+                          {user.lastName.charAt(0)}
+                        </Avatar>
+                        <div>
+                          <Anchor component={Link} to={userPath(user.id)} fw={500} size="sm">
+                            {user.firstName} {user.lastName}
+                          </Anchor>
+                          <Text size="xs" c="dimmed">
+                            {user.email}
+                          </Text>
+                        </div>
+                      </Group>
+                    </Table.Td>
+                    <Table.Td>
+                      <Badge
+                        variant={user.role === "administrator" ? "filled" : "light"}
+                        color={user.role === "administrator" ? "primer" : "gray"}
+                      >
+                        {t(`role.${user.role}`)}
+                      </Badge>
+                    </Table.Td>
+                    <Table.Td>
+                      <Text size="sm">{countryName(user.country)}</Text>
+                    </Table.Td>
+                    <Table.Td>
+                      <Text size="sm">{dateFormat.format(new Date(user.createdAt))}</Text>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          </Table.ScrollContainer>
+        </Paper>
       )}
 
-      {pageCount > 1 ? (
-        <Pagination
-          total={pageCount}
-          value={page}
-          onChange={handlePageChange}
-          aria-label={t("users.pagination")}
-        />
+      {total > 0 ? (
+        <Group justify="space-between" align="center">
+          <Group gap="sm">
+            <Text size="sm" c="dimmed">
+              {t("users.range", { from, to, total })}
+            </Text>
+            <Select
+              aria-label={t("users.pageSize")}
+              data={PAGE_SIZES.map((size) => ({ value: String(size), label: String(size) }))}
+              value={String(filters.pageSize)}
+              onChange={(value) => applyFilters({ pageSize: Number(value) })}
+              allowDeselect={false}
+              w={80}
+              size="xs"
+            />
+          </Group>
+          {pageCount > 1 ? (
+            <Pagination
+              total={pageCount}
+              value={filters.page}
+              onChange={(page) => applyFilters({ page })}
+              aria-label={t("users.pagination")}
+            />
+          ) : null}
+        </Group>
       ) : null}
     </Stack>
   );

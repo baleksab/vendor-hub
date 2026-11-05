@@ -10,7 +10,7 @@ packages/user-administrator/
 │   ├── UserAdministrator.tsx   exposed component: QueryClient, contexts, lazy <Routes>
 │   ├── main.tsx                standalone entry: BrowserRouter, ui theme, MantineProvider
 │   ├── paths.ts                USERS_PATH, userPath (the remote is mounted at /admin)
-│   ├── api/                    client.ts, queryKeys.ts (userKeys), users.ts (listUsers, getUser, updateUser)
+│   ├── api/                    client.ts, queryKeys.ts (userKeys), users.ts (listUsers, getUser, updateUser), countries.ts (listCountries)
 │   ├── hooks/                  useUsers, useUser, useUpdateUser
 │   ├── context/                ApiContext (client), MessagesContext (t)
 │   ├── i18n/messages.ts        en and sr texts, createT(locale)
@@ -24,13 +24,14 @@ packages/user-administrator/
 
 `./UserAdministrator` with the props `{ locale, apiBaseUrl, onUnauthorized }` (type `UserAdministratorProps` in `@vendor-hub/types`). It renders `<Routes>` with `users`, `users/:id` and a catch-all redirect to `users`. Both pages are `React.lazy` chunks.
 
-`react`, `react-dom`, `react-router`, `@mantine/core` and `@mantine/hooks` are `singleton` shared modules. `react-router` must be shared so that `<Routes>`, `Link` and `useParams` use the shell's router, and its version must match the shell's. TanStack Query is not shared: the remote owns its `QueryClient`.
+`react`, `react-dom`, `react-router`, `@mantine/core` and `@mantine/hooks` are `singleton` shared modules. `react-router` must be shared so that `<Routes>`, `Link` and `useParams` use the shell's router, and its version must match the shell's. TanStack Query is not shared: the remote owns its `QueryClient`, created once at module level (`api/queryClient.ts`), so the cache survives leaving and re-entering `/admin` (`staleTime` 30 s, inactive queries are dropped after the default 5 min `gcTime`).
 
 ## Data
 
 - All calls use `createApiClient` and `unwrap` from `@vendor-hub/api-client`, with `apiBaseUrl` as base URL. In the shell that is the shell origin, where the `/api/v1/*` proxy adds the token. The browser never holds the JWT.
 - `queryKeys.ts` is the only place that builds query keys. Hooks never write an array literal.
 - `QueryCache` and `MutationCache` call `onUnauthorized` on `ApiError.kind === "unauthorized"`. Queries are not retried on 401, 403 and 404.
+- The list state (`q`, `role`, `country`, `size`, `page`) lives in the URL search params (`pages/UserList/filters.ts`), search is debounced, and any filter change goes back to page 1. Filtering and paging happen on the API (`search`, `role`, `country`, `limit`, `offset`). The country list comes from `GET /api/v1/countries` (cached forever) and is labelled with `Intl.DisplayNames` in the `locale`.
 - `useUpdateUser` writes the response into the detail cache and invalidates the lists.
 - The edit form sends only changed fields (PATCH semantics), the password only when filled. A `validation` error maps `fieldErrors` onto the fields, `conflict` lands on the email.
 

@@ -16,3 +16,5 @@ pnpm-debug.log*
 .env.*.local
 .env.secret*
 !.env.secret.example
+
+.mf/

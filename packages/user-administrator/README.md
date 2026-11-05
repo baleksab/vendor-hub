@@ -1,6 +1,6 @@
 # @mfe/user-administrator
 
-Remote with the administrator pages for user management: a list (`/admin/users`) and a detail/edit page (`/admin/users/:id`). Vite + React, exposed through Module Federation 2, client-only.
+Remote with the administrator pages for user management: a list with search, role and country filters and pagination (`/admin/users`, the filters live in the URL) and a detail/edit page (`/admin/users/:id`). Vite + React, exposed through Module Federation 2, client-only.
 
 ## Stack
 

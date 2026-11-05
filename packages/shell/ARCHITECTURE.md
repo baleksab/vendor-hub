@@ -68,7 +68,7 @@ browser --(HttpOnly cookie, same origin)--> shell server --(Authorization: Beare
 
 ### API proxy
 
-`routes/apiProxy.ts` is registered as `api/v1/*` and handles every method through `proxy/forwardApiRequest.server.ts`. It answers `404` for anything outside the allowlist (`proxy/proxyAllowlist.ts`: `GET` and `PATCH` on `/api/v1/users` and `/api/v1/users/:id`), checks the `Origin` on non-GET requests (`assertSameOrigin`), answers `401` without a session cookie, and forwards method, path, query and body to `API_URL` with `Authorization: Bearer <token>` from the cookie. The `Cookie` header and other request headers are not forwarded, the response keeps only the status and `Content-Type`, and a failed upstream call becomes `502`. Adding a path to the allowlist is a deliberate change.
+`routes/apiProxy.ts` is registered as `api/v1/*` and handles every method through `proxy/forwardApiRequest.server.ts`. It answers `404` for anything outside the allowlist (`proxy/proxyAllowlist.ts`: `GET` and `PATCH` on `/api/v1/users` and `/api/v1/users/:id`, and `GET /api/v1/countries`), checks the `Origin` on non-GET requests (`assertSameOrigin`), answers `401` without a session cookie, and forwards method, path, query and body to `API_URL` with `Authorization: Bearer <token>` from the cookie. The `Cookie` header and other request headers are not forwarded, the response keeps only the status and `Content-Type`, and a failed upstream call becomes `502`. Adding a path to the allowlist is a deliberate change.
 
 API calls use `openapi-fetch` with the `paths` type generated into `@vendor-hub/types`, so paths, methods, bodies and responses are checked by `tsc`. `createServerApi(token?)` builds the client, and every call is wrapped in `unwrap` (`@vendor-hub/api-client`). Calls are defined once per resource in `api/endpoints/*.server.ts`, and actions and loaders use those functions instead of building requests themselves.
 
@@ -78,7 +78,7 @@ Forms are a plain `<Form method="post">` with Mantine inputs. The action validat
 
 ## Layout and pages
 
-`AppLayout` wraps the `Outlet` in a Mantine `AppShell` with a left sidebar, like a chat app. The sidebar has the title, the `NavLink`s (active state from `useMatch`) and, at the bottom, the `LanguageSwitcher` and the `UserMenu` (log in / register buttons, or an avatar with the user name and a log out item). Below `sm` the sidebar is hidden and opens full width from a sticky top bar, closing again on navigation. Content sits in a centered `Container`.
+`AppLayout` wraps the `Outlet` in a Mantine `AppShell` with a left sidebar, like a chat app. The sidebar has the title, the `NavLink`s (active state from `useMatch`) and, at the bottom, the `LanguageSwitcher` and the `UserMenu` (log in / register buttons, or an avatar with the user name and a log out item). Below `sm` the sidebar is hidden and opens full width from a sticky top bar, closing again on navigation. Content sits in a centered `Container` that owns the page padding (`py` `lg`, `56` from `sm`), so pages do not add their own vertical padding.
 
 The theme (`@vendor-hub/ui`, `src/theme.ts`) follows the GitHub (Primer) design system: a blue primary color, GitHub gray and dark scales, the system font stack with 14px body text, weight 600 headings, a 6px radius and flat bordered cards. Sizes are compact from `sm` up (44px touch targets below). `cssVariablesResolver` sets the dark-scheme border color.
 

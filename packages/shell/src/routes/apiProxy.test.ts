@@ -91,7 +91,7 @@ describe("api proxy", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it.each(["/api/v1/vendors", "/api/v1/countries", "/api/v1/users/a/b", "/api/v1/users/..%2Fme"])(
+  it.each(["/api/v1/vendors", "/api/v1/countries/x", "/api/v1/users/a/b", "/api/v1/users/..%2Fme"])(
     "answers 404 for %s",
     async (path) => {
       const response = await call(await proxied(path));
@@ -100,6 +100,12 @@ describe("api proxy", () => {
       expect(fetchMock).not.toHaveBeenCalled();
     },
   );
+
+  it("forwards the country list", async () => {
+    fetchMock.mockResolvedValueOnce(json({ data: ["RS"] }));
+
+    expect((await call(await proxied("/api/v1/countries"))).status).toBe(200);
+  });
 
   it("answers 404 for a method outside the allowlist", async () => {
     const request = await proxied("/api/v1/users", {

@@ -1,5 +1,9 @@
-import { Skeleton } from "@mantine/core";
+import { PageSpinner } from "@vendor-hub/ui";
+
+import { useT } from "../../i18n/LocaleProvider";
 
 export function RemoteFallback() {
-  return <Skeleton height={96} />;
+  const t = useT();
+
+  return <PageSpinner label={t("remote.loading")} />;
 }
