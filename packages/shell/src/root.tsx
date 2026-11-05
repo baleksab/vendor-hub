@@ -20,7 +20,6 @@ import {
 import { getEnv } from "./env.server";
 import { getSession } from "./auth/session.server";
 import type { Route } from "./+types/root";
-import "@fontsource-variable/inter";
 import "./app.css";
 import { AppLayout } from "./components/AppLayout/AppLayout";
 import { LOCALES } from "./i18n/locales";
@@ -62,7 +61,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#2f6feb" />
+        <meta name="theme-color" content="#0969da" />
         <ColorSchemeScript />
         <Meta />
         <Links />

@@ -1,80 +1,69 @@
-import {
-  Card,
-  createTheme,
-  type CSSVariablesResolver,
-  type MantineColorsTuple,
-} from "@mantine/core";
+import { createTheme, type CSSVariablesResolver, type MantineColorsTuple } from "@mantine/core";
 
-const cobalt: MantineColorsTuple = [
-  "#eef4ff",
-  "#d9e6ff",
-  "#b3ccff",
-  "#8cb0fb",
-  "#6291f5",
-  "#4a7df0",
-  "#2f6feb",
-  "#2559c4",
-  "#1c449a",
-  "#132f6e",
+const primer: MantineColorsTuple = [
+  "#ddf4ff",
+  "#b6e3ff",
+  "#80ccff",
+  "#54aeff",
+  "#218bff",
+  "#0969da",
+  "#0550ae",
+  "#033d8b",
+  "#0a3069",
+  "#002155",
 ];
 
 const gray: MantineColorsTuple = [
-  "#fafafa",
-  "#f3f3f3",
-  "#e5e5e5",
-  "#d4d4d4",
-  "#a3a3a3",
-  "#8a8a8a",
-  "#6b6b6b",
-  "#4d4d4d",
-  "#2b2b2b",
-  "#111111",
+  "#f6f8fa",
+  "#eaeef2",
+  "#d8dee4",
+  "#d0d7de",
+  "#afb8c1",
+  "#8c959f",
+  "#656d76",
+  "#424a53",
+  "#32383f",
+  "#1f2328",
 ];
 
 const dark: MantineColorsTuple = [
-  "#d4d4d4",
-  "#b8b8b8",
-  "#8a8a8a",
-  "#6b6b6b",
-  "#3a3a3a",
-  "#2b2b2b",
-  "#222222",
-  "#1a1a1a",
-  "#141414",
-  "#0e0e0e",
+  "#e6edf3",
+  "#c9d1d9",
+  "#8b949e",
+  "#6e7681",
+  "#484f58",
+  "#30363d",
+  "#21262d",
+  "#0d1117",
+  "#161b22",
+  "#010409",
 ];
 
 export const theme = createTheme({
-  primaryColor: "cobalt",
-  primaryShade: 6,
-  colors: { cobalt, gray, dark },
-  black: "#111111",
-  fontFamily: "'Inter Variable', Inter, -apple-system, system-ui, sans-serif",
-  fontFamilyMonospace: "ui-monospace, 'JetBrains Mono', monospace",
+  primaryColor: "primer",
+  primaryShade: 5,
+  colors: { primer, gray, dark },
+  black: "#1f2328",
+  fontFamily:
+    '-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif',
+  fontFamilyMonospace:
+    'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
+  fontSizes: { xs: "12px", sm: "13px", md: "14px", lg: "16px", xl: "20px" },
+  lineHeights: { md: "1.5" },
   defaultRadius: "md",
-  radius: { lg: "12px" },
+  radius: { md: "6px", lg: "6px" },
   headings: {
     fontWeight: "600",
     sizes: {
-      h1: { fontSize: "1.75rem", lineHeight: "1.2" },
-      h2: { fontSize: "1.375rem", lineHeight: "1.2" },
-      h3: { fontSize: "1.125rem", lineHeight: "1.2" },
+      h1: { fontSize: "24px", lineHeight: "1.25" },
+      h2: { fontSize: "20px", lineHeight: "1.25" },
+      h3: { fontSize: "16px", lineHeight: "1.25" },
     },
-  },
-  components: {
-    Card: Card.extend({
-      defaultProps: {
-        radius: "lg",
-        padding: "md",
-        withBorder: true,
-        bg: "light-dark(var(--mantine-color-white), var(--mantine-color-dark-6))",
-      },
-    }),
   },
 });
 
 export const cssVariablesResolver: CSSVariablesResolver = () => ({
   variables: {},
-  light: { "--mantine-color-body": "#fafafa" },
-  dark: {},
+  light: {},
+  dark: { "--mantine-color-default-border": "#30363d" },
 });
