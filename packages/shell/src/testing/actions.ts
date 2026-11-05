@@ -3,7 +3,6 @@ Object.assign(process.env, {
   SHELL_HOST: "localhost",
   SHELL_PORT: "4100",
   SHELL_ORIGIN: "http://shell.test",
-  REMOTE_TEST_MANIFEST_URL: "http://remote.test/mf-manifest.json",
   USER_ADMINISTRATOR_MANIFEST_URL: "http://admin.test/mf-manifest.json",
   API_URL: "http://api.test",
   SESSION_COOKIE_NAME: "session",

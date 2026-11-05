@@ -3,7 +3,6 @@ import type { Messages } from "../index";
 export const sr = {
   "app.title": "Vendor Hub",
   "nav.home": "Početna",
-  "nav.remoteTest": "Remote test",
   "nav.vendors": "Prodavci",
   "nav.menu": "Otvori navigaciju",
   "nav.close": "Zatvori navigaciju",
@@ -50,10 +49,6 @@ export const sr = {
   "vendors.title": "Prodavci",
   "seo.vendors.title": "Prodavci",
   "seo.vendors.description": "Svi prodavci na Vendor Hub-u.",
-  "remoteTest.title": "Remote test",
-  "remoteTest.hint": "Shell koristi React i Mantine.",
-  "remoteTest.error.title": "Greška",
-  "remoteTest.error.message": "Nije moguće učitati remote.",
   "notFound.title": "Stranica nije pronađena",
   "notFound.message": "Stranica koju tražite ne postoji.",
   "notFound.back": "Nazad na početnu",
@@ -62,9 +57,6 @@ export const sr = {
   "seo.home.title": "Vendor Hub",
   "seo.home.description":
     "Vendor Hub je platforma za više prodavaca: svaki prodavac dobija svoju stranicu, a kupci ih sve nalaze na jednom mestu.",
-  "seo.remoteTest.title": "Remote test",
-  "seo.remoteTest.description":
-    "Micro frontend koji se u shell učitava u toku rada preko Module Federation-a.",
   "seo.notFound.title": "Stranica nije pronađena",
   "seo.notFound.description": "Stranica koju tražite ne postoji.",
   "nav.login": "Prijava",

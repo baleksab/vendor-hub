@@ -4,10 +4,10 @@ import { buildSitemap } from "./sitemap";
 
 describe("buildSitemap", () => {
   it("lists every path as an absolute url on the origin", () => {
-    const sitemap = buildSitemap("https://example.com", ["/", "/remote-test"]);
+    const sitemap = buildSitemap("https://example.com", ["/", "/vendors"]);
 
     expect(sitemap).toContain("<loc>https://example.com/</loc>");
-    expect(sitemap).toContain("<loc>https://example.com/remote-test</loc>");
+    expect(sitemap).toContain("<loc>https://example.com/vendors</loc>");
   });
 
   it("is a urlset document with an xml declaration", () => {

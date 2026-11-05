@@ -4,7 +4,7 @@ import { loginPath, requestTarget, safeRedirectTo } from "./safeRedirect";
 
 describe("safeRedirectTo", () => {
   it("keeps same-origin relative paths with query and hash", () => {
-    expect(safeRedirectTo("/remote-test?a=1#top")).toBe("/remote-test?a=1#top");
+    expect(safeRedirectTo("/vendors?a=1#top")).toBe("/vendors?a=1#top");
   });
 
   it.each([

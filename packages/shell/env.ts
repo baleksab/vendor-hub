@@ -5,7 +5,6 @@ export type ShellEnv = {
   host: string;
   port: number;
   origin: string;
-  remoteTestManifestUrl: string;
   userAdministratorManifestUrl: string;
   apiUrl: string;
   sessionCookieName: string;
@@ -73,7 +72,6 @@ export function readShellEnv(source: Source): ShellEnv {
     host: required(source, "SHELL_HOST"),
     port: parsePort(source, "SHELL_PORT"),
     origin: new URL(parseUrl(source, "SHELL_ORIGIN")).origin,
-    remoteTestManifestUrl: parseUrl(source, "REMOTE_TEST_MANIFEST_URL"),
     userAdministratorManifestUrl: parseUrl(source, "USER_ADMINISTRATOR_MANIFEST_URL"),
     apiUrl: new URL(parseUrl(source, "API_URL")).origin,
     sessionCookieName: required(source, "SESSION_COOKIE_NAME"),

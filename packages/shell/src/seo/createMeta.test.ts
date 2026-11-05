@@ -5,7 +5,7 @@ import { createPageMeta, type PageMetaInput } from "./createMeta";
 const input: PageMetaInput = {
   title: "Title",
   description: "Description",
-  path: "/remote-test",
+  path: "/vendors",
   origin: "https://example.com",
   locale: "sr",
   siteName: "Site",
@@ -23,7 +23,7 @@ describe("createPageMeta", () => {
     expect(createPageMeta(input)).toContainEqual({
       tagName: "link",
       rel: "canonical",
-      href: "https://example.com/remote-test",
+      href: "https://example.com/vendors",
     });
   });
 
@@ -33,7 +33,7 @@ describe("createPageMeta", () => {
     expect(meta).toContainEqual({ property: "og:title", content: "Title" });
     expect(meta).toContainEqual({ property: "og:description", content: "Description" });
     expect(meta).toContainEqual({ property: "og:type", content: "website" });
-    expect(meta).toContainEqual({ property: "og:url", content: "https://example.com/remote-test" });
+    expect(meta).toContainEqual({ property: "og:url", content: "https://example.com/vendors" });
     expect(meta).toContainEqual({ property: "og:site_name", content: "Site" });
     expect(meta).toContainEqual({ property: "og:locale", content: "sr_RS" });
     expect(meta).toContainEqual({ name: "twitter:card", content: "summary" });

@@ -45,7 +45,6 @@ export async function loader({ request }: Route.LoaderArgs) {
       locale,
       origin: env.origin,
       remoteManifestUrls: {
-        "remote-test": env.remoteTestManifestUrl,
         "user-administrator": env.userAdministratorManifestUrl,
       },
       user: session?.user ?? null,

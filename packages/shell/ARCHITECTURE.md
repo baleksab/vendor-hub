@@ -16,7 +16,6 @@ packages/shell/
 │   │   ├── BecomeVendor/   vendor registration form, becomeVendorAction.server.ts, noindex
 │   │   ├── Login/          login form, loginAction.server.ts, noindex
 │   │   ├── Register/       registration form, registerAction.server.ts, countries from the API, noindex
-│   │   ├── RemoteTest/     loads `remote-test/Widget`
 │   │   ├── Admin/          `/admin/*`, loader allows administrators only, mounts the user-administrator remote, noindex
 │   │   └── NotFound/       splat route, 404 + noindex
 │   ├── components/         shared: AppLayout, NavLink, LanguageSwitcher, UserMenu, FormField, FormAlert, RemoteSlot, RemoteErrorBoundary, RemoteFallback
@@ -48,7 +47,7 @@ packages/shell/
 
 - `root.tsx` has the `loader` that reads env with `getEnv()` (cached `readShellEnv(process.env)`) and returns the locale, the public origin, the remote manifest URL, the current user and the vendors of that user (`GET /vendors/me`, cached per request, `null` if the call fails). Env is read on the server only; the client gets the URL as loader data.
 - `Layout` renders the HTML document with `mantineHtmlProps`, `ColorSchemeScript` in `<head>` and `MantineProvider` (theme from `@vendor-hub/ui`) around the children. Mantine is server-rendered; its CSS is static, so SSR needs no style extraction.
-- `Layout` renders the HTML document. SSR output includes the route markup and, for remote routes, a skeleton.
+- `Layout` renders the HTML document. SSR output includes the route markup and, for remote routes, a loading spinner.
 - `pnpm build` produces `build/`; `pnpm start` runs `scripts/start.mjs`, which checks the env keys and maps `SHELL_HOST`/`SHELL_PORT` to the `HOST`/`PORT` that `react-router-serve` expects.
 
 ## Authentication
@@ -96,10 +95,10 @@ New language: add `messages/<code>.ts`, register it in `catalogs` in `i18n/index
 
 `src/remote.ts` creates one `@module-federation/runtime` instance (`createInstance`) with the list of remotes and the `shared` config. It does not use the `@module-federation/vite` plugin. `react`, `react-dom`, `react-router`, `@mantine/core` and `@mantine/hooks` are provided as `singleton` with the shell's own copy. `react-router` is shared so that the `<Routes>` of a remote follow the shell's router. The Mantine and React Router versions come from the `MANTINE_VERSION` and `REACT_ROUTER_VERSION` globals, which `vite.config.ts` fills from the installed packages.
 
-`RemoteTest` and `Admin` do the loading with `loadRemoteModule` (`remote.ts`, caches the promise per module) inside `components/RemoteSlot` (error boundary + `Suspense`):
+`Admin` does the loading with `loadRemoteModule` (`remote.ts`, caches the promise per module) inside `components/RemoteSlot` (error boundary + `Suspense`):
 
-1. `useIsClient` (`hooks/useIsClient`, built on `useSyncExternalStore`) is `false` on the server and during hydration, so the server and the first client render both show a skeleton. No hydration mismatch.
-2. After hydration the route calls `loadRemoteModule` for the module (`remote-test/Widget`, `user-administrator/UserAdministrator`).
+1. `useIsClient` (`hooks/useIsClient`, built on `useSyncExternalStore`) is `false` on the server and during hydration, so the server and the first client render both show the loading spinner. No hydration mismatch.
+2. After hydration the route calls `loadRemoteModule` for the module (`user-administrator/UserAdministrator`).
 3. The module is read with `use()` inside `Suspense`, wrapped in an error boundary that shows a message if the remote cannot be loaded.
 
 A new remote means: a new entry in `remotes` and `RemoteName` in `remote.ts`, a manifest URL key in `env.ts`, the env files and `scripts/start.mjs`, and a route that loads it the same way.
