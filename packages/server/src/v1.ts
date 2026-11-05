@@ -4,6 +4,7 @@ import { authController } from "./auth/auth.controller.ts";
 import type { AuthService } from "./auth/auth.service.ts";
 import { authenticate } from "./auth/authenticate.ts";
 import type { TokenService } from "./auth/token.service.ts";
+import { countriesController } from "./countries/countries.controller.ts";
 import { publicUsersController, usersController } from "./users/users.controller.ts";
 import type { UsersService } from "./users/users.service.ts";
 
@@ -20,6 +21,7 @@ export function v1(deps: V1Deps) {
     await app.register(async (publicScope) => {
       await publicScope.register(publicUsersController(deps.usersService));
       await publicScope.register(authController(deps.authService));
+      await publicScope.register(countriesController());
     });
 
     await app.register(async (protectedScope) => {

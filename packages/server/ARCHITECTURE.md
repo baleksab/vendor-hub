@@ -14,6 +14,7 @@ packages/server/
 │   ├── db/                   client, base-entity, schema, migrate, seed-admin, migrations/
 │   ├── users/                schemas, controller, service, repository, mapper, user types, role
 │   ├── auth/                 schemas, controller, service, password + token services, authenticate
+│   ├── countries/            GET /api/v1/countries (public, supported country codes)
 │   ├── health/               GET /health (pings the DB)
 │   ├── swagger/              Swagger UI at /docs, GET /swagger/schema.json
 │   └── testing/              in-memory users repository, buildTestApp(), test database helper
@@ -35,7 +36,8 @@ packages/server/
 
 controller -> service -> repository, constructor injection, wired by hand in `app.ts`. Controllers validate and shape HTTP, services hold rules and throw `AppError` subclasses, repositories talk to Drizzle. The mapper `toUserResponse` is the only place that decides which user fields are public.
 
-- **users** owns the `users` table. Registration (`POST /api/v1/users`) always creates a `regular` user. Get, list and `PATCH` need a valid token but have no role checks yet.
+- **users** owns the `users` table. Registration (`POST /api/v1/users`) always creates a `regular` user. Get, list and `PATCH` need a valid token but have no role checks yet. `GET /api/v1/users/me` returns the user from the token (`request.auth.userId`) and is registered before `/users/:id`.
+- **countries** has one public route, `GET /api/v1/countries`, that returns `COUNTRY_CODES` from `shared/countries.ts`, the same list `CreateUserRequest` validates against, so clients can fill a select without a copy of the list.
 - **auth** has one route, `POST /api/v1/auth` (login). It reads credentials through the narrow `UserCredentialsLookup`, implemented by the users repository. Wrong email and wrong password give the same `401`, and an unknown email still runs one argon2 verify.
 - **Tokens:** `jose`, HS256 pinned on verify, claims `sub`, `role`, `iat`, `exp`, stateless guard (no DB hit), no refresh tokens. `authenticate` sets a typed `request.auth`.
 - **Errors:** one global handler returns RFC 9457 `application/problem+json`. Validation errors add an `errors: [{ path, message }]` array.

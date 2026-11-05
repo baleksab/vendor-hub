@@ -110,6 +110,17 @@ describe("users and auth routes", () => {
     expect(patch.json()).toMatchObject({ firstName: "Janet", role: "administrator" });
   });
 
+  it("returns the current user on /users/me and requires a token", async () => {
+    const headers = await bearer();
+    const me = await app.inject({ method: "GET", url: "/api/v1/users/me", headers });
+    const anonymous = await app.inject({ method: "GET", url: "/api/v1/users/me" });
+
+    expect(me.statusCode).toBe(200);
+    expect(me.json()).toMatchObject({ id: repository.rows[0]?.id, email: "jane@example.com" });
+    expect(JSON.stringify(me.json())).not.toMatch(/password|hash/i);
+    expect(anonymous.statusCode).toBe(401);
+  });
+
   it("returns 404 for a missing user and 400 for an empty patch", async () => {
     const headers = await bearer();
     const missing = await app.inject({
