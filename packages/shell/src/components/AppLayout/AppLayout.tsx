@@ -50,7 +50,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     >
       <AppShell.Navbar
         p="md"
-        bg="light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8))"
+        bg="light-dark(var(--mantine-color-white), var(--mantine-color-dark-8))"
       >
         <Group justify="space-between" wrap="nowrap" mb="md">
           <Anchor component={Link} to="/" fw={500} fz="xl" c="inherit" underline="never">
