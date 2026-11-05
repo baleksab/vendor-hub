@@ -17,7 +17,7 @@ Zod schemas -> @fastify/swagger -> GET /swagger/schema.json -> openapi-typescrip
 packages/types/
 ├── scripts/generate-types.ts   fetches the document, runs openapi-typescript, writes the file
 ├── src/
-│   ├── index.ts                export type * from the generated file (aliases go here)
+│   ├── index.ts                export type * from the generated file, plus aliases for the schemas the apps use (LoginRequest, UserResponse, ...)
 │   └── generated/schema.gen.ts GENERATED and committed, never edited by hand
 ├── env.ts                      OPENAPI_URL, validated (throws on a missing key)
 ├── .env / .env.local
