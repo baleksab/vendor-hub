@@ -29,3 +29,7 @@ export function createT(locale: Locale): T {
     return messages[key].replace(/\{(\w+)\}/g, (_match, name: string) => String(values[name]));
   };
 }
+
+export function isMessageKey(value: string): value is MessageKey {
+  return Object.hasOwn(en, value);
+}

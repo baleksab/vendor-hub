@@ -63,6 +63,18 @@ export function usersController(service: UsersService) {
     );
 
     typed.get(
+      "/users/me",
+      {
+        schema: {
+          tags: ["users"],
+          security,
+          response: { 200: UserResponse, 401: ProblemResponse, 404: ProblemResponse },
+        },
+      },
+      async (request) => toUserResponse(await service.get(request.auth.userId)),
+    );
+
+    typed.get(
       "/users/:id",
       {
         schema: {

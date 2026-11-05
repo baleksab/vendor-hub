@@ -71,7 +71,7 @@ pnpm dev            # shell and remotes
 | API           | `http://localhost:4200` (docs `/docs`) |
 | Postgres      | `localhost:5433`                       |
 
-Ports are changed only in the `.env.local` files.
+Ports are changed only in the `.env.local` files. The shell needs the API running for login and registration, so start `pnpm server:dev` first (the shell's `API_URL` points at it).
 
 | Command                              | What it does                     |
 | ------------------------------------ | -------------------------------- |
@@ -96,6 +96,7 @@ Ports are changed only in the `.env.local` files.
 | -------------------------------------- | ----------------------- |
 | Monorepo, SSR shell, Module Federation | done (test remote only) |
 | API server, OpenAPI, users and login   | done                    |
+| Shell login, registration, session     | done                    |
 | Vendors, roles, subdomain routing      | planned                 |
 | Catalog, cart, orders, payment         | planned                 |
 | Admin and statistics remotes, reports  | planned                 |

@@ -4,7 +4,7 @@ The host application of Vendor Hub. React Router 8 in framework mode with SSR, b
 
 ## Stack
 
-React 19, React Router 8, Mantine, Tailwind, `@module-federation/runtime`, Vitest.
+React 19, React Router 8, Mantine, Tailwind, `@module-federation/runtime`, openapi-fetch, Zod, Vitest.
 
 ## Scripts
 
@@ -20,6 +20,6 @@ Run from the repo root with `pnpm --filter @mfe/shell <script>`, or `pnpm dev` t
 
 ## Configuration
 
-Hosts, ports and URLs come from `.env` and `.env.local` through `env.ts`, which throws on a missing key. Change the port only in `.env.local`.
+Hosts, ports and URLs come from `.env` and `.env.local` through `env.ts`, which throws on a missing key. Change the port only in `.env.local`. Besides the shell and remote settings, `API_URL` (the API origin, used only on the shell server) and `SESSION_COOKIE_NAME` / `SESSION_COOKIE_SECURE` (the cookie that holds the login token) are required. The API must be running for login, registration and the user menu (`pnpm server:dev`).
 
 See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the structure, layout, SEO, localization and how remotes are loaded.

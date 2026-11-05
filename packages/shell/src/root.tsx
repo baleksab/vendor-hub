@@ -7,6 +7,7 @@ import {
   mantineHtmlProps,
 } from "@mantine/core";
 import {
+  data as routeData,
   isRouteErrorResponse,
   Links,
   Meta,
@@ -16,7 +17,8 @@ import {
   useRouteLoaderData,
 } from "react-router";
 
-import { readShellEnv } from "../env.ts";
+import { getEnv } from "./env.server";
+import { getSession } from "./auth/session.server";
 import type { Route } from "./+types/root";
 import "./app.css";
 import { AppLayout } from "./components/AppLayout/AppLayout";
@@ -29,15 +31,20 @@ export function links(): Route.LinkDescriptors {
   return [{ rel: "icon", href: "/favicon.svg", type: "image/svg+xml" }];
 }
 
-export function loader({ request }: Route.LoaderArgs) {
-  const env = readShellEnv(process.env);
+export async function loader({ request }: Route.LoaderArgs) {
+  const env = getEnv();
   const locale = resolveLocale(request, env.defaultLocale);
+  const { session, headers } = await getSession(request);
 
-  return {
-    locale,
-    origin: env.origin,
-    remoteTestManifestUrl: env.remoteTestManifestUrl,
-  };
+  return routeData(
+    {
+      locale,
+      origin: env.origin,
+      remoteTestManifestUrl: env.remoteTestManifestUrl,
+      user: session?.user ?? null,
+    },
+    { headers },
+  );
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {

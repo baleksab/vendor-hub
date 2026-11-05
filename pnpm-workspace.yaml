@@ -40,6 +40,7 @@ catalog:
   "@types/pg": 8.23.1
   "@node-rs/argon2": 2.2.2
   jose: 6.2.15
+  openapi-fetch: 0.17.0
 
 catalogs:
   # openapi-typescript uses the JS compiler API, which TypeScript 7 does not have,

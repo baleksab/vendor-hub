@@ -1,15 +1,19 @@
 import { Anchor, AppShell, Burger, Container, Drawer, Group, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import type { ReactNode } from "react";
-import { Link } from "react-router";
+import { useEffect, type ReactNode } from "react";
+import { Link, useLocation } from "react-router";
 
 import { useT } from "../../i18n/LocaleProvider";
 import { LanguageSwitcher } from "../LanguageSwitcher/LanguageSwitcher";
 import { NavLink } from "../NavLink/NavLink";
+import { UserMenu } from "../UserMenu/UserMenu";
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const t = useT();
   const [opened, { toggle, close }] = useDisclosure(false);
+  const location = useLocation();
+
+  useEffect(close, [location.key, close]);
 
   const links = [
     { to: "/", label: t("nav.home") },
@@ -42,6 +46,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
             <Group visibleFrom="sm">
               <LanguageSwitcher />
+              <UserMenu />
             </Group>
           </Group>
         </Container>
@@ -60,6 +65,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <NavLink key={link.to} {...link} onNavigate={close} />
           ))}
           <LanguageSwitcher touch />
+          <UserMenu touch onNavigate={close} />
         </Stack>
       </Drawer>
 

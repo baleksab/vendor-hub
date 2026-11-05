@@ -32,7 +32,9 @@ describe("OpenAPI document", () => {
   it("lists the expected routes", () => {
     expect(Object.keys(document.paths).sort()).toEqual([
       "/api/v1/auth",
+      "/api/v1/countries",
       "/api/v1/users",
+      "/api/v1/users/me",
       "/api/v1/users/{id}",
       "/health",
     ]);

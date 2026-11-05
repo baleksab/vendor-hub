@@ -26,7 +26,7 @@ The remote's manifest URL is not hardcoded in the shell. The root loader reads i
 
 ## Boundaries
 
-- **The server is a separate process.** It does not take part in Module Federation. The shell does not call it yet, it only imports its API types. It runs on its own with `pnpm server:dev` and is not started by `pnpm dev`. It stores data in Postgres, started with `pnpm db:up` from the root `docker-compose.yml` (only Postgres runs in Docker).
+- **The server is a separate process.** It does not take part in Module Federation. The shell server calls it (login, session, countries) from its loaders and actions, see the shell's `ARCHITECTURE.md`; the browser never talks to it directly and never holds the token. It runs on its own with `pnpm server:dev` and is not started by `pnpm dev`. It stores data in Postgres, started with `pnpm db:up` from the root `docker-compose.yml` (only Postgres runs in Docker).
 - **Only the shell is SSR.** Remotes are client bundles and never run on the server. This also keeps the door open for non-React remotes.
 - **Shell and remotes know each other only through** the manifest URL, the exposed module names and the shared module list.
 - **Root has only framework-agnostic tooling** (`typescript`, `oxlint`, `oxlint-tsgolint`, `oxfmt`, `husky`). Everything tied to React, Vite, Tailwind or the router lives in the package that uses it.
