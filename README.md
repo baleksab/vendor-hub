@@ -64,12 +64,12 @@ pnpm server:dev     # API
 pnpm dev            # shell and remotes
 ```
 
-| Service       | URL                                    |
-| ------------- | -------------------------------------- |
-| Shell         | `http://localhost:4100`                |
-| Remote (test) | `http://localhost:4101`                |
-| API           | `http://localhost:4200` (docs `/docs`) |
-| Postgres      | `localhost:5433`                       |
+| Service       | URL                                                                  |
+| ------------- | -------------------------------------------------------------------- |
+| Shell         | `http://vendorhub.localhost:8080` (nginx), upstream `localhost:4100` |
+| Remote (test) | `http://localhost:4101`                                              |
+| API           | `http://localhost:4200` (docs `/docs`)                               |
+| Postgres      | `localhost:5433`                                                     |
 
 Ports are changed only in the `.env.local` files. The shell needs the API running for login and registration, so start `pnpm server:dev` first (the shell's `API_URL` points at it).
 
