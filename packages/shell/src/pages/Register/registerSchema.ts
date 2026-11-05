@@ -1,35 +1,20 @@
 import { z } from "zod";
 
-import type { CreateUserRequest, LoginRequest } from "../api/types";
-import type { MessageKey } from "../i18n";
+import type { CreateUserRequest } from "@vendor-hub/types";
+import type { MessageKey } from "../../i18n";
+import { email, message } from "../../forms/fields";
 
-const EMAIL_MAX = 254;
 const PASSWORD_MIN = 8;
 const PASSWORD_MAX = 128;
 const NAME_MAX = 100;
 const ADDRESS_MAX = 255;
 const PHONE_PATTERN = /^\+[1-9]\d{6,14}$/;
 
-const message = (key: MessageKey) => ({ error: key });
-
-const email = z
-  .string()
-  .trim()
-  .toLowerCase()
-  .min(1, message("validation.required"))
-  .max(EMAIL_MAX, message("validation.tooLong"))
-  .pipe(z.email(message("validation.email")));
-
 const name = z
   .string()
   .trim()
   .min(1, message("validation.required"))
   .max(NAME_MAX, message("validation.tooLong"));
-
-export const loginSchema = z.object({
-  email,
-  password: z.string().min(1, message("validation.required")),
-}) satisfies z.ZodType<LoginRequest, unknown>;
 
 export function createRegisterSchema(countries: readonly string[]) {
   return z

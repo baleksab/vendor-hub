@@ -1,4 +1,4 @@
-import { ApiError } from "./ApiError";
+import { ApiError } from "../api/ApiError";
 
 export type ErrorContext = "login" | "register" | "generic";
 

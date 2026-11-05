@@ -1,13 +1,13 @@
 import { Alert, Anchor, Button, Stack, Text, Title } from "@mantine/core";
 import { Form, Link, useNavigation, useSearchParams } from "react-router";
 
-import { loginAction } from "../../auth/authActions.server";
 import { redirectIfAuthenticated } from "../../auth/session.server";
 import { FormAlert } from "../../components/FormAlert/FormAlert";
 import { FormField } from "../../components/FormField/FormField";
 import { useT } from "../../i18n/LocaleProvider";
 import { pageMeta } from "../../seo/pageMeta";
 import type { Route } from "./+types/Login";
+import { loginAction } from "./loginAction.server";
 
 export function meta({ matches }: Route.MetaArgs) {
   return pageMeta(matches, {

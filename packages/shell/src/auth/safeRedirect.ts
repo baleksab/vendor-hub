@@ -24,3 +24,7 @@ export function safeRedirectTo(value: string | null | undefined, fallback = "/")
 export function loginPath(redirectTo: string): string {
   return `/login?redirectTo=${encodeURIComponent(redirectTo)}`;
 }
+
+export function redirectTarget(request: Request): string {
+  return safeRedirectTo(new URL(request.url).searchParams.get("redirectTo"));
+}

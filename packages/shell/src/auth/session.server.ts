@@ -1,10 +1,9 @@
 import { redirect } from "react-router";
 
 import { ApiError } from "../api/ApiError";
-import { unwrap } from "../api/createApiClient";
-import { createServerApi } from "../api/createServerApi.server";
-import type { UserResponse } from "../api/types";
-import { safeRedirectTo, loginPath } from "./safeRedirect";
+import { getCurrentUser } from "../api/endpoints/users.server";
+import type { UserResponse } from "@vendor-hub/types";
+import { loginPath, safeRedirectTo } from "./safeRedirect";
 import { clearToken, readToken } from "./sessionCookie.server";
 
 export type Session = { user: UserResponse; token: string };
@@ -22,7 +21,7 @@ async function loadSession(request: Request): Promise<SessionResult> {
   }
 
   try {
-    const user = await unwrap(createServerApi(token).GET("/api/v1/users/me"));
+    const user = await getCurrentUser(token);
 
     return { session: { user, token }, headers };
   } catch (error) {

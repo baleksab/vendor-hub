@@ -9,14 +9,14 @@ import {
   useSearchParams,
 } from "react-router";
 
-import { loadCountries } from "../../api/countries.server";
-import { registerAction } from "../../auth/authActions.server";
+import { loadCountries } from "../../api/endpoints/countries.server";
 import { redirectIfAuthenticated } from "../../auth/session.server";
 import { FormAlert } from "../../components/FormAlert/FormAlert";
 import { FormField } from "../../components/FormField/FormField";
 import { useLocale, useT } from "../../i18n/LocaleProvider";
 import { pageMeta } from "../../seo/pageMeta";
 import type { Route } from "./+types/Register";
+import { registerAction } from "./registerAction.server";
 
 export function meta({ matches }: Route.MetaArgs) {
   return pageMeta(matches, {
