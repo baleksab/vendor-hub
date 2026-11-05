@@ -28,7 +28,7 @@ The remote's manifest URL is not hardcoded in the shell. The root loader reads i
 ## Vendor sites
 
 ```
-browser --> nginx (vendor.hub, *.vendor.hub) --(X-Vendor-Slug)--> shell SSR --> GET /api/v1/vendors/by-slug/:slug
+browser --> nginx (vendorhub.localhost, *.vendorhub.localhost) --(X-Vendor-Slug)--> shell SSR --> GET /api/v1/vendors/by-slug/:slug
 ```
 
 nginx (`infra/nginx/vendorhub.conf.template`, rendered with `envsubst` from `infra/nginx/.env.local`) is the only public entry. The main site block clears `X-Vendor-Slug`, so a client can never set it. The wildcard block takes the slug from the host and sets the header, and proxies only `/`, the asset paths, `/_root.data`, `/favicon.svg` and `/locale`. Everything else on a vendor subdomain redirects to the main site. The shell port is not published in production. The shell reads the header and renders the public vendor page, see the shell's `ARCHITECTURE.md`.

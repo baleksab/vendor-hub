@@ -3,11 +3,11 @@ import { describe, expect, it } from "vitest";
 import { readShellEnv } from "../../env";
 import { readVendorSlug, vendorSiteOrigin } from "./vendorSite";
 
-const template = "http://{slug}.vendor.hub";
+const template = "http://{slug}.vendorhub.localhost";
 
 describe("vendorSiteOrigin", () => {
   it("puts the slug into the template", () => {
-    expect(vendorSiteOrigin(template, "acme")).toBe("http://acme.vendor.hub");
+    expect(vendorSiteOrigin(template, "acme")).toBe("http://acme.vendorhub.localhost");
   });
 
   it("drops a path from the template", () => {

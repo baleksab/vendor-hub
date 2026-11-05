@@ -1,6 +1,6 @@
 # Vendor Hub
 
-A multi-vendor online store platform. Every vendor gets its own storefront on a reserved subdomain (`<vendor>.vendor.hub` locally). Public pages (landing page, storefronts, catalog, product pages) are rendered on the server. The tools for running a store (vendor admin panel, statistics) are microfrontends, built separately and loaded into the shell in the browser.
+A multi-vendor online store platform. Every vendor gets its own storefront on a reserved subdomain (`<vendor>.vendorhub.localhost` locally). Public pages (landing page, storefronts, catalog, product pages) are rendered on the server. The tools for running a store (vendor admin panel, statistics) are microfrontends, built separately and loaded into the shell in the browser.
 
 Course project: _Odabrana poglavlja iz projektovanja poslovnih aplikacija_ (2026/27). Chosen base: **online store** (catalog, cart, order, payment, delivery, return).
 
@@ -17,7 +17,7 @@ SSR serves the public side (fast first paint, SEO for storefronts and products).
 ## Architecture
 
 ```
- *.vendor.hub ──► nginx ──┬──► shell (SSR)        pages
+ *.vendorhub.localhost ──► nginx ──┬──► shell (SSR)        pages
                                     ├──► remotes            admin, statistics
                                     └──► server (REST API) ──► PostgreSQL
 ```
@@ -46,7 +46,7 @@ Requirements: Node 24 (`.nvmrc`), the pnpm version from `packageManager`, and Do
 docker compose up
 ```
 
-Then open `http://vendor.hub`.
+Then open `http://vendorhub.localhost`.
 
 ### Development
 
@@ -62,28 +62,20 @@ pnpm --filter @mfe/server db:seed-admin
 
 pnpm server:dev     # API
 pnpm dev            # shell and remotes
-pnpm nginx:up       # nginx on port 80, open http://vendor.hub
+pnpm nginx:up       # nginx on port 80, open http://vendorhub.localhost
 ```
 
-`vendor.hub` and `*.vendor.hub` must resolve to `127.0.0.1`. `/etc/hosts` has no wildcards, so on macOS use dnsmasq once:
+`*.localhost` resolves to `127.0.0.1` in Chrome, Firefox and Safari, so no hosts file or DNS setup is needed.
 
-```sh
-brew install dnsmasq
-echo 'address=/vendor.hub/127.0.0.1' >> "$(brew --prefix)/etc/dnsmasq.conf"
-sudo brew services start dnsmasq
-sudo mkdir -p /etc/resolver
-echo 'nameserver 127.0.0.1' | sudo tee /etc/resolver/vendor.hub
-```
+nginx (`infra/nginx`) sends `vendorhub.localhost` to the shell and `<slug>.vendorhub.localhost` to the shell with the `X-Vendor-Slug` header. `pnpm nginx:down` stops it. Its settings are in `infra/nginx/.env.local`; changing the domain or port also means changing `SHELL_ORIGIN`, `VENDOR_SITE_ORIGIN` (shell) and `REMOTE_TEST_ALLOWED_ORIGINS` (remote).
 
-nginx (`infra/nginx`) sends `vendor.hub` to the shell and `<slug>.vendor.hub` to the shell with the `X-Vendor-Slug` header. `pnpm nginx:down` stops it. Its settings are in `infra/nginx/.env.local`; changing the domain or port also means changing `SHELL_ORIGIN`, `VENDOR_SITE_ORIGIN` (shell) and `REMOTE_TEST_ALLOWED_ORIGINS` (remote).
-
-| Service       | URL                                                    |
-| ------------- | ------------------------------------------------------ |
-| Shell         | `http://vendor.hub` (nginx), upstream `localhost:4100` |
-| Vendor site   | `http://<slug>.vendor.hub` (nginx)                     |
-| Remote (test) | `http://localhost:4101`                                |
-| API           | `http://localhost:4200` (docs `/docs`)                 |
-| Postgres      | `localhost:5433`                                       |
+| Service       | URL                                                             |
+| ------------- | --------------------------------------------------------------- |
+| Shell         | `http://vendorhub.localhost` (nginx), upstream `localhost:4100` |
+| Vendor site   | `http://<slug>.vendorhub.localhost` (nginx)                     |
+| Remote (test) | `http://localhost:4101`                                         |
+| API           | `http://localhost:4200` (docs `/docs`)                          |
+| Postgres      | `localhost:5433`                                                |
 
 Ports are changed only in the `.env.local` files. The shell needs the API running for login and registration, so start `pnpm server:dev` first (the shell's `API_URL` points at it).
 
