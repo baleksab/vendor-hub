@@ -12,6 +12,10 @@ projekat/
 │   ├── api-client/     shared typed fetch client, unwrap, ApiError (@vendor-hub/api-client)
 │   └── ui/             Mantine theme, design tokens, common components (@vendor-hub/ui)
 ├── infra/nginx/        nginx template for the site (docker compose service)
+├── scripts/            deploy.sh (one-command deploy), healthcheck.mjs (container health probe)
+├── Dockerfile          one build stage, one target per app (server, shell, user-administrator)
+├── docker-compose.yml  Postgres and nginx (also used for local development)
+├── docker-compose.deploy.yml  overlay for the full stack: migrate, server, shell, user-administrator
 ├── pnpm-workspace.yaml workspace + dependency catalog
 ├── tsconfig.base.json  shared compiler options
 ├── .oxlintrc.json      shared lint rules
@@ -82,16 +86,18 @@ No hosts, ports or URLs in code. Each package has `.env` (keys with empty values
 
 ## Root scripts
 
-| Script                         | What it does                             |
-| ------------------------------ | ---------------------------------------- |
-| `pnpm dev`                     | shell and remote dev servers in parallel |
-| `pnpm server:dev`              | API server dev (isolated from `dev`)     |
-| `pnpm db:up` / `db:down`       | start / stop Postgres (Docker Compose)   |
-| `pnpm db:reset`                | stop Postgres and delete its volume      |
-| `pnpm types:generate`          | regenerate API types (server must run)   |
-| `pnpm build`                   | remotes, then shell, then server         |
-| `pnpm test`                    | Vitest in shell, server and api-client   |
-| `pnpm lint` / `lint:fix`       | oxlint                                   |
-| `pnpm typecheck`               | typecheck in every package               |
-| `pnpm check`                   | lint + typecheck + build                 |
-| `pnpm format` / `format:check` | oxfmt                                    |
+| Script                         | What it does                              |
+| ------------------------------ | ----------------------------------------- |
+| `pnpm dev`                     | shell and remote dev servers in parallel  |
+| `pnpm server:dev`              | API server dev (isolated from `dev`)      |
+| `pnpm db:up` / `db:down`       | start / stop Postgres (Docker Compose)    |
+| `pnpm stack:deploy`            | build and start the whole stack in Docker |
+| `pnpm stack:down`              | stop the Docker stack                     |
+| `pnpm db:reset`                | stop Postgres and delete its volume       |
+| `pnpm types:generate`          | regenerate API types (server must run)    |
+| `pnpm build`                   | remotes, then shell, then server          |
+| `pnpm test`                    | Vitest in shell, server and api-client    |
+| `pnpm lint` / `lint:fix`       | oxlint                                    |
+| `pnpm typecheck`               | typecheck in every package                |
+| `pnpm check`                   | lint + typecheck + build                  |
+| `pnpm format` / `format:check` | oxfmt                                     |

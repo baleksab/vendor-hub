@@ -25,6 +25,8 @@ Other useful commands:
 | `pnpm build`             | build remotes, shell, server                  |
 | `pnpm test`              | unit tests (Vitest)                           |
 | `pnpm db:up` / `db:down` | start / stop Postgres (Docker Compose)        |
+| `pnpm stack:deploy`      | build and start the whole stack in Docker     |
+| `pnpm stack:down`        | stop the Docker stack                         |
 | `pnpm db:reset`          | stop Postgres and delete its volume           |
 | `pnpm types:generate`    | regenerate API types (server must be running) |
 
