@@ -11,6 +11,7 @@ body:
         - remotes
         - server
         - types
+        - infra
         - root / tooling
         - not sure
     validations:

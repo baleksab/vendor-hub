@@ -9,6 +9,7 @@ projekat/
 │   ├── remote-test/    test remote, Vite + Module Federation, client-only
 │   ├── server/         REST API, Fastify + Zod (not part of the microfrontend runtime)
 │   └── types/          API types generated from the server's OpenAPI document (@vendor-hub/types)
+├── infra/nginx/        nginx template for the main site and the vendor subdomains (docker compose service)
 ├── pnpm-workspace.yaml workspace + dependency catalog
 ├── tsconfig.base.json  shared compiler options
 ├── .oxlintrc.json      shared lint rules
@@ -24,9 +25,17 @@ projekat/
 
 The remote's manifest URL is not hardcoded in the shell. The root loader reads it from env and passes it to the client.
 
+## Vendor sites
+
+```
+browser --> nginx (vendor.hub, *.vendor.hub) --(X-Vendor-Slug)--> shell SSR --> GET /api/v1/vendors/by-slug/:slug
+```
+
+nginx (`infra/nginx/vendorhub.conf.template`, rendered with `envsubst` from `infra/nginx/.env.local`) is the only public entry. The main site block clears `X-Vendor-Slug`, so a client can never set it. The wildcard block takes the slug from the host and sets the header, and proxies only `/`, the asset paths, `/_root.data`, `/favicon.svg` and `/locale`. Everything else on a vendor subdomain redirects to the main site. The shell port is not published in production. The shell reads the header and renders the public vendor page, see the shell's `ARCHITECTURE.md`.
+
 ## Boundaries
 
-- **The server is a separate process.** It does not take part in Module Federation. The shell server calls it (login, session, countries) from its loaders and actions, see the shell's `ARCHITECTURE.md`; the browser never talks to it directly and never holds the token. It runs on its own with `pnpm server:dev` and is not started by `pnpm dev`. It stores data in Postgres, started with `pnpm db:up` from the root `docker-compose.yml` (only Postgres runs in Docker).
+- **The server is a separate process.** It does not take part in Module Federation. The shell server calls it (login, session, countries) from its loaders and actions, see the shell's `ARCHITECTURE.md`; the browser never talks to it directly and never holds the token. It runs on its own with `pnpm server:dev` and is not started by `pnpm dev`. It stores data in Postgres, started with `pnpm db:up` from the root `docker-compose.yml` (Postgres and nginx run in Docker, the apps run on the host).
 - **Only the shell is SSR.** Remotes are client bundles and never run on the server. This also keeps the door open for non-React remotes.
 - **Shell and remotes know each other only through** the manifest URL, the exposed module names and the shared module list.
 - **Root has only framework-agnostic tooling** (`typescript`, `oxlint`, `oxlint-tsgolint`, `oxfmt`, `husky`). Everything tied to React, Vite, Tailwind or the router lives in the package that uses it.

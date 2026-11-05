@@ -18,6 +18,7 @@ Closes #
 - [ ] `remotes`
 - [ ] `server`
 - [ ] `types`
+- [ ] `infra` (nginx, docker compose)
 - [ ] root / tooling
 
 ## Checklist
