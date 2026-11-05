@@ -106,4 +106,4 @@ Ports are changed only in the `.env.local` files.
 
 - [`ARCHITECTURE.md`](ARCHITECTURE.md): monorepo architecture
 - [`CONTRIBUTING.md`](CONTRIBUTING.md): workflow, commits, PRs, project rules
-- Per package: `packages/*/ARCHITECTURE.md`
+- Per package: `packages/*/README.md` and `packages/*/ARCHITECTURE.md`
