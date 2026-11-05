@@ -1,10 +1,11 @@
-import { forwardApiRequest } from "../proxy/forwardApiRequest.server";
-import type { Route } from "./+types/apiProxy";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 
-export function loader({ request }: Route.LoaderArgs) {
+import { forwardApiRequest } from "../proxy/forwardApiRequest.server";
+
+export function loader({ request }: LoaderFunctionArgs) {
   return forwardApiRequest(request);
 }
 
-export function action({ request }: Route.ActionArgs) {
+export function action({ request }: ActionFunctionArgs) {
   return forwardApiRequest(request);
 }

@@ -100,7 +100,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </Anchor>
         </Group>
 
-        <Container size="md" px="md" py={{ base: "lg", sm: 56 }}>
+        <Container
+          size="md"
+          px="md"
+          py={{ base: "lg", sm: 56 }}
+          display="flex"
+          mih={{ base: `calc(100dvh - ${TOP_BAR_HEIGHT}px)`, sm: "100dvh" }}
+          style={{ flexDirection: "column" }}
+        >
           {children}
         </Container>
       </AppShell.Main>
