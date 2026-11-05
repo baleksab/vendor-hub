@@ -28,6 +28,7 @@ export default defineConfig(({ mode }) => {
       host: env.host,
       port: env.port,
       strictPort: true,
+      allowedHosts: [`.${new URL(env.origin).hostname}`],
     },
   };
 });

@@ -3,11 +3,11 @@ import { describe, expect, it } from "vitest";
 import { readShellEnv } from "../../env";
 import { readVendorSlug, vendorSiteOrigin } from "./vendorSite";
 
-const template = "http://{slug}.vendorhub.localhost:8080";
+const template = "http://{slug}.vendor.hub";
 
 describe("vendorSiteOrigin", () => {
   it("puts the slug into the template", () => {
-    expect(vendorSiteOrigin(template, "acme")).toBe("http://acme.vendorhub.localhost:8080");
+    expect(vendorSiteOrigin(template, "acme")).toBe("http://acme.vendor.hub");
   });
 
   it("drops a path from the template", () => {
@@ -52,7 +52,7 @@ describe("VENDOR_SITE_ORIGIN parsing", () => {
     expect(readShellEnv({ ...base, VENDOR_SITE_ORIGIN: template }).vendorSiteOrigin).toBe(template);
   });
 
-  it.each(["http://vendors.localhost:8080", "http://{slug}.{slug}.localhost", "not a url {slug}"])(
+  it.each(["http://vendors.localhost", "http://{slug}.{slug}.localhost", "not a url {slug}"])(
     "rejects %s",
     (value) => {
       expect(() => readShellEnv({ ...base, VENDOR_SITE_ORIGIN: value })).toThrow(
