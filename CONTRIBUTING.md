@@ -10,6 +10,7 @@ Requirements: Node 24 (see `.nvmrc`) and the pnpm version from `packageManager` 
 pnpm install
 pnpm dev      # shell and remotes in parallel
 pnpm server:dev  # API server (not started by pnpm dev)
+pnpm db:up    # Postgres in Docker (needs packages/server/.env.secret)
 pnpm check    # lint + typecheck + build
 ```
 
@@ -23,6 +24,8 @@ Other useful commands:
 | `pnpm format:check`      | verify formatting                             |
 | `pnpm build`             | build remotes, shell, server                  |
 | `pnpm test`              | unit tests (Vitest)                           |
+| `pnpm db:up` / `db:down` | start / stop Postgres (Docker Compose)        |
+| `pnpm db:reset`          | stop Postgres and delete its volume           |
 | `pnpm types:generate`    | regenerate API types (server must be running) |
 
 A husky pre-commit hook runs lint and typecheck. Don't bypass it with `--no-verify`. If it fails, fix the cause.
@@ -96,7 +99,7 @@ These come from the repo's architecture and are checked in review.
 - **Versions live in the catalog.** Add or bump dependencies in `pnpm-workspace.yaml` and use `catalog:` in packages (`catalogMode: strict`). The only exception is the React Router packages, pinned in `packages/shell/package.json`, and they must all match each other.
 - **Root has only framework-agnostic devDependencies** (`typescript`, `oxlint`, `oxlint-tsgolint`, `oxfmt`, `husky`). No react, vite, tailwind or router there.
 - **No magic values.** No hosts, ports or URLs in code, configs or scripts. They come from the package's `.env` / `.env.local` through its `env.ts`, which throws on a missing key. No fallbacks.
-- **No secrets in env files.** `.env.local` is committed on purpose, so it holds non-secret local values only.
+- **No secrets in committed env files.** `.env.local` is committed on purpose, so it holds non-secret local values only. Secrets go to the gitignored `.env.secret`; copy `.env.secret.example` to create it.
 - **Only the shell is SSR.** Remotes load client-side after hydration.
 - **Shared singletons.** `react`, `react-dom`, `@mantine/core` and `@mantine/hooks` stay `singleton` in every `shared` config, and the two Mantine packages share one version.
 - **The shell owns the Mantine theme and CSS.** Embedded remotes use Mantine components without a provider or Mantine CSS.
@@ -106,6 +109,18 @@ These come from the repo's architecture and are checked in review.
 ## API changes
 
 Every route declares its Zod schemas, because they are the source of the OpenAPI document (Swagger UI at `/docs`, JSON at `/swagger/schema.json`). When you change a route schema, start the server (`pnpm server:dev`), run `pnpm types:generate` and commit the changed `packages/types/src/generated/schema.gen.ts` together with the change. `pnpm --filter @vendor-hub/types types:check` verifies that the committed file is up to date. Never edit the generated file by hand.
+
+## Database
+
+Postgres runs in Docker from the root `docker-compose.yml`. Copy `packages/server/.env.secret.example` to `packages/server/.env.secret`, then:
+
+```sh
+pnpm db:up
+pnpm --filter @mfe/server db:migrate
+pnpm --filter @mfe/server db:seed-admin   # first administrator, from ADMIN_* env keys
+```
+
+The Drizzle schema is `packages/server/src/db/schema.ts`. After changing it run `pnpm --filter @mfe/server db:generate`, review the generated SQL and commit it. Applied migrations are never edited. Integration tests (`*.e2e.test.ts`) need the database and run with `pnpm --filter @mfe/server test:e2e`.
 
 ## Code style
 

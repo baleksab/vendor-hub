@@ -26,7 +26,7 @@ The remote's manifest URL is not hardcoded in the shell. The root loader reads i
 
 ## Boundaries
 
-- **The server is a separate process.** It does not take part in Module Federation. The shell does not call it yet, it only imports its API types. It runs on its own with `pnpm server:dev` and is not started by `pnpm dev`.
+- **The server is a separate process.** It does not take part in Module Federation. The shell does not call it yet, it only imports its API types. It runs on its own with `pnpm server:dev` and is not started by `pnpm dev`. It stores data in Postgres, started with `pnpm db:up` from the root `docker-compose.yml` (only Postgres runs in Docker).
 - **Only the shell is SSR.** Remotes are client bundles and never run on the server. This also keeps the door open for non-React remotes.
 - **Shell and remotes know each other only through** the manifest URL, the exposed module names and the shared module list.
 - **Root has only framework-agnostic tooling** (`typescript`, `oxlint`, `oxlint-tsgolint`, `oxfmt`, `husky`). Everything tied to React, Vite, Tailwind or the router lives in the package that uses it.
@@ -66,6 +66,8 @@ No hosts, ports or URLs in code. Each package has `.env` (keys with empty values
 | ------------------------------ | ---------------------------------------- |
 | `pnpm dev`                     | shell and remote dev servers in parallel |
 | `pnpm server:dev`              | API server dev (isolated from `dev`)     |
+| `pnpm db:up` / `db:down`       | start / stop Postgres (Docker Compose)   |
+| `pnpm db:reset`                | stop Postgres and delete its volume      |
 | `pnpm types:generate`          | regenerate API types (server must run)   |
 | `pnpm build`                   | remote, then shell, then server          |
 | `pnpm test`                    | Vitest in shell and server               |
