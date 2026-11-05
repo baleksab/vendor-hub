@@ -6,7 +6,6 @@ export default [
   route("login", "pages/Login/Login.tsx"),
   route("register", "pages/Register/Register.tsx"),
   route("become-vendor", "pages/BecomeVendor/BecomeVendor.tsx"),
-  route("vendor", "pages/Vendor/Vendor.tsx"),
   route("logout", "routes/logout.ts"),
   route("locale", "routes/locale.ts"),
   route("robots.txt", "routes/robots.txt.ts"),

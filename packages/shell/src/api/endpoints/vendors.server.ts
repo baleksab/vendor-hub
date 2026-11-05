@@ -1,5 +1,5 @@
 import type {
-  AddOperatorRequest,
+  VendorListResponse,
   MyVendorsResponse,
   PublicVendorResponse,
   RegisterVendorRequest,
@@ -19,16 +19,8 @@ export function getMyVendors(token: string): Promise<MyVendorsResponse> {
   return unwrap(createServerApi(token).GET("/api/v1/vendors/me"));
 }
 
-export function addOperator(token: string, body: AddOperatorRequest): Promise<VendorResponse> {
-  return unwrap(createServerApi(token).POST("/api/v1/vendors/me/operators", { body }));
-}
-
-export async function removeOperator(token: string, userId: string): Promise<void> {
-  await unwrap(
-    createServerApi(token).DELETE("/api/v1/vendors/me/operators/{userId}", {
-      params: { path: { userId } },
-    }),
-  );
+export function listVendors(query: { limit: number; offset: number }): Promise<VendorListResponse> {
+  return unwrap(createServerApi().GET("/api/v1/vendors", { params: { query } }));
 }
 
 export function getVendorBySlug(slug: string): Promise<PublicVendorResponse> {

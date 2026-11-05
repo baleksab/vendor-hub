@@ -54,13 +54,4 @@ describe("describeError for vendors", () => {
       slug: "vendor.error.slugTaken",
     });
   });
-
-  it("maps operator errors to the email field", () => {
-    expect(describeError(make("conflict"), "addOperator").fields).toEqual({
-      email: "vendor.error.alreadyMember",
-    });
-    expect(describeError(make("client", 404), "addOperator").fields).toEqual({
-      email: "vendor.error.userNotFound",
-    });
-  });
 });

@@ -1,6 +1,6 @@
 import { ApiError } from "../api/ApiError";
 
-export type ErrorContext = "login" | "register" | "vendor" | "addOperator" | "generic";
+export type ErrorContext = "login" | "register" | "vendor" | "generic";
 
 export type ErrorDescription = {
   form: string | null;
@@ -13,8 +13,6 @@ function describeConflict(error: ApiError, context: ErrorContext): ErrorDescript
       return { form: null, fields: { email: "auth.error.emailTaken" } };
     case "vendor":
       return { form: null, fields: { slug: "vendor.error.slugTaken" } };
-    case "addOperator":
-      return { form: null, fields: { email: "vendor.error.alreadyMember" } };
     default:
       return { form: error.detail || "auth.error.generic", fields: {} };
   }
@@ -42,8 +40,6 @@ export function describeError(error: unknown, context: ErrorContext): ErrorDescr
         ? { form: null, fields: error.fieldErrors }
         : { form: error.detail || "auth.error.generic", fields: {} };
     case "client":
-      return context === "addOperator" && error.status === 404
-        ? { form: null, fields: { email: "vendor.error.userNotFound" } }
-        : { form: error.detail || "auth.error.generic", fields: {} };
+      return { form: error.detail || "auth.error.generic", fields: {} };
   }
 }

@@ -17,13 +17,13 @@ beforeEach(() => {
 });
 
 describe("becomeVendorAction", () => {
-  it("registers the vendor with the token and redirects to /vendor", async () => {
-    api.POST.mockResolvedValueOnce(ok({ id: "v1" }, 201));
+  it("registers the vendor with the token and redirects to its site", async () => {
+    api.POST.mockResolvedValueOnce(ok({ id: "v1", slug: "acme" }, 201));
 
     const response = (await becomeVendorAction(await authedForm(values, url))) as Response;
     const [path, call] = api.POST.mock.calls[0] as [string, { body: Record<string, string> }];
 
-    expect(response.headers.get("Location")).toBe("/vendor");
+    expect(response.headers.get("Location")).toBe("http://acme.vendors.test");
     expect(path).toBe("/api/v1/vendors");
     expect(call.body).toEqual({ ...values, slug: "acme" });
   });
