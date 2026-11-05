@@ -11,14 +11,17 @@ packages/shell/
 │   ├── routes.ts           route config
 │   ├── pages/              src/pages/{Name}/{Name}.tsx, one folder per page
 │   │   ├── Home/
-│   │   ├── Login/          login form + action, noindex
-│   │   ├── Register/       registration form + action, countries from the API, noindex
+│   │   ├── Login/          login form, loginAction.server.ts, noindex
+│   │   ├── Register/       registration form, registerAction.server.ts, countries from the API, noindex
 │   │   ├── RemoteTest/     components/ (RemoteSlot, RemoteErrorBoundary, RemoteFallback), loadWidget.ts
 │   │   └── NotFound/       splat route, 404 + noindex
 │   ├── components/         shared: AppLayout, NavLink, LanguageSwitcher, UserMenu, FormField, FormAlert
 │   ├── hooks/              shared: useIsClient, useSession
-│   ├── api/                typed openapi-fetch clients, `unwrap`, ApiError, describeError, API types, problem+json schema
-│   ├── auth/               session cookie, getSession/requireUser, login/register/logout actions, same-origin check, safeRedirect, Zod form schemas
+│   ├── api/                typed openapi-fetch clients, `unwrap`, ApiError, problem+json schema
+│   │   └── endpoints/      one `*.server.ts` per resource (auth, users, countries), the only place that knows API paths
+│   ├── forms/              shared form helpers: readValues, invalid, failed, FormErrors, describeError, common Zod fields
+│   ├── auth/               session cookie, getSession/requireUser, signIn, same-origin check, safeRedirect
+│   ├── testing/            shared helpers for action tests
 │   ├── env.server.ts       cached env for server-only code
 │   ├── seo/                createPageMeta, pageMeta, buildRobots, buildSitemap, indexablePages
 │   ├── routes/             resource routes only: locale.ts, logout.ts, robots.txt.ts, sitemap.xml.ts
@@ -51,18 +54,18 @@ The shell is a backend-for-frontend for the access token. The browser never sees
 browser --(HttpOnly cookie, same origin)--> shell server --(Authorization: Bearer)--> API
 ```
 
-- Login and register are React Router actions (`auth/authActions.server.ts`, called from the `action` of `pages/Login` and `pages/Register`). They validate the form data with the Zod schemas, call the API, and answer with `redirect(..., { headers: { "Set-Cookie": ... } })`. The token never reaches a response body or client code. Logout is the `POST /logout` action (`routes/logout.ts`): clears the cookie and redirects home. After an action React Router revalidates the root loader, so the header updates without any client state.
+- Login and register are React Router actions (`pages/Login/loginAction.server.ts` and `pages/Register/registerAction.server.ts`, called from the `action` of each page). They validate the form data with the Zod schemas, call the API, and answer with `redirect(..., { headers: { "Set-Cookie": ... } })`. The token never reaches a response body or client code. Logout is the `POST /logout` action (`routes/logout.ts`): clears the cookie and redirects home. After an action React Router revalidates the root loader, so the header updates without any client state.
 - Registration creates the user and then logs in with the same credentials. If that login fails, the user lands on `/login?registered=1` with a notice.
 - The cookie (`auth/sessionCookie.server.ts`) is `HttpOnly`, `SameSite=Lax`, `Path=/`, `Secure` from env, with `Max-Age` from `expiresIn`. It holds the signed JWT as is, the shell cannot verify it, only the API does.
 - CSRF: `assertSameOrigin` requires `Origin` equal to `SHELL_ORIGIN` on every non-GET request to these actions, on top of `SameSite=Lax`.
 - `getSession(request)` (`auth/session.server.ts`) calls `GET /api/v1/users/me` once per request and clears the cookie if the API answers `401`. The root loader returns the `user`, so the first paint already has the right header, and `useSession` just reads it. `requireUser` redirects to `/login?redirectTo=...`, `redirectIfAuthenticated` is used by the login and register loaders. `redirectTo` is accepted only as a same-origin relative path (`auth/safeRedirect.ts`).
 - There is no client-side API client and no data library: everything that needs the API runs in loaders and actions on the server. A client-side client (and a proxy that adds the token from the cookie) is added when a remote needs to call the API.
 
-API calls use `openapi-fetch` with the `paths` type generated into `@vendor-hub/types`, so paths, methods, bodies and responses are checked by `tsc`. `createServerApi(token?)` builds the client, and every call is wrapped in `unwrap` (`api/createApiClient.ts`).
+API calls use `openapi-fetch` with the `paths` type generated into `@vendor-hub/types`, so paths, methods, bodies and responses are checked by `tsc`. `createServerApi(token?)` builds the client, and every call is wrapped in `unwrap` (`api/createApiClient.ts`). Calls are defined once per resource in `api/endpoints/*.server.ts`, and actions and loaders use those functions instead of building requests themselves.
 
-API errors go through `ApiError` (`api/ApiError.ts`): `unwrap` turns every failed call (HTTP error or network failure) into `status`, `kind`, `title`, `detail` and `fieldErrors` parsed from `application/problem+json`. `describeError` maps them to i18n keys for the forms (wrong credentials never say which field was wrong, a duplicate email lands on the email field).
+API errors go through `ApiError` (`api/ApiError.ts`): `unwrap` turns every failed call (HTTP error or network failure) into `status`, `kind`, `title`, `detail` and `fieldErrors` parsed from `application/problem+json`. `describeError` (`forms/describeError.ts`) maps them to i18n keys for the forms (wrong credentials never say which field was wrong, a duplicate email lands on the email field).
 
-Forms are a plain `<Form method="post">` with Mantine inputs. The action validates with the Zod schemas in `auth/schemas.ts` (messages are i18n keys) and returns `{ form, fields, values }`, which the page shows under the inputs (passwords are never sent back). The forms work without JavaScript. The register form takes its country list from the public `GET /api/v1/countries` (loaded in the route loader, retry with `useRevalidator`), labels come from `Intl.DisplayNames` in the UI language.
+Forms are a plain `<Form method="post">` with Mantine inputs. The action validates with the Zod schema next to the page (`pages/Login/loginSchema.ts`, `pages/Register/registerSchema.ts`) (messages are i18n keys) and returns `{ form, fields, values }`, which the page shows under the inputs (passwords are never sent back). The forms work without JavaScript. The register form takes its country list from the public `GET /api/v1/countries` (loaded in the route loader, retry with `useRevalidator`), labels come from `Intl.DisplayNames` in the UI language.
 
 ## Layout and pages
 
