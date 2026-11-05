@@ -63,6 +63,35 @@ describe("UsersService", () => {
     });
   });
 
+  it("hashes the password on update and never sends the plain one", async () => {
+    const user = await service.create(request);
+
+    await service.update(user.id, { password: "another-password" });
+
+    expect(repository.rows[0]?.passwordHash).toBe("hash:another-password");
+    expect(repository.rows[0]).not.toHaveProperty("password");
+  });
+
+  it("does not let an actor change their own role", async () => {
+    const user = await service.create(request);
+
+    await expect(
+      service.update(user.id, { role: "administrator" }, user.id),
+    ).rejects.toBeInstanceOf(BadRequestError);
+    await expect(service.update(user.id, { firstName: "Janet" }, user.id)).resolves.toMatchObject({
+      firstName: "Janet",
+    });
+  });
+
+  it("lets an actor change another user's role", async () => {
+    const user = await service.create(request);
+    const other = await service.create({ ...request, email: "other@example.com" });
+
+    await expect(
+      service.update(user.id, { role: "administrator" }, other.id),
+    ).resolves.toMatchObject({ role: "administrator" });
+  });
+
   it("throws NotFoundError for a missing id", async () => {
     const id = "0b4fd4a1-8e8f-4f4a-9a52-6f1c4a5d2c11";
 

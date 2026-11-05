@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "fastify-type-provider-zod";
 
+import { requireRole } from "../auth/require-role.ts";
 import { ProblemResponse } from "../shared/problem.ts";
 import { toUserResponse } from "./users.mapper.ts";
 import {
@@ -14,6 +15,7 @@ import {
 import type { UsersService } from "./users.service.ts";
 
 const security = [{ bearerAuth: [] }];
+const administratorOnly = requireRole("administrator");
 
 export function publicUsersController(service: UsersService) {
   return async (app: FastifyInstance): Promise<void> => {
@@ -49,8 +51,14 @@ export function usersController(service: UsersService) {
           tags: ["users"],
           security,
           querystring: ListUsersQuery,
-          response: { 200: UserListResponse, 400: ProblemResponse, 401: ProblemResponse },
+          response: {
+            200: UserListResponse,
+            400: ProblemResponse,
+            401: ProblemResponse,
+            403: ProblemResponse,
+          },
         },
+        onRequest: administratorOnly,
       },
       async (request) => {
         const { items, total } = await service.list(request.query);
@@ -85,9 +93,11 @@ export function usersController(service: UsersService) {
             200: UserResponse,
             400: ProblemResponse,
             401: ProblemResponse,
+            403: ProblemResponse,
             404: ProblemResponse,
           },
         },
+        onRequest: administratorOnly,
       },
       async (request) => toUserResponse(await service.get(request.params.id)),
     );
@@ -104,12 +114,15 @@ export function usersController(service: UsersService) {
             200: UserResponse,
             400: ProblemResponse,
             401: ProblemResponse,
+            403: ProblemResponse,
             404: ProblemResponse,
             409: ProblemResponse,
           },
         },
+        onRequest: administratorOnly,
       },
-      async (request) => toUserResponse(await service.update(request.params.id, request.body)),
+      async (request) =>
+        toUserResponse(await service.update(request.params.id, request.body, request.auth.userId)),
     );
   };
 }

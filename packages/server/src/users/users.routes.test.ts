@@ -32,6 +32,24 @@ describe("users and auth routes", () => {
     return { authorization: `Bearer ${accessToken}` };
   }
 
+  const adminEmail = "admin@example.com";
+
+  async function adminBearer(): Promise<{ authorization: string }> {
+    await register({ ...validUser, email: adminEmail });
+
+    const admin = repository.rows.find((row) => row.email === adminEmail);
+
+    if (admin === undefined) {
+      throw new Error("Administrator was not registered");
+    }
+
+    admin.role = "administrator";
+
+    const { accessToken } = (await login(adminEmail)).json();
+
+    return { authorization: `Bearer ${accessToken}` };
+  }
+
   it("registers a regular user without exposing the password", async () => {
     const response = await register({ ...validUser, role: "administrator" });
     const body = response.json();
@@ -91,23 +109,144 @@ describe("users and auth routes", () => {
     }
   });
 
-  it("lets a logged-in user list, get and update users", async () => {
+  it("returns 403 for a regular user on list, get and patch", async () => {
     const headers = await bearer();
+    const id = repository.rows[0]?.id;
+    const calls = [
+      app.inject({ method: "GET", url: "/api/v1/users", headers }),
+      app.inject({ method: "GET", url: `/api/v1/users/${id}`, headers }),
+      app.inject({
+        method: "PATCH",
+        url: `/api/v1/users/${id}`,
+        headers,
+        payload: { role: "administrator" },
+      }),
+    ];
+
+    for (const response of await Promise.all(calls)) {
+      expect(response.statusCode).toBe(403);
+    }
+
+    expect(repository.rows[0]?.role).toBe("regular");
+  });
+
+  it("lets an administrator list and get users", async () => {
+    const headers = await adminBearer();
+    await register({ ...validUser, email: "other@example.com" });
+
     const list = await app.inject({ method: "GET", url: "/api/v1/users?limit=5", headers });
     const id = list.json().data[0].id;
-
-    expect(list.json().meta).toEqual({ total: 1, limit: 5, offset: 0 });
-
     const get = await app.inject({ method: "GET", url: `/api/v1/users/${id}`, headers });
+
+    expect(list.json().meta).toEqual({ total: 2, limit: 5, offset: 0 });
+    expect(get.statusCode).toBe(200);
+  });
+
+  it("patches one field and leaves the others unchanged", async () => {
+    const headers = await adminBearer();
+    const target = (await register({ ...validUser, email: "other@example.com" })).json();
     const patch = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/users/${target.id}`,
+      headers,
+      payload: { firstName: "Janet" },
+    });
+
+    expect(patch.statusCode).toBe(200);
+    expect(patch.json()).toEqual({
+      ...target,
+      firstName: "Janet",
+      updatedAt: expect.any(String),
+    });
+  });
+
+  it("patches every field and never returns the password or hash", async () => {
+    const headers = await adminBearer();
+    const target = (await register({ ...validUser, email: "other@example.com" })).json();
+    const payload = {
+      email: "changed@example.com",
+      password: "brand-new-password",
+      firstName: "Changed",
+      lastName: "Person",
+      address: "Other street 2",
+      phoneNumber: "+381607654321",
+      country: "DE",
+      role: "administrator",
+    };
+    const patch = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/users/${target.id}`,
+      headers,
+      payload,
+    });
+    const { password: _password, ...expected } = payload;
+
+    expect(patch.statusCode).toBe(200);
+    expect(patch.json()).toMatchObject(expected);
+    expect(JSON.stringify(patch.json())).not.toMatch(/password|hash/i);
+  });
+
+  it("lets the user log in with the new password only", async () => {
+    const headers = await adminBearer();
+    const target = (await register({ ...validUser, email: "other@example.com" })).json();
+
+    await app.inject({
+      method: "PATCH",
+      url: `/api/v1/users/${target.id}`,
+      headers,
+      payload: { password: "brand-new-password" },
+    });
+
+    expect((await login("other@example.com", "brand-new-password")).statusCode).toBe(200);
+    expect((await login("other@example.com", validUser.password)).statusCode).toBe(401);
+  });
+
+  it("returns 404 for a missing user, 400 for an empty patch and 409 for a taken email", async () => {
+    const headers = await adminBearer();
+    const target = (await register({ ...validUser, email: "other@example.com" })).json();
+    const missing = await app.inject({
+      method: "PATCH",
+      url: "/api/v1/users/0b4fd4a1-8e8f-4f4a-9a52-6f1c4a5d2c11",
+      headers,
+      payload: { firstName: "X" },
+    });
+    const empty = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/users/${target.id}`,
+      headers,
+      payload: {},
+    });
+    const taken = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/users/${target.id}`,
+      headers,
+      payload: { email: adminEmail },
+    });
+
+    expect(missing.statusCode).toBe(404);
+    expect(empty.statusCode).toBe(400);
+    expect(taken.statusCode).toBe(409);
+  });
+
+  it("rejects an administrator changing their own role but allows other fields", async () => {
+    const headers = await adminBearer();
+    const id = repository.rows[0]?.id;
+    const role = await app.inject({
       method: "PATCH",
       url: `/api/v1/users/${id}`,
       headers,
-      payload: { firstName: "Janet", role: "administrator" },
+      payload: { role: "regular" },
+    });
+    const name = await app.inject({
+      method: "PATCH",
+      url: `/api/v1/users/${id}`,
+      headers,
+      payload: { firstName: "Boss" },
     });
 
-    expect(get.statusCode).toBe(200);
-    expect(patch.json()).toMatchObject({ firstName: "Janet", role: "administrator" });
+    expect(role.statusCode).toBe(400);
+    expect(name.statusCode).toBe(200);
+    expect(repository.rows[0]?.role).toBe("administrator");
   });
 
   it("returns the current user on /users/me and requires a token", async () => {
@@ -121,37 +260,17 @@ describe("users and auth routes", () => {
     expect(anonymous.statusCode).toBe(401);
   });
 
-  it("returns 404 for a missing user and 400 for an empty patch", async () => {
-    const headers = await bearer();
-    const missing = await app.inject({
-      method: "PATCH",
-      url: "/api/v1/users/0b4fd4a1-8e8f-4f4a-9a52-6f1c4a5d2c11",
-      headers,
-      payload: { firstName: "X" },
-    });
-    const id = repository.rows[0]?.id;
-    const empty = await app.inject({
-      method: "PATCH",
-      url: `/api/v1/users/${id}`,
-      headers,
-      payload: {},
-    });
-
-    expect(missing.statusCode).toBe(404);
-    expect(empty.statusCode).toBe(400);
-  });
-
   it("puts the updated role into the next token", async () => {
-    const headers = await bearer();
-    const id = repository.rows[0]?.id;
+    const headers = await adminBearer();
+    const target = (await register({ ...validUser, email: "other@example.com" })).json();
 
     await app.inject({
       method: "PATCH",
-      url: `/api/v1/users/${id}`,
+      url: `/api/v1/users/${target.id}`,
       headers,
       payload: { role: "administrator" },
     });
-    const token = (await login()).json().accessToken as string;
+    const token = (await login("other@example.com")).json().accessToken as string;
     const claims = JSON.parse(Buffer.from(token.split(".")[1] ?? "", "base64url").toString());
 
     expect(claims.role).toBe("administrator");
