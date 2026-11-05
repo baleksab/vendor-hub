@@ -10,18 +10,21 @@ packages/shell/
 │   ├── root.tsx            document Layout, root loader (locale, origin, manifest URL, user), ErrorBoundary
 │   ├── routes.ts           route config
 │   ├── pages/              src/pages/{Name}/{Name}.tsx, one folder per page
-│   │   ├── Home/
+│   │   ├── Home/           main site home, or the vendor site when the request carries the vendor header (components/VendorSite)
+│   │   ├── BecomeVendor/   vendor registration form, becomeVendorAction.server.ts, noindex
+│   │   ├── Vendor/         own vendor, members, operators (vendorAction.server.ts), noindex
 │   │   ├── Login/          login form, loginAction.server.ts, noindex
 │   │   ├── Register/       registration form, registerAction.server.ts, countries from the API, noindex
 │   │   ├── RemoteTest/     components/ (RemoteSlot, RemoteErrorBoundary, RemoteFallback), loadWidget.ts
 │   │   └── NotFound/       splat route, 404 + noindex
-│   ├── components/         shared: AppLayout, NavLink, LanguageSwitcher, UserMenu, FormField, FormAlert
+│   ├── components/         shared: AppLayout, VendorSiteLayout, NavLink, LanguageSwitcher, UserMenu, FormField, FormAlert
 │   ├── hooks/              shared: useIsClient, useSession
 │   ├── api/                typed openapi-fetch clients, `unwrap`, ApiError, problem+json schema
-│   │   └── endpoints/      one `*.server.ts` per resource (auth, users, countries), the only place that knows API paths
+│   │   └── endpoints/      one `*.server.ts` per resource (auth, users, countries, vendors), the only place that knows API paths
 │   ├── forms/              shared form helpers: readValues, invalid, failed, FormErrors, describeError, common Zod fields
 │   ├── auth/               session cookie, getSession/requireUser, signIn, same-origin check, safeRedirect
 │   ├── testing/            shared helpers for action tests
+│   ├── vendor/             vendorSite.ts (slug header, site origin from the template), myVendors.server.ts (per-request cache)
 │   ├── env.server.ts       cached env for server-only code
 │   ├── seo/                createPageMeta, pageMeta, buildRobots, buildSitemap, indexablePages
 │   ├── routes/             resource routes only: locale.ts, logout.ts, robots.txt.ts, sitemap.xml.ts
@@ -41,7 +44,7 @@ packages/shell/
 
 ## Server side
 
-- `root.tsx` has the `loader` that reads env with `getEnv()` (cached `readShellEnv(process.env)`) and returns the locale, the public origin, the remote manifest URL and the current user. Env is read on the server only; the client gets the URL as loader data.
+- `root.tsx` has the `loader` that reads env with `getEnv()` (cached `readShellEnv(process.env)`) and returns the locale, the public origin, the remote manifest URL, the current user and the vendors of that user (`GET /vendors/me`, cached per request, `null` if the call fails). Env is read on the server only; the client gets the URL as loader data.
 - `Layout` renders the HTML document with `mantineHtmlProps`, `ColorSchemeScript` in `<head>` and `MantineProvider` (theme from `src/theme.ts`) around the children. Mantine is server-rendered; its CSS is static, so SSR needs no style extraction.
 - `Layout` renders the HTML document. SSR output includes the route markup and, for remote routes, a skeleton.
 - `pnpm build` produces `build/`; `pnpm start` runs `scripts/start.mjs`, which checks the env keys and maps `SHELL_HOST`/`SHELL_PORT` to the `HOST`/`PORT` that `react-router-serve` expects.
@@ -105,3 +108,11 @@ CI (`.github/workflows/checks.yml`) runs format, lint, typecheck, build and unit
 - `react` and `react-dom` stay `singleton` in the `shared` config in `remote.ts`.
 - Nothing in the shell may assume a remote runs on the server.
 - API types come from `@vendor-hub/types`, a devDependency used with `import type` only, so nothing from it ends up in the bundle.
+
+## Vendors and vendor sites
+
+- `BecomeVendor` (`/become-vendor`) and `Vendor` (`/vendor`) need a logged-in user (`requireUser`). `BecomeVendor` redirects to `/vendor` when the user already owns a vendor, a slug conflict lands on the slug field (`describeError` context `vendor`). `Vendor` shows the owned vendor with members, the "add operator" form and remove buttons (owner only), plus the vendors the user operates, and redirects to `/become-vendor` if the user has none. The two forms on `Vendor` share one action and are told apart by a hidden `intent` field (`add` or `remove`).
+- `AppLayout` shows "Become a vendor" to users who own no vendor and "My vendor" to users who own or operate one. The root loader provides the vendors, so the first paint is right.
+- **Vendor site:** nginx routes `<slug>.<base domain>` to the shell and sets the `VENDOR_SLUG_HEADER` header (and clears it on the main site). If the header is present, the root loader skips the session and the vendor lookup, returns the vendor site origin (from the `VENDOR_SITE_ORIGIN` template) as `origin` and the root `App` renders `VendorSiteLayout` (no navbar, no login, language switcher kept). The `Home` loader loads the vendor with the public `GET /vendors/by-slug/:slug` and `Home` renders `VendorSite`, `404` if the vendor does not exist. The site is public: no login is needed to see it. The URL is never rewritten, so server and client render the same route and there is no hydration mismatch. `meta` uses the vendor name and a cut of the description, with the canonical link on the subdomain.
+- The shell trusts the vendor header only because nginx is the only way in. The shell port must not be published in production.
+- Links to a vendor site are built with `vendorSiteOrigin(VENDOR_SITE_ORIGIN, slug)`.
