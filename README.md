@@ -43,13 +43,14 @@ Requirements: Node 24 (`.nvmrc`), the pnpm version from `packageManager`, and Do
 
 ### Everything in Docker
 
-> Planned. Today the compose file only starts Postgres.
-
 ```sh
-docker compose up
+cp packages/server/.env.secret.example packages/server/.env.secret
+# fill in the secrets, they are never committed
+
+pnpm stack:deploy
 ```
 
-Then open `http://vendorhub.localhost`.
+The script (`scripts/deploy.sh`) checks Docker and the secrets file, builds the images, starts Postgres, applies the migrations, seeds the administrator, then starts the server, the shell, the remote and nginx, and waits until all of them are healthy. Then open `http://vendorhub.localhost`. `pnpm stack:down` stops everything. It runs as its own compose project (`vendor-hub-stack`), separate from the containers of `pnpm db:up` and `pnpm nginx:up`, so stop `pnpm nginx:up` first (nginx needs port 80). The deploy does not publish Postgres on the host.
 
 ### Development
 
@@ -110,7 +111,7 @@ Ports are changed only in the `.env.local` files. The shell needs the API runnin
 | Vendors, roles, vendor pages           | in progress (server, shell) |
 | Catalog, cart, orders, payment         | planned                     |
 | Admin and statistics remotes, reports  | planned                     |
-| Full-stack `docker compose up`         | planned                     |
+| Full-stack Docker deploy               | done (`pnpm stack:deploy`)  |
 | Specialist track                       | undecided                   |
 
 ## Documentation

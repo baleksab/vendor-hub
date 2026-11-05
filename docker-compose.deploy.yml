@@ -1,0 +1,103 @@
+x-server-build: &server-build
+  context: .
+  target: server
+
+x-server-env: &server-env
+  env_file:
+    - packages/server/.env
+    - packages/server/.env.local
+    - packages/server/.env.secret
+  environment:
+    SERVER_HOST: 0.0.0.0
+    DB_HOST: postgres
+    DB_PORT: "5432"
+
+services:
+  postgres:
+    ports: !reset []
+
+  migrate:
+    <<: *server-env
+    build: *server-build
+    image: vendor-hub-server
+    command: ["sh", "-c", "node src/db/migrate.ts && node src/db/seed-admin.ts"]
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  server:
+    <<: *server-env
+    build: *server-build
+    image: vendor-hub-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:?}:${SERVER_PORT:?}"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "node", "/app/scripts/healthcheck.mjs", "SERVER_HOST", "SERVER_PORT", "/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  shell:
+    build:
+      context: .
+      target: shell
+    image: vendor-hub-shell
+    restart: unless-stopped
+    env_file:
+      - packages/shell/.env
+      - packages/shell/.env.local
+    environment:
+      SHELL_HOST: 0.0.0.0
+      API_URL: http://server:${SERVER_PORT:?}
+    ports:
+      - "${SHELL_PORT:?}:${SHELL_PORT:?}"
+    depends_on:
+      server:
+        condition: service_healthy
+    healthcheck:
+      test:
+        ["CMD", "node", "/app/scripts/healthcheck.mjs", "SHELL_HOST", "SHELL_PORT", "/robots.txt"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  user-administrator:
+    build:
+      context: .
+      target: user-administrator
+    image: vendor-hub-user-administrator
+    restart: unless-stopped
+    env_file:
+      - packages/user-administrator/.env
+      - packages/user-administrator/.env.local
+    environment:
+      USER_ADMINISTRATOR_HOST: 0.0.0.0
+    ports:
+      - "${USER_ADMINISTRATOR_PORT:?}:${USER_ADMINISTRATOR_PORT:?}"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "/app/scripts/healthcheck.mjs",
+          "USER_ADMINISTRATOR_HOST",
+          "USER_ADMINISTRATOR_PORT",
+          "/mf-manifest.json",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  nginx:
+    environment:
+      SHELL_UPSTREAM: shell:${SHELL_PORT:?}
+    depends_on:
+      shell:
+        condition: service_healthy
+      user-administrator:
+        condition: service_healthy

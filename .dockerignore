@@ -1,0 +1,17 @@
+.git
+.github
+.claude
+.husky
+.vscode
+.idea
+.DS_Store
+
+**/node_modules
+**/dist
+**/build
+**/.react-router
+**/.mf
+**/*.tsbuildinfo
+
+**/.env.secret
+**/.env.*.local
