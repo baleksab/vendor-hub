@@ -60,7 +60,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </Anchor>
         </Group>
 
-        <Stack component="nav" aria-label={t("nav.label")} gap={2} flex={1} px="md">
+        <Stack component="nav" aria-label={t("nav.label")} gap={2} flex={1} px="md" pt="md">
           {links.map((link) => (
             <NavLink key={link.to} {...link} />
           ))}
