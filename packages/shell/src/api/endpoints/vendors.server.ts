@@ -5,7 +5,7 @@ import type {
   RegisterVendorRequest,
   VendorResponse,
 } from "@vendor-hub/types";
-import { unwrap } from "../createApiClient";
+import { unwrap } from "@vendor-hub/api-client";
 import { createServerApi } from "../createServerApi.server";
 
 export function registerVendor(

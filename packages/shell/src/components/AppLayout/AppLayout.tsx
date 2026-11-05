@@ -24,7 +24,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     closeMobile();
   }, [location.key, closeMobile]);
 
-  const { vendors } = useSession();
+  const { user, vendors } = useSession();
 
   const links = [
     { to: "/", label: t("nav.home") },
@@ -34,6 +34,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   if (vendors === null || vendors.owned === null) {
     links.push({ to: "/become-vendor", label: t("nav.becomeVendor") });
+  }
+
+  if (user?.role === "administrator") {
+    links.push({ to: "/admin/users", label: t("nav.administration") });
   }
 
   return (

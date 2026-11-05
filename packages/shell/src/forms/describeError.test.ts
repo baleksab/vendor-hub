@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ApiError } from "../api/ApiError";
+import { ApiError } from "@vendor-hub/api-client";
 import { describeError } from "./describeError";
 
 describe("describeError", () => {

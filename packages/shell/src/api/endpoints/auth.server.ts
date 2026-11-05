@@ -1,4 +1,4 @@
-import { unwrap } from "../createApiClient";
+import { unwrap } from "@vendor-hub/api-client";
 import { createServerApi } from "../createServerApi.server";
 import type { LoginRequest, TokenResponse } from "@vendor-hub/types";
 

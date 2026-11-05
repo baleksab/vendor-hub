@@ -1,6 +1,6 @@
 import type { paths } from "@vendor-hub/types";
 import { getEnv } from "../env.server";
-import { createApiClient } from "./createApiClient";
+import { createApiClient } from "@vendor-hub/api-client";
 
 export function createServerApi(token?: string) {
   return createApiClient<paths>({

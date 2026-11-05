@@ -1,0 +1,33 @@
+{
+  "name": "@mfe/user-administrator",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mantine/core": "catalog:",
+    "@mantine/form": "catalog:",
+    "@mantine/hooks": "catalog:",
+    "@tanstack/react-query": "catalog:",
+    "@vendor-hub/api-client": "workspace:*",
+    "@vendor-hub/ui": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-router": "8.5.1"
+  },
+  "devDependencies": {
+    "@module-federation/vite": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vendor-hub/types": "workspace:*",
+    "@vitejs/plugin-react": "catalog:",
+    "tailwindcss": "catalog:",
+    "vite": "catalog:"
+  }
+}

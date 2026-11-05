@@ -16,3 +16,14 @@ export type MyVendorsResponse = Schemas["MyVendorsResponse"];
 export type PublicVendorResponse = Schemas["PublicVendorResponse"];
 export type VendorListResponse = Schemas["VendorListResponse"];
 export type VendorListItemResponse = Schemas["VendorListItemResponse"];
+
+export type UpdateUserRequest = Schemas["UpdateUserRequest"];
+export type UserListResponse = Schemas["UserListResponse"];
+
+export type Locale = "en" | "sr";
+
+export type UserAdministratorProps = {
+  locale: Locale;
+  apiBaseUrl: string;
+  onUnauthorized: () => void;
+};
