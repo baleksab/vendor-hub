@@ -39,7 +39,7 @@ export function UserMenu() {
           style={{ borderRadius: "var(--mantine-radius-md)" }}
         >
           <Group gap="sm" wrap="nowrap">
-            <Avatar name={name} color="clay" radius="xl" />
+            <Avatar name={name} radius="xl" />
             <Text fw={500} truncate>
               {name}
             </Text>

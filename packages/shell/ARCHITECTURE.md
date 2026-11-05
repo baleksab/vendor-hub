@@ -73,9 +73,7 @@ Forms are a plain `<Form method="post">` with Mantine inputs. The action validat
 
 ## Layout and pages
 
-`AppLayout` wraps the `Outlet` in a Mantine `AppShell` with a left sidebar, like a chat app. The sidebar has the title, the `NavLink`s (active state from `useMatch`) and, at the bottom, the `LanguageSwitcher` and the `UserMenu` (log in / register buttons, or an avatar with the user name and a log out item). A `Burger` collapses it on desktop, and a floating `Burger` brings it back. Below `sm` the sidebar is hidden and opens full width from a sticky top bar, closing again on navigation. Content sits in a centered `Container`, and the landing page is centered. Design is mobile first. Unknown URLs hit the splat route `NotFound` (status 404, `noindex`), and the root `ErrorBoundary` renders other errors, also `noindex`.
-
-`theme.ts` holds the warm palette (`clay` as the primary color, warm `gray` and `dark` scales), a serif font for headings and `cssVariablesResolver`, which sets the off-white light background.
+`AppLayout` wraps the `Outlet` in a Mantine `AppShell` with a left sidebar, like a chat app. The sidebar has the title, the `NavLink`s (active state from `useMatch`) and, at the bottom, the `LanguageSwitcher` and the `UserMenu` (log in / register buttons, or an avatar with the user name and a log out item). A `Burger` collapses it on desktop, and a floating `Burger` brings it back. Below `sm` the sidebar is hidden and opens full width from a sticky top bar, closing again on navigation. Content sits in a centered `Container`. Design is mobile first. Unknown URLs hit the splat route `NotFound` (status 404, `noindex`), and the root `ErrorBoundary` renders other errors, also `noindex`.
 
 ## SEO
 
