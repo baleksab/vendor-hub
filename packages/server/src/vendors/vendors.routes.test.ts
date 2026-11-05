@@ -230,4 +230,33 @@ describe("vendors routes", () => {
 
     expect(response.statusCode).toBe(404);
   });
+
+  it("lists vendors publicly, newest first, with pagination and no contact data", async () => {
+    const first = await bearerFor();
+    const second = await bearerFor(operatorUser);
+
+    await registerVendor(first);
+    await registerVendor(second, { ...acme, slug: "second", name: "Second Shop" });
+
+    const all = await app.inject({ method: "GET", url: "/api/v1/vendors" });
+    const page = await app.inject({ method: "GET", url: "/api/v1/vendors?limit=1&offset=1" });
+
+    expect(all.statusCode).toBe(200);
+    expect(all.json().meta).toEqual({ total: 2, limit: 20, offset: 0 });
+    expect(all.json().data.map((vendor: { slug: string }) => vendor.slug)).toEqual([
+      "second",
+      "acme",
+    ]);
+    expect(page.json().data).toEqual([
+      { slug: "acme", name: "Acme Inc", description: acme.description },
+    ]);
+    expect(page.json().meta).toEqual({ total: 2, limit: 1, offset: 1 });
+    expect(JSON.stringify(all.json())).not.toMatch(/email|phone|address|userId|example\.com/i);
+  });
+
+  it("rejects an invalid page size on the vendor list", async () => {
+    const response = await app.inject({ method: "GET", url: "/api/v1/vendors?limit=0" });
+
+    expect(response.statusCode).toBe(400);
+  });
 });
