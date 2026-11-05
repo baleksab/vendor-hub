@@ -9,7 +9,7 @@
     "vite.config.ts",
     "react-router.config.ts",
     "vitest.config.ts",
-    "app/**/*",
+    "src/**/*",
     ".react-router/types/**/*"
   ]
 }

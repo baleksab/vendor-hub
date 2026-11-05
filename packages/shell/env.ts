@@ -1,4 +1,4 @@
-import { isLocale, LOCALES, type Locale } from "./app/i18n/locales.ts";
+import { isLocale, LOCALES, type Locale } from "./src/i18n/locales.ts";
 
 export type ShellEnv = {
   defaultLocale: Locale;

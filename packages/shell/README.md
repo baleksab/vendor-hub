@@ -22,4 +22,4 @@ Run from the repo root with `pnpm --filter @mfe/shell <script>`, or `pnpm dev` t
 
 Hosts, ports and URLs come from `.env` and `.env.local` through `env.ts`, which throws on a missing key. Change the port only in `.env.local`.
 
-See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the structure, localization and how remotes are loaded.
+See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the structure, layout, SEO, localization and how remotes are loaded.
