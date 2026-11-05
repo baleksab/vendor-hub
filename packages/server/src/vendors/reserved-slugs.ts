@@ -1,0 +1,17 @@
+export const RESERVED_SLUGS: ReadonlySet<string> = new Set([
+  "www",
+  "api",
+  "admin",
+  "app",
+  "mail",
+  "static",
+  "assets",
+  "vendorhub",
+  "localhost",
+  "docs",
+  "swagger",
+  "health",
+  "login",
+  "register",
+  "support",
+]);

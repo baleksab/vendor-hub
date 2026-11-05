@@ -92,16 +92,16 @@ Ports are changed only in the `.env.local` files. The shell needs the API runnin
 
 ## Project status
 
-| Area                                   | State                   |
-| -------------------------------------- | ----------------------- |
-| Monorepo, SSR shell, Module Federation | done (test remote only) |
-| API server, OpenAPI, users and login   | done                    |
-| Shell login, registration, session     | done                    |
-| Vendors, roles, subdomain routing      | planned                 |
-| Catalog, cart, orders, payment         | planned                 |
-| Admin and statistics remotes, reports  | planned                 |
-| Full-stack `docker compose up`         | planned                 |
-| Specialist track                       | undecided               |
+| Area                                   | State                     |
+| -------------------------------------- | ------------------------- |
+| Monorepo, SSR shell, Module Federation | done (test remote only)   |
+| API server, OpenAPI, users and login   | done                      |
+| Shell login, registration, session     | done                      |
+| Vendors, roles, subdomain routing      | in progress (server done) |
+| Catalog, cart, orders, payment         | planned                   |
+| Admin and statistics remotes, reports  | planned                   |
+| Full-stack `docker compose up`         | planned                   |
+| Specialist track                       | undecided                 |
 
 ## Documentation
 

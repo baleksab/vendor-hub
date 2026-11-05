@@ -1,9 +1,9 @@
 import { and, count, desc, eq, sql } from "drizzle-orm";
-import pg from "pg";
 
 import { notDeleted } from "../db/base-entity.ts";
 import type { Database } from "../db/client.ts";
 import { users } from "../db/schema.ts";
+import { findUniqueViolation } from "../db/unique-violation.ts";
 import { ConflictError } from "../shared/errors.ts";
 import type { Page } from "../shared/pagination.ts";
 import type { NewUser, User, UserCredentials, UserCredentialsLookup, UserPatch } from "./user.ts";
@@ -14,8 +14,6 @@ export type UsersRepository = UserCredentialsLookup & {
   list(page: Page): Promise<{ items: User[]; total: number }>;
   update(id: string, patch: UserPatch): Promise<User | undefined>;
 };
-
-const UNIQUE_VIOLATION = "23505";
 
 const publicColumns = {
   id: users.id,
@@ -32,14 +30,6 @@ const publicColumns = {
 
 function emailTaken(): ConflictError {
   return new ConflictError("A user with this email already exists");
-}
-
-function isUniqueViolation(error: unknown): boolean {
-  const cause = error instanceof Error ? error.cause : undefined;
-
-  return [error, cause].some(
-    (candidate) => candidate instanceof pg.DatabaseError && candidate.code === UNIQUE_VIOLATION,
-  );
 }
 
 export class DrizzleUsersRepository implements UsersRepository {
@@ -59,7 +49,7 @@ export class DrizzleUsersRepository implements UsersRepository {
 
       return row;
     } catch (error) {
-      throw isUniqueViolation(error) ? emailTaken() : error;
+      throw findUniqueViolation(error) !== undefined ? emailTaken() : error;
     }
   }
 
@@ -99,7 +89,7 @@ export class DrizzleUsersRepository implements UsersRepository {
 
       return row;
     } catch (error) {
-      throw isUniqueViolation(error) ? emailTaken() : error;
+      throw findUniqueViolation(error) !== undefined ? emailTaken() : error;
     }
   }
 

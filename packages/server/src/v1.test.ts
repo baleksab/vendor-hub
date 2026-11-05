@@ -36,6 +36,11 @@ describe("OpenAPI document", () => {
       "/api/v1/users",
       "/api/v1/users/me",
       "/api/v1/users/{id}",
+      "/api/v1/vendors",
+      "/api/v1/vendors/by-slug/{slug}",
+      "/api/v1/vendors/me",
+      "/api/v1/vendors/me/operators",
+      "/api/v1/vendors/me/operators/{userId}",
       "/health",
     ]);
   });
