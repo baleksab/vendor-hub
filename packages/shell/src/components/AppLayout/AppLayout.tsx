@@ -11,6 +11,9 @@ import { UserMenu } from "../UserMenu/UserMenu";
 
 const SIDEBAR_WIDTH = 240;
 const TOP_BAR_HEIGHT = 52;
+const BURGER_ICON_SIZE = 18;
+const BURGER_TOUCH_PADDING = 13;
+const burgerStyle = { boxSizing: "content-box", padding: BURGER_TOUCH_PADDING } as const;
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const t = useT();
@@ -54,7 +57,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
             opened
             onClick={closeMobile}
             hiddenFrom="sm"
-            size={44}
+            size={BURGER_ICON_SIZE}
+            style={burgerStyle}
             aria-label={t("nav.close")}
           />
         </Group>
@@ -82,7 +86,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
           style={{ zIndex: 10, borderBottom: "1px solid var(--mantine-color-default-border)" }}
           bg="var(--mantine-color-body)"
         >
-          <Burger opened={false} onClick={openMobile} size={44} aria-label={t("nav.menu")} />
+          <Burger
+            opened={false}
+            onClick={openMobile}
+            size={BURGER_ICON_SIZE}
+            style={burgerStyle}
+            aria-label={t("nav.menu")}
+          />
           <Anchor component={Link} to="/" fw={600} fz="lg" c="inherit" underline="never">
             {t("app.title")}
           </Anchor>
