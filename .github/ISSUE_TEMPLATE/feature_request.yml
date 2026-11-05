@@ -28,6 +28,7 @@ body:
         - remotes
         - server
         - types
+        - infra
         - root / tooling
         - new package
         - not sure

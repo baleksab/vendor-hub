@@ -18,5 +18,26 @@ services:
       timeout: 3s
       retries: 10
 
+  nginx:
+    image: nginx:1.28-alpine
+    restart: unless-stopped
+    environment:
+      NGINX_PORT: ${NGINX_PORT:?}
+      VENDOR_BASE_DOMAIN: ${VENDOR_BASE_DOMAIN:?}
+      SHELL_UPSTREAM: ${SHELL_UPSTREAM:?}
+      MAIN_SITE_ORIGIN: ${MAIN_SITE_ORIGIN:?}
+      VENDOR_SLUG_HEADER: ${VENDOR_SLUG_HEADER:?}
+    ports:
+      - "${NGINX_PORT:?}:${NGINX_PORT:?}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./infra/nginx/vendorhub.conf.template:/etc/nginx/templates/vendorhub.conf.template:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:$${NGINX_PORT}/nginx-health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
 volumes:
   postgres-data:

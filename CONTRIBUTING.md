@@ -67,7 +67,7 @@ We use [Conventional Commits](https://www.conventionalcommits.org/).
 
 **Types:** `feat`, `fix`, `refactor`, `perf`, `docs`, `test`, `build`, `ci`, `chore`, `revert`.
 
-**Scopes:** `shell`, `remotes`, `server`, `types`, `deps`, `repo` (root config, tooling, CI). For a change to one specific remote, use its package name as the scope instead of `remotes`.
+**Scopes:** `shell`, `remotes`, `server`, `types`, `deps`, `infra` (nginx, docker compose), `repo` (root config, tooling, CI). For a change to one specific remote, use its package name as the scope instead of `remotes`.
 
 Rules for the summary: imperative mood ("add", not "added"), lowercase, no trailing period, up to about 72 characters.
 
