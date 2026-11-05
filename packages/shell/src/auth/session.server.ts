@@ -3,7 +3,7 @@ import { redirect } from "react-router";
 import { ApiError } from "../api/ApiError";
 import { getCurrentUser } from "../api/endpoints/users.server";
 import type { UserResponse } from "@vendor-hub/types";
-import { loginPath, safeRedirectTo } from "./safeRedirect";
+import { loginPath, requestTarget, safeRedirectTo } from "./safeRedirect";
 import { clearToken, readToken } from "./sessionCookie.server";
 
 export type Session = { user: UserResponse; token: string };
@@ -48,9 +48,7 @@ export async function requireUser(request: Request): Promise<Session> {
   const { session, headers } = await getSession(request);
 
   if (session === null) {
-    const url = new URL(request.url);
-
-    throw redirect(loginPath(url.pathname + url.search), { headers });
+    throw redirect(loginPath(requestTarget(request)), { headers });
   }
 
   return session;
