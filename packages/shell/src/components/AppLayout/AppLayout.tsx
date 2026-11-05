@@ -10,7 +10,7 @@ import { NavLink } from "../NavLink/NavLink";
 import { UserMenu } from "../UserMenu/UserMenu";
 
 const SIDEBAR_WIDTH = 240;
-const TOP_BAR_HEIGHT = 52;
+const TOP_BAR_HEIGHT = 56;
 const BURGER_ICON_SIZE = 18;
 const BURGER_TOUCH_PADDING = 13;
 const burgerStyle = { boxSizing: "content-box", padding: BURGER_TOUCH_PADDING } as const;
@@ -55,7 +55,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             style={burgerStyle}
             aria-label={t("nav.close")}
           />
-          <Anchor component={Link} to="/" fw={600} fz="lg" c="inherit" underline="never">
+          <Anchor component={Link} to="/" fw={600} fz="lg" c="inherit" underline="never" px="xs">
             {t("app.title")}
           </Anchor>
         </Group>
@@ -90,7 +90,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             style={burgerStyle}
             aria-label={t("nav.menu")}
           />
-          <Anchor component={Link} to="/" fw={600} fz="lg" c="inherit" underline="never">
+          <Anchor component={Link} to="/" fw={600} fz="lg" c="inherit" underline="never" px="xs">
             {t("app.title")}
           </Anchor>
         </Group>
