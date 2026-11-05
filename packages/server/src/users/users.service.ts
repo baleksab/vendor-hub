@@ -1,7 +1,7 @@
 import type { PasswordHasher } from "../auth/password.service.ts";
 import { BadRequestError, NotFoundError } from "../shared/errors.ts";
 import type { Page } from "../shared/pagination.ts";
-import type { User } from "./user.ts";
+import type { User, UserPatch } from "./user.ts";
 import type { CreateUserRequest, UpdateUserRequest } from "./users.schemas.ts";
 import type { UsersRepository } from "./users.repository.ts";
 
@@ -38,12 +38,23 @@ export class UsersService {
     return this.repository.list(page);
   }
 
-  async update(id: string, request: UpdateUserRequest): Promise<User> {
+  async update(id: string, request: UpdateUserRequest, actorId?: string): Promise<User> {
     if (Object.values(request).every((value) => value === undefined)) {
       throw new BadRequestError("At least one field must be present");
     }
 
-    const user = await this.repository.update(id, request);
+    if (id === actorId && request.role !== undefined) {
+      throw new BadRequestError("You cannot change your own role");
+    }
+
+    const { password, ...profile } = request;
+    const patch: UserPatch = { ...profile };
+
+    if (password !== undefined) {
+      patch.passwordHash = await this.passwords.hash(password);
+    }
+
+    const user = await this.repository.update(id, patch);
 
     if (user === undefined) {
       throw new NotFoundError(`User ${id} not found`);

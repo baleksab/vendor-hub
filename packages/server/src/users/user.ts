@@ -17,7 +17,9 @@ export type NewUser = Omit<User, "id" | "createdAt" | "updatedAt"> & {
   passwordHash: string;
 };
 
-export type UserPatch = Partial<Omit<User, "id" | "createdAt" | "updatedAt">>;
+export type UserPatch = Partial<Omit<User, "id" | "createdAt" | "updatedAt">> & {
+  passwordHash?: string;
+};
 
 export type UserCredentials = {
   id: string;

@@ -12,11 +12,12 @@ const phoneNumber = z
   .string()
   .regex(/^\+[1-9]\d{6,14}$/, "Must be in E.164 format, e.g. +381601234567");
 const country = z.enum(COUNTRY_CODES);
+const password = z.string().min(8).max(128);
 
 export const CreateUserRequest = z
   .object({
     email,
-    password: z.string().min(8).max(128),
+    password,
     firstName,
     lastName,
     address,
@@ -28,6 +29,7 @@ export const CreateUserRequest = z
 export const UpdateUserRequest = z
   .object({
     email: email.optional(),
+    password: password.optional(),
     firstName: firstName.optional(),
     lastName: lastName.optional(),
     address: address.optional(),

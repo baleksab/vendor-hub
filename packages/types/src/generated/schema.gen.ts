@@ -95,6 +95,15 @@ export interface paths {
                         "application/json": components["schemas"]["ProblemResponse"];
                     };
                 };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
             };
         };
         put?: never;
@@ -498,6 +507,15 @@ export interface paths {
                     };
                 };
                 /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -548,6 +566,15 @@ export interface paths {
                 };
                 /** @description Default Response */
                 401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                403: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -798,6 +825,7 @@ export interface components {
         };
         UpdateUserRequestInput: {
             email?: string;
+            password?: string;
             firstName?: string;
             lastName?: string;
             address?: string;
@@ -928,6 +956,7 @@ export interface components {
         UpdateUserRequest: {
             /** Format: email */
             email?: string;
+            password?: string;
             firstName?: string;
             lastName?: string;
             address?: string;

@@ -45,6 +45,7 @@ describe("users and auth against Postgres", () => {
 
   async function bearer(): Promise<{ authorization: string }> {
     await register();
+    await handle.db.update(users).set({ role: "administrator" });
 
     return { authorization: `Bearer ${(await login()).json().accessToken}` };
   }
@@ -52,9 +53,15 @@ describe("users and auth against Postgres", () => {
   it("runs the full flow: create, login, call protected routes", async () => {
     const created = await register();
     const id = created.json().id;
-    const headers = { authorization: `Bearer ${(await login()).json().accessToken}` };
+    const regular = { authorization: `Bearer ${(await login()).json().accessToken}` };
 
     expect(created.statusCode).toBe(201);
+    expect(
+      (await app.inject({ method: "GET", url: "/api/v1/users", headers: regular })).statusCode,
+    ).toBe(403);
+
+    await handle.db.update(users).set({ role: "administrator" });
+    const headers = { authorization: `Bearer ${(await login()).json().accessToken}` };
 
     const list = await app.inject({ method: "GET", url: "/api/v1/users", headers });
     const get = await app.inject({ method: "GET", url: `/api/v1/users/${id}`, headers });
@@ -103,6 +110,12 @@ describe("users and auth against Postgres", () => {
     await register();
     const duplicate = await register({ ...validUser, email: "JANE@example.com" });
     const other = await register({ ...validUser, email: "other@example.com" });
+
+    await handle.db
+      .update(users)
+      .set({ role: "administrator" })
+      .where(eq(users.email, "jane@example.com"));
+
     const headers = { authorization: `Bearer ${(await login()).json().accessToken}` };
     const update = await app.inject({
       method: "PATCH",
@@ -117,15 +130,15 @@ describe("users and auth against Postgres", () => {
 
   it("puts the updated role into the next token", async () => {
     const headers = await bearer();
-    const [row] = await handle.db.select().from(users);
+    const other = (await register({ ...validUser, email: "other@example.com" })).json();
 
     await app.inject({
       method: "PATCH",
-      url: `/api/v1/users/${row?.id}`,
+      url: `/api/v1/users/${other.id}`,
       headers,
       payload: { role: "administrator" },
     });
-    const token = (await login()).json().accessToken as string;
+    const token = (await login("other@example.com")).json().accessToken as string;
     const claims = JSON.parse(Buffer.from(token.split(".")[1] ?? "", "base64url").toString());
 
     expect(claims.role).toBe("administrator");
