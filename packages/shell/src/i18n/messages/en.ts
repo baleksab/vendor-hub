@@ -7,10 +7,45 @@ export const en = {
   "nav.close": "Close navigation",
   "nav.label": "Main navigation",
   "language.label": "Language",
-  "home.title": "Vendor Hub",
-  "home.subtitle": "One place for your vendors, built from independently deployed micro frontends.",
-  "home.cta": "Open remote test",
+  "home.eyebrow": "Multi-vendor platform",
+  "home.title": "One platform, many independent stores",
+  "home.subtitle":
+    "Vendor Hub gives every vendor its own page and gives customers one place to discover them. Public pages load fast and are easy to find, and the vendor tools are built as separate modules.",
   "home.browseVendors": "Browse vendors",
+  "home.becomeVendor": "Become a vendor",
+  "home.features.title": "Built for both sides of the store",
+  "home.features.subtitle": "Customers find vendors in one place. Vendors get a page of their own.",
+  "home.feature.pages.title": "A page for every vendor",
+  "home.feature.pages.text":
+    "Register once and get a public page at its own address, ready to share.",
+  "home.feature.fast.title": "Fast and easy to find",
+  "home.feature.fast.text":
+    "Public pages are rendered on the server, so they open quickly and show up well in search.",
+  "home.feature.modules.title": "Independent tools",
+  "home.feature.modules.text":
+    "The admin panel and statistics are separate modules, built and deployed on their own.",
+  "home.feature.languages.title": "Your language, your theme",
+  "home.feature.languages.text":
+    "The whole site works in English and Serbian, in a light or a dark theme.",
+  "home.steps.title": "How it works",
+  "home.step.account.title": "Create an account",
+  "home.step.account.text": "Sign up with your email, it takes a minute.",
+  "home.step.vendor.title": "Register your vendor",
+  "home.step.vendor.text": "Pick a name and a short address for your page.",
+  "home.step.share.title": "Share your page",
+  "home.step.share.text": "Customers find you in the vendor list or at your own address.",
+  "home.architecture.title": "Modular by design",
+  "home.architecture.text":
+    "The shell renders the public pages on the server. Vendor tools load into it as independent modules in the browser, and everything talks to one API.",
+  "home.architecture.shell": "Shell, rendered on the server",
+  "home.architecture.pages": "Public pages",
+  "home.architecture.admin": "Vendor admin",
+  "home.architecture.stats": "Statistics",
+  "home.architecture.modules": "Modules loaded in the browser",
+  "home.architecture.api": "REST API and database",
+  "home.cta.title": "Ready to open your page?",
+  "home.cta.text":
+    "Create a vendor page in a minute, or look at the vendors that are already here.",
   "vendors.title": "Vendors",
   "seo.vendors.title": "Vendors",
   "seo.vendors.description": "All vendors on Vendor Hub.",
@@ -25,7 +60,7 @@ export const en = {
   "error.message": "An unexpected error occurred. Try again later.",
   "seo.home.title": "Vendor Hub",
   "seo.home.description":
-    "One place for your vendors, built from independently deployed micro frontends.",
+    "Vendor Hub is a multi-vendor platform: every vendor gets its own page, and customers find them all in one place.",
   "seo.remoteTest.title": "Remote test",
   "seo.remoteTest.description":
     "A micro frontend loaded into the shell at runtime with Module Federation.",

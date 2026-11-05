@@ -10,7 +10,7 @@ packages/shell/
 │   ├── root.tsx            document Layout, root loader (locale, origin, manifest URL, user), ErrorBoundary
 │   ├── routes.ts           route config
 │   ├── pages/              src/pages/{Name}/{Name}.tsx, one folder per page
-│   │   ├── Home/           landing page with links to the vendor list and the remote test
+│   │   ├── Home/           landing page: components/ (Hero, Features, Steps, Architecture, CallToAction, inline SVG illustration and icons)
 │   │   ├── Vendors/        `/vendors`, the paginated vendor list (components/VendorList)
 │   │   ├── VendorSite/     `/vendors/:slug`, the public vendor page (components/VendorSiteContent)
 │   │   ├── BecomeVendor/   vendor registration form, becomeVendorAction.server.ts, noindex
