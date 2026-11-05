@@ -14,3 +14,5 @@ export type AddOperatorRequest = Schemas["AddOperatorRequest"];
 export type VendorResponse = Schemas["VendorResponse"];
 export type MyVendorsResponse = Schemas["MyVendorsResponse"];
 export type PublicVendorResponse = Schemas["PublicVendorResponse"];
+export type VendorListResponse = Schemas["VendorListResponse"];
+export type VendorListItemResponse = Schemas["VendorListItemResponse"];
