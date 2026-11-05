@@ -4,6 +4,7 @@ export const en = {
   "nav.remoteTest": "Remote test",
   "nav.vendors": "Vendors",
   "nav.menu": "Open navigation",
+  "nav.close": "Close navigation",
   "nav.label": "Main navigation",
   "language.label": "Language",
   "home.title": "Vendor Hub",

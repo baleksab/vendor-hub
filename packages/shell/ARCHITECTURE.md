@@ -73,7 +73,9 @@ Forms are a plain `<Form method="post">` with Mantine inputs. The action validat
 
 ## Layout and pages
 
-`AppLayout` wraps the `Outlet` in a Mantine `AppShell`. The header has the logo, `NavLink`s (active state from `useMatch`), `LanguageSwitcher` and `UserMenu` (log in / register, or the user name with a log out item) from `sm` up. Below `sm` a `Burger` opens a `Drawer` with the same links, the language switcher and the user menu. Design is mobile first. Unknown URLs hit the splat route `NotFound` (status 404, `noindex`), and the root `ErrorBoundary` renders other errors, also `noindex`.
+`AppLayout` wraps the `Outlet` in a Mantine `AppShell` with a left sidebar, like a chat app. The sidebar has the title, the `NavLink`s (active state from `useMatch`) and, at the bottom, the `LanguageSwitcher` and the `UserMenu` (log in / register buttons, or an avatar with the user name and a log out item). Below `sm` the sidebar is hidden and opens full width from a sticky top bar, closing again on navigation. Content sits in a centered `Container`.
+
+`theme.ts` follows the GitHub (Primer) design system: a blue primary color, GitHub gray and dark scales, the system font stack with 14px body text, weight 600 headings, a 6px radius and flat bordered cards. Sizes are compact from `sm` up (44px touch targets below). `cssVariablesResolver` sets the dark-scheme border color.
 
 ## SEO
 

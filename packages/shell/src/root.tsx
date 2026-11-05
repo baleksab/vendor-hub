@@ -25,7 +25,7 @@ import { AppLayout } from "./components/AppLayout/AppLayout";
 import { LOCALES } from "./i18n/locales";
 import { LocaleProvider, useT } from "./i18n/LocaleProvider";
 import { resolveLocale } from "./i18n/server";
-import { theme } from "./theme";
+import { cssVariablesResolver, theme } from "./theme";
 import { loadMyVendors } from "./vendor/myVendors.server";
 
 export function links(): Route.LinkDescriptors {
@@ -61,13 +61,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#228be6" />
+        <meta name="theme-color" content="#0969da" />
         <ColorSchemeScript />
         <Meta />
         <Links />
       </head>
       <body>
-        <MantineProvider theme={theme}>
+        <MantineProvider theme={theme} cssVariablesResolver={cssVariablesResolver}>
           <LocaleProvider locale={locale}>{children}</LocaleProvider>
         </MantineProvider>
         <ScrollRestoration />
