@@ -17,7 +17,6 @@
     "@react-router/node": "8.5.1",
     "@react-router/serve": "8.5.1",
     "@tanstack/react-form": "catalog:",
-    "@tanstack/react-query": "catalog:",
     "axios": "catalog:",
     "isbot": "5.2.2",
     "react": "catalog:",

@@ -42,7 +42,7 @@ export function RegisterForm({ countries }: { countries: string[] }) {
     validationLogic: revalidateLogic({ mode: "change", modeAfterSubmission: "change" }),
     validators: { onDynamic: schema },
     onSubmit: ({ value }) => {
-      mutation.mutate(toCreateUserRequest(schema.parse(value)));
+      void mutation.run(toCreateUserRequest(schema.parse(value)));
     },
   });
 

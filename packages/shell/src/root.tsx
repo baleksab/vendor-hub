@@ -19,7 +19,6 @@ import {
 
 import { getEnv } from "./env.server";
 import { getSession } from "./auth/session.server";
-import { QueryProvider } from "./providers/QueryProvider";
 import type { Route } from "./+types/root";
 import "./app.css";
 import { AppLayout } from "./components/AppLayout/AppLayout";
@@ -65,9 +64,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <MantineProvider theme={theme}>
-          <LocaleProvider locale={locale}>
-            {data ? <QueryProvider origin={data.origin}>{children}</QueryProvider> : children}
-          </LocaleProvider>
+          <LocaleProvider locale={locale}>{children}</LocaleProvider>
         </MantineProvider>
         <ScrollRestoration />
         <Scripts />

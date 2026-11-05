@@ -42,7 +42,6 @@ export const sr = {
   "auth.phoneHint": "Međunarodni format, npr. +381601234567",
   "auth.country": "Država",
   "auth.countryPlaceholder": "Izaberi državu",
-  "auth.countryLoading": "Učitavam države...",
   "auth.countryError": "Nisam uspeo da učitam listu država.",
   "auth.countryRetry": "Pokušaj ponovo",
   "login.title": "Prijava",

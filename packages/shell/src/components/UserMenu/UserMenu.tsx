@@ -16,7 +16,7 @@ export function UserMenu({ touch = false, onNavigate }: Props) {
 
   const handleLogout = () => {
     onNavigate?.();
-    logout.mutate();
+    void logout.run();
   };
 
   if (user === null) {

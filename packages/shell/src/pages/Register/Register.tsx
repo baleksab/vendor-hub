@@ -1,10 +1,9 @@
-import { Alert, Anchor, Button, Loader, Stack, Text, Title } from "@mantine/core";
-import { Link, useLoaderData, useSearchParams } from "react-router";
+import { Alert, Anchor, Button, Stack, Text, Title } from "@mantine/core";
+import { Link, useLoaderData, useRevalidator, useSearchParams } from "react-router";
 
 import { createServerApi } from "../../api/createServerApi.server";
 import type { CountryListResponse } from "../../api/types";
 import { redirectIfAuthenticated } from "../../auth/session.server";
-import { useCountries } from "../../hooks/useCountries/useCountries";
 import { useT } from "../../i18n/LocaleProvider";
 import { pageMeta } from "../../seo/pageMeta";
 import type { Route } from "./+types/Register";
@@ -33,8 +32,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function Register() {
   const t = useT();
-  const { countries: initialCountries } = useLoaderData<typeof loader>();
-  const countries = useCountries(initialCountries);
+  const { countries } = useLoaderData<typeof loader>();
+  const { revalidate, state } = useRevalidator();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo");
   const loginTo = redirectTo ? `/login?redirectTo=${encodeURIComponent(redirectTo)}` : "/login";
@@ -43,19 +42,19 @@ export default function Register() {
     <Stack component="section" gap="md" py={{ base: "md", sm: "xl" }} maw={560} mx="auto">
       <Title order={1}>{t("register.title")}</Title>
 
-      {countries.data !== undefined ? (
-        <RegisterForm countries={countries.data} />
-      ) : countries.isError ? (
+      {countries !== null ? (
+        <RegisterForm countries={countries} />
+      ) : (
         <Alert color="red" role="alert" title={t("auth.countryError")}>
-          <Button variant="default" mih={44} onClick={() => void countries.refetch()}>
+          <Button
+            variant="default"
+            mih={44}
+            loading={state === "loading"}
+            onClick={() => void revalidate()}
+          >
             {t("auth.countryRetry")}
           </Button>
         </Alert>
-      ) : (
-        <Stack component="output" align="center" gap="xs">
-          <Loader size="sm" />
-          <Text c="dimmed">{t("auth.countryLoading")}</Text>
-        </Stack>
       )}
 
       <Text c="dimmed">

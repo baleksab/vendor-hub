@@ -20,7 +20,7 @@ export function LoginForm() {
     validationLogic: revalidateLogic({ mode: "change", modeAfterSubmission: "change" }),
     validators: { onDynamic: loginSchema },
     onSubmit: ({ value }) => {
-      mutation.mutate(loginSchema.parse(value));
+      void mutation.run(loginSchema.parse(value));
     },
   });
 

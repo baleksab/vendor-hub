@@ -39,7 +39,6 @@ export const en = {
   "auth.phoneHint": "International format, e.g. +381601234567",
   "auth.country": "Country",
   "auth.countryPlaceholder": "Select a country",
-  "auth.countryLoading": "Loading countries...",
   "auth.countryError": "Could not load the list of countries.",
   "auth.countryRetry": "Try again",
   "login.title": "Log in",

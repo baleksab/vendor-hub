@@ -1,21 +1,11 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "react-router";
-
-import { queryKeys } from "../../api/queryKeys";
-import { AUTH_MUTATION_SCOPE, useBrowserClients } from "../../providers/QueryProvider";
+import { useBrowserClients } from "../../api/useBrowserClients";
+import { useAsyncAction } from "../useAsyncAction/useAsyncAction";
 
 export function useLogoutMutation() {
   const { auth } = useBrowserClients();
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
-  return useMutation({
-    mutationKey: [AUTH_MUTATION_SCOPE, "logout"],
-    mutationFn: () => auth.post("/logout", {}),
-    onSuccess: async () => {
-      queryClient.clear();
-      queryClient.setQueryData(queryKeys.session.current(), null);
-      await navigate("/");
-    },
+  return useAsyncAction(() => auth.post("/logout", {}), {
+    redirectOnUnauthorized: false,
+    onSuccess: () => window.location.assign("/"),
   });
 }

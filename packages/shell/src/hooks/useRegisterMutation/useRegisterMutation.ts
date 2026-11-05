@@ -1,20 +1,16 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate, useSearchParams } from "react-router";
+import { useSearchParams } from "react-router";
 
-import { queryKeys } from "../../api/queryKeys";
+import { useBrowserClients } from "../../api/useBrowserClients";
 import type { CreateUserRequest, UserResponse } from "../../api/types";
 import { safeRedirectTo } from "../../auth/safeRedirect";
-import { AUTH_MUTATION_SCOPE, useBrowserClients } from "../../providers/QueryProvider";
+import { useAsyncAction } from "../useAsyncAction/useAsyncAction";
 
 export function useRegisterMutation() {
   const { api, auth } = useBrowserClients();
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  return useMutation({
-    mutationKey: [AUTH_MUTATION_SCOPE, "register"],
-    mutationFn: async (request: CreateUserRequest) => {
+  return useAsyncAction(
+    async (request: CreateUserRequest) => {
       await api.post("/users", request);
 
       try {
@@ -28,15 +24,12 @@ export function useRegisterMutation() {
         return null;
       }
     },
-    onSuccess: async (user) => {
-      if (user === null) {
-        await navigate("/login?registered=1");
-
-        return;
-      }
-
-      queryClient.setQueryData(queryKeys.session.current(), user);
-      await navigate(safeRedirectTo(searchParams.get("redirectTo")));
+    {
+      redirectOnUnauthorized: false,
+      onSuccess: (user) =>
+        window.location.assign(
+          user === null ? "/login?registered=1" : safeRedirectTo(searchParams.get("redirectTo")),
+        ),
     },
-  });
+  );
 }
