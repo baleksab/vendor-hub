@@ -6,6 +6,9 @@ export type ShellEnv = {
   port: number;
   origin: string;
   remoteTestManifestUrl: string;
+  apiUrl: string;
+  sessionCookieName: string;
+  sessionCookieSecure: boolean;
 };
 
 type Source = Record<string, string | undefined>;
@@ -43,6 +46,16 @@ function parseUrl(source: Source, key: string): string {
   }
 }
 
+function parseBoolean(source: Source, key: string): boolean {
+  const raw = required(source, key);
+
+  if (raw !== "true" && raw !== "false") {
+    throw new Error(`Env key ${key} must be "true" or "false", got "${raw}"`);
+  }
+
+  return raw === "true";
+}
+
 function parseLocale(source: Source, key: string): Locale {
   const raw = required(source, key);
 
@@ -60,5 +73,8 @@ export function readShellEnv(source: Source): ShellEnv {
     port: parsePort(source, "SHELL_PORT"),
     origin: new URL(parseUrl(source, "SHELL_ORIGIN")).origin,
     remoteTestManifestUrl: parseUrl(source, "REMOTE_TEST_MANIFEST_URL"),
+    apiUrl: new URL(parseUrl(source, "API_URL")).origin,
+    sessionCookieName: required(source, "SESSION_COOKIE_NAME"),
+    sessionCookieSecure: parseBoolean(source, "SESSION_COOKIE_SECURE"),
   };
 }

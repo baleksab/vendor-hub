@@ -40,9 +40,16 @@ catalog:
   "@types/pg": 8.23.1
   "@node-rs/argon2": 2.2.2
   jose: 6.2.15
+  axios: 1.21.0
+  "@tanstack/react-query": 5.106.1
+  "@tanstack/react-form": 1.33.5
 
 catalogs:
   # openapi-typescript uses the JS compiler API, which TypeScript 7 does not have,
   # so the types package (the generator) stays on TypeScript 5.
   generator:
     typescript: 5.9.3
+
+minimumReleaseAgeExclude:
+  - "@tanstack/query-core@5.106.1"
+  - "@tanstack/react-query@5.106.1"

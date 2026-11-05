@@ -7,16 +7,22 @@ The host application. React Router 8 in framework mode with SSR, built with Vite
 ```
 packages/shell/
 ├── src/
-│   ├── root.tsx            document Layout, root loader (locale, origin, manifest URL), ErrorBoundary
+│   ├── root.tsx            document Layout, root loader (locale, origin, manifest URL, user), ErrorBoundary
 │   ├── routes.ts           route config
 │   ├── pages/              src/pages/{Name}/{Name}.tsx, one folder per page
 │   │   ├── Home/
+│   │   ├── Login/          login form, noindex
+│   │   ├── Register/       registration form, countries from the API, noindex
 │   │   ├── RemoteTest/     components/ (RemoteSlot, RemoteErrorBoundary, RemoteFallback), loadWidget.ts
 │   │   └── NotFound/       splat route, 404 + noindex
-│   ├── components/         shared: AppLayout, NavLink, LanguageSwitcher
-│   ├── hooks/              shared: useIsClient
+│   ├── components/         shared: AppLayout, NavLink, LanguageSwitcher, UserMenu, FormField
+│   ├── hooks/              shared: useIsClient, useSession, useCountries, useServerErrors, login/register/logout mutations
+│   ├── api/                axios clients, ApiError, describeError, queryKeys, API types, problem+json schema
+│   ├── auth/               session cookie, getSession/requireUser, same-origin check, safeRedirect, Zod form schemas
+│   ├── providers/          QueryProvider (QueryClient and browser axios clients)
+│   ├── env.server.ts       cached env for server-only code
 │   ├── seo/                createPageMeta, pageMeta, buildRobots, buildSitemap, indexablePages
-│   ├── routes/             resource routes only: locale.ts, robots.txt.ts, sitemap.xml.ts
+│   ├── routes/             resource routes only: locale.ts, robots.txt.ts, sitemap.xml.ts, auth.login.ts, auth.logout.ts, api.proxy.ts
 │   ├── i18n/               locales, messages (en, sr), createT, LocaleProvider, server-side resolveLocale
 │   ├── remote.ts           Module Federation runtime instance
 │   ├── theme.ts            Mantine theme
@@ -33,14 +39,33 @@ packages/shell/
 
 ## Server side
 
-- `root.tsx` has the `loader` that reads env with `readShellEnv(process.env)` and returns the locale, the public origin and the remote manifest URL. Env is read on the server only; the client gets the URL as loader data.
+- `root.tsx` has the `loader` that reads env with `getEnv()` (cached `readShellEnv(process.env)`) and returns the locale, the public origin, the remote manifest URL and the current user. Env is read on the server only; the client gets the URL as loader data.
 - `Layout` renders the HTML document with `mantineHtmlProps`, `ColorSchemeScript` in `<head>` and `MantineProvider` (theme from `src/theme.ts`) around the children. Mantine is server-rendered; its CSS is static, so SSR needs no style extraction.
 - `Layout` renders the HTML document. SSR output includes the route markup and, for remote routes, a skeleton.
 - `pnpm build` produces `build/`; `pnpm start` runs `scripts/start.mjs`, which checks the env keys and maps `SHELL_HOST`/`SHELL_PORT` to the `HOST`/`PORT` that `react-router-serve` expects.
 
+## Authentication
+
+The shell is a backend-for-frontend for the access token. The browser never sees the JWT:
+
+```
+browser --(HttpOnly cookie, same origin)--> shell server --(Authorization: Bearer)--> API
+```
+
+- `POST /auth/login` (`routes/auth.login.ts`) validates the body, calls `POST /api/v1/auth`, loads the user from `GET /api/v1/users/me` and answers with the user JSON plus `Set-Cookie`. The token is not in the body. `POST /auth/logout` clears the cookie.
+- `/api/*` (`routes/api.proxy.ts`) forwards the request to `/api/v1/*` with the token from the cookie. It clears the cookie when the API answers `401`, refuses `auth` (the token endpoint) and any path with dot segments. Client-side queries and, later, remotes use it.
+- The cookie (`auth/sessionCookie.server.ts`) is `HttpOnly`, `SameSite=Lax`, `Path=/`, `Secure` from env, with `Max-Age` from `expiresIn`. It holds the signed JWT as is, the shell cannot verify it, only the API does.
+- CSRF: `assertSameOrigin` requires `Content-Type: application/json` and `Origin` equal to `SHELL_ORIGIN` on every non-GET request to these routes.
+- `getSession(request)` (`auth/session.server.ts`) calls `GET /api/v1/users/me` once per request. The root loader returns the `user`, so the first paint already has the right header. `requireUser` redirects to `/login?redirectTo=...`, `redirectIfAuthenticated` is used by the login and register loaders. `redirectTo` is accepted only as a same-origin relative path (`auth/safeRedirect.ts`).
+- On the client, `QueryProvider` (root `Layout`) creates one `QueryClient` per request on the server and one per browser session on the client. `useSession` reads the user with `initialData` from the root loader. A `401` from any query or non-auth mutation clears the session and redirects to `/login`.
+
+API errors go through `ApiError` (`api/ApiError.ts`): the axios interceptor turns every failure into `status`, `kind`, `title`, `detail` and `fieldErrors` parsed from `application/problem+json`. `describeError` maps them to i18n keys for the forms (wrong credentials never say which field was wrong, a duplicate email lands on the email field). `useServerErrors` shows them and drops a field error when the user edits that field.
+
+Forms use TanStack Form with Zod schemas (`auth/schemas.ts`) through Standard Schema. Validation runs on every change through one source (`onDynamic` with `revalidateLogic`), and a field shows its error only after it was blurred once or the form was submitted, then it updates live while typing. The submit button is disabled until hydration (`useIsClient`), and the `<form>` always prevents the native submit. The register form takes its country list from the public `GET /api/v1/countries` (loaded in the route loader, then `useCountries`), labels come from `Intl.DisplayNames` in the UI language.
+
 ## Layout and pages
 
-`AppLayout` wraps the `Outlet` in a Mantine `AppShell`. The header has the logo, `NavLink`s (active state from `useMatch`) and `LanguageSwitcher` from `sm` up. Below `sm` a `Burger` opens a `Drawer` with the same links and the language switcher. Design is mobile first. Unknown URLs hit the splat route `NotFound` (status 404, `noindex`), and the root `ErrorBoundary` renders other errors, also `noindex`.
+`AppLayout` wraps the `Outlet` in a Mantine `AppShell`. The header has the logo, `NavLink`s (active state from `useMatch`), `LanguageSwitcher` and `UserMenu` (log in / register, or the user name with a log out item) from `sm` up. Below `sm` a `Burger` opens a `Drawer` with the same links, the language switcher and the user menu. Design is mobile first. Unknown URLs hit the splat route `NotFound` (status 404, `noindex`), and the root `ErrorBoundary` renders other errors, also `noindex`.
 
 ## SEO
 
@@ -66,7 +91,7 @@ A new remote means: a new entry in `remotes` in `remote.ts`, a manifest URL key 
 
 ## Tests
 
-Unit tests use Vitest and live next to the code as `src/**/*.test.ts`. They cover pure logic (i18n, SEO helpers) and check that every page exports `meta`, with no DOM and no React rendering. `vitest.config.ts` is a separate file on purpose, so tests do not load the `reactRouter()` plugin and do not need `.env` (`env.ts` throws on a missing key). Do not import `env.ts` from code under test.
+Unit tests use Vitest and live next to the code as `src/**/*.test.ts`. They cover pure logic (i18n, SEO helpers, API error mapping, form schemas, redirect validation), the auth resource routes with a mocked API (cookie flags, token never in a body, `401` clears the cookie, origin check) and check that every page exports `meta`, with no DOM and no React rendering. `vitest.config.ts` is a separate file on purpose, so tests do not load the `reactRouter()` plugin and do not need `.env` (`env.ts` throws on a missing key). Do not import `env.ts` from code under test.
 
 CI (`.github/workflows/checks.yml`) runs format, lint, typecheck, build and unit tests as separate jobs on every PR and on pushes to `main`.
 
