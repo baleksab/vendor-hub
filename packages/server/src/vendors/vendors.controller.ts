@@ -6,10 +6,12 @@ import { ProblemResponse } from "../shared/problem.ts";
 import { toMyVendorsResponse, toPublicVendorResponse, toVendorResponse } from "./vendors.mapper.ts";
 import {
   AddOperatorRequest,
+  ListVendorsQuery,
   MyVendorsResponse,
   OperatorParams,
   PublicVendorResponse,
   RegisterVendorRequest,
+  VendorListResponse,
   VendorResponse,
   VendorSlugParams,
 } from "./vendors.schemas.ts";
@@ -19,7 +21,28 @@ const security = [{ bearerAuth: [] }];
 
 export function publicVendorsController(service: VendorsService) {
   return async (app: FastifyInstance): Promise<void> => {
-    app.withTypeProvider<ZodTypeProvider>().get(
+    const typed = app.withTypeProvider<ZodTypeProvider>();
+
+    typed.get(
+      "/vendors",
+      {
+        schema: {
+          tags: ["vendors"],
+          querystring: ListVendorsQuery,
+          response: { 200: VendorListResponse, 400: ProblemResponse },
+        },
+      },
+      async (request) => {
+        const { items, total } = await service.list(request.query);
+
+        return {
+          data: items,
+          meta: { total, limit: request.query.limit, offset: request.query.offset },
+        };
+      },
+    );
+
+    typed.get(
       "/vendors/by-slug/:slug",
       {
         schema: {

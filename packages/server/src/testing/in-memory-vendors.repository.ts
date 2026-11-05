@@ -1,6 +1,7 @@
 import { ConflictError } from "../shared/errors.ts";
 import type { VendorMemberRole } from "../vendors/vendor-member-role.ts";
-import type { NewVendor, Vendor, VendorSummary } from "../vendors/vendor.ts";
+import type { Page } from "../shared/pagination.ts";
+import type { NewVendor, Vendor, VendorListItem, VendorSummary } from "../vendors/vendor.ts";
 import {
   ALREADY_MEMBER_MESSAGE,
   ALREADY_OWNER_MESSAGE,
@@ -47,6 +48,17 @@ export class InMemoryVendorsRepository implements VendorsRepository {
     this.members.push({ vendorId: vendor.id, userId: input.ownerId, role: "owner" });
 
     return this.toVendor(vendor);
+  }
+
+  async list(page: Page): Promise<{ items: VendorListItem[]; total: number }> {
+    const newestFirst = [...this.vendors].reverse();
+
+    return {
+      items: newestFirst
+        .slice(page.offset, page.offset + page.limit)
+        .map(({ slug, name, description }) => ({ slug, name, description })),
+      total: newestFirst.length,
+    };
   }
 
   async findBySlug(slug: string): Promise<Vendor | undefined> {

@@ -1,6 +1,7 @@
 import type { UserCredentialsLookup } from "../users/user.ts";
 import { BadRequestError, ConflictError, NotFoundError } from "../shared/errors.ts";
-import type { Vendor, VendorSummary } from "./vendor.ts";
+import type { Page } from "../shared/pagination.ts";
+import type { Vendor, VendorListItem, VendorSummary } from "./vendor.ts";
 import type { AddOperatorRequest, RegisterVendorRequest } from "./vendors.schemas.ts";
 import {
   ALREADY_MEMBER_MESSAGE,
@@ -23,6 +24,10 @@ export class VendorsService {
     }
 
     return this.repository.create({ ...request, ownerId });
+  }
+
+  async list(page: Page): Promise<{ items: VendorListItem[]; total: number }> {
+    return this.repository.list(page);
   }
 
   async getMine(

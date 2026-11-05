@@ -27,3 +27,9 @@ export type NewVendor = {
   description: string;
   ownerId: string;
 };
+
+export type VendorListItem = {
+  slug: string;
+  name: string;
+  description: string;
+};
