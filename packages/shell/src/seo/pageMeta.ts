@@ -14,7 +14,7 @@ type PageMetaOptions = {
   noindex?: boolean;
 };
 
-function readRootData(matches: ReadonlyArray<RootMatch>) {
+export function readRootData(matches: ReadonlyArray<RootMatch>) {
   const data = matches.find((match) => match?.id === "root")?.loaderData;
 
   if (typeof data !== "object" || data === null) {

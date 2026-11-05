@@ -7,6 +7,8 @@ Object.assign(process.env, {
   API_URL: "http://api.test",
   SESSION_COOKIE_NAME: "session",
   SESSION_COOKIE_SECURE: "true",
+  VENDOR_SITE_ORIGIN: "http://{slug}.vendors.test",
+  VENDOR_SLUG_HEADER: "X-Vendor-Slug",
 });
 
 export const ORIGIN = "http://shell.test";
@@ -37,4 +39,23 @@ export async function outcome(
   promise: Promise<unknown>,
 ): Promise<Response | { data: unknown; init: ResponseInit }> {
   return (await promise) as Response | { data: unknown; init: ResponseInit };
+}
+
+export async function authedForm(
+  values: Record<string, string>,
+  url: string,
+  origin = ORIGIN,
+): Promise<Request> {
+  const { commitToken } = await import("../auth/sessionCookie.server");
+  const cookie = (await commitToken(TOKEN, 60)).split(";")[0] ?? "";
+
+  return new Request(url, {
+    method: "POST",
+    headers: {
+      Origin: origin,
+      Cookie: cookie,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams(values),
+  });
 }

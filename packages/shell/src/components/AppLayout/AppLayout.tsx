@@ -3,6 +3,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { useEffect, type ReactNode } from "react";
 import { Link, useLocation } from "react-router";
 
+import { useSession } from "../../hooks/useSession/useSession";
 import { useT } from "../../i18n/LocaleProvider";
 import { LanguageSwitcher } from "../LanguageSwitcher/LanguageSwitcher";
 import { NavLink } from "../NavLink/NavLink";
@@ -15,10 +16,22 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   useEffect(close, [location.key, close]);
 
+  const { user, vendors } = useSession();
+
   const links = [
     { to: "/", label: t("nav.home") },
     { to: "/remote-test", label: t("nav.remoteTest") },
   ];
+
+  if (user !== null && vendors !== null) {
+    if (vendors.owned === null) {
+      links.push({ to: "/become-vendor", label: t("nav.becomeVendor") });
+    }
+
+    if (vendors.owned !== null || vendors.operating.length > 0) {
+      links.push({ to: "/vendor", label: t("nav.myVendor") });
+    }
+  }
 
   return (
     <AppShell header={{ height: 60 }} padding="md">

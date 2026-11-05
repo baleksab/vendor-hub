@@ -1,4 +1,4 @@
-import { PasswordInput, Select, TextInput } from "@mantine/core";
+import { PasswordInput, Select, TextInput, Textarea } from "@mantine/core";
 
 import { isMessageKey } from "../../i18n";
 import { useT } from "../../i18n/LocaleProvider";
@@ -10,7 +10,7 @@ type Props = {
   label: string;
   error?: string;
   defaultValue?: string;
-  kind?: "text" | "password" | "select";
+  kind?: "text" | "password" | "select" | "textarea";
   type?: "text" | "email" | "tel";
   autoComplete?: string;
   description?: string;
@@ -46,6 +46,10 @@ export function FormField({
 
   if (kind === "select") {
     return <Select {...common} data={options ?? []} placeholder={placeholder} searchable />;
+  }
+
+  if (kind === "textarea") {
+    return <Textarea {...common} autosize minRows={4} />;
   }
 
   if (kind === "password") {
