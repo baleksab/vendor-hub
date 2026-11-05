@@ -17,7 +17,6 @@ const port = required("SHELL_PORT");
 
 required("SHELL_ORIGIN");
 required("DEFAULT_LOCALE");
-required("REMOTE_TEST_MANIFEST_URL");
 required("USER_ADMINISTRATOR_MANIFEST_URL");
 required("API_URL");
 required("SESSION_COOKIE_NAME");

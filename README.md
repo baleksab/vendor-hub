@@ -76,7 +76,6 @@ nginx (`infra/nginx`) sends `vendorhub.localhost` to the shell. `pnpm nginx:down
 | ------------------- | --------------------------------------------------------------- |
 | Shell               | `http://vendorhub.localhost` (nginx), upstream `localhost:4100` |
 | Vendor site         | `http://vendorhub.localhost/vendors/<slug>` (nginx)             |
-| Remote (test)       | `http://localhost:4101`                                         |
 | Remote (user admin) | `http://localhost:4102`                                         |
 | Admin pages         | `http://vendorhub.localhost/admin/users` (administrators only)  |
 | API                 | `http://localhost:4200` (docs `/docs`)                          |
@@ -103,16 +102,16 @@ Ports are changed only in the `.env.local` files. The shell needs the API runnin
 
 ## Project status
 
-| Area                                   | State                                   |
-| -------------------------------------- | --------------------------------------- |
-| Monorepo, SSR shell, Module Federation | done (test remote, user administration) |
-| API server, OpenAPI, users and login   | done                                    |
-| Shell login, registration, session     | done                                    |
-| Vendors, roles, vendor pages           | in progress (server, shell)             |
-| Catalog, cart, orders, payment         | planned                                 |
-| Admin and statistics remotes, reports  | planned                                 |
-| Full-stack `docker compose up`         | planned                                 |
-| Specialist track                       | undecided                               |
+| Area                                   | State                       |
+| -------------------------------------- | --------------------------- |
+| Monorepo, SSR shell, Module Federation | done (user administration)  |
+| API server, OpenAPI, users and login   | done                        |
+| Shell login, registration, session     | done                        |
+| Vendors, roles, vendor pages           | in progress (server, shell) |
+| Catalog, cart, orders, payment         | planned                     |
+| Admin and statistics remotes, reports  | planned                     |
+| Full-stack `docker compose up`         | planned                     |
+| Specialist track                       | undecided                   |
 
 ## Documentation
 

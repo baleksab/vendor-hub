@@ -4,7 +4,6 @@ export default [
   index("pages/Home/Home.tsx"),
   route("vendors", "pages/Vendors/Vendors.tsx"),
   route("vendors/:slug", "pages/VendorSite/VendorSite.tsx"),
-  route("remote-test", "pages/RemoteTest/RemoteTest.tsx"),
   route("login", "pages/Login/Login.tsx"),
   route("register", "pages/Register/Register.tsx"),
   route("become-vendor", "pages/BecomeVendor/BecomeVendor.tsx"),
