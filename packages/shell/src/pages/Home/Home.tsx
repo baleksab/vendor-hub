@@ -18,14 +18,22 @@ export default function Home() {
   const t = useT();
 
   return (
-    <Stack component="section" gap="md" maw={640} py={{ base: "lg", sm: "xl" }}>
+    <Stack
+      component="section"
+      gap="md"
+      align="center"
+      ta="center"
+      maw={640}
+      mx="auto"
+      py={{ base: "xl", sm: 96 }}
+    >
       <Title order={1} fz={{ base: 32, sm: 44 }}>
         {t("home.title")}
       </Title>
       <Text c="dimmed" fz={{ base: "md", sm: "lg" }}>
         {t("home.subtitle")}
       </Text>
-      <Group>
+      <Group justify="center">
         <Button component={Link} to={VENDORS_PATH} size="md" mih={44}>
           {t("home.browseVendors")}
         </Button>

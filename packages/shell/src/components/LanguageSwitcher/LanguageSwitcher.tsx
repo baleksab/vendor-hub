@@ -4,21 +4,22 @@ import { Form } from "react-router";
 import { useLocale, useT } from "../../i18n/LocaleProvider";
 import { LOCALES } from "../../i18n/locales";
 
-export function LanguageSwitcher({ touch = false }: { touch?: boolean }) {
+export function LanguageSwitcher() {
   const t = useT();
   const current = useLocale();
 
   return (
     <Form method="post" action="/locale" aria-label={t("language.label")}>
-      <Button.Group>
+      <Button.Group w="100%">
         {LOCALES.map((locale) => (
           <Button
             key={locale}
             type="submit"
             name="locale"
             value={locale}
-            size={touch ? "md" : "compact-sm"}
-            h={touch ? 44 : undefined}
+            size="md"
+            h={44}
+            flex={1}
             variant={locale === current ? "filled" : "default"}
             aria-pressed={locale === current}
           >

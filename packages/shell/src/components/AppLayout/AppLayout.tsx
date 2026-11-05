@@ -1,4 +1,4 @@
-import { Anchor, AppShell, Burger, Container, Drawer, Group, Stack } from "@mantine/core";
+import { Anchor, AppShell, Burger, Container, Group, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, type ReactNode } from "react";
 import { Link, useLocation } from "react-router";
@@ -9,12 +9,18 @@ import { LanguageSwitcher } from "../LanguageSwitcher/LanguageSwitcher";
 import { NavLink } from "../NavLink/NavLink";
 import { UserMenu } from "../UserMenu/UserMenu";
 
+const SIDEBAR_WIDTH = 280;
+const TOP_BAR_HEIGHT = 56;
+
 export function AppLayout({ children }: { children: ReactNode }) {
   const t = useT();
-  const [opened, { toggle, close }] = useDisclosure(false);
+  const [mobileOpened, { open: openMobile, close: closeMobile }] = useDisclosure(false);
+  const [desktopOpened, desktop] = useDisclosure(true);
   const location = useLocation();
 
-  useEffect(close, [location.key, close]);
+  useEffect(() => {
+    closeMobile();
+  }, [location.key, closeMobile]);
 
   const { vendors } = useSession();
 
@@ -28,57 +34,92 @@ export function AppLayout({ children }: { children: ReactNode }) {
     links.push({ to: "/become-vendor", label: t("nav.becomeVendor") });
   }
 
+  const closeSidebar = () => {
+    closeMobile();
+    desktop.close();
+  };
+
   return (
-    <AppShell header={{ height: 60 }} padding="md">
-      <AppShell.Header>
-        <Container size="md" h="100%">
-          <Group h="100%" justify="space-between" wrap="nowrap">
-            <Group gap="xs" wrap="nowrap">
-              <Burger
-                opened={opened}
-                onClick={toggle}
-                hiddenFrom="sm"
-                size={44}
-                aria-label={t("nav.menu")}
-              />
-              <Anchor component={Link} to="/" fw={700} c="inherit" underline="never">
-                {t("app.title")}
-              </Anchor>
-            </Group>
-
-            <Group component="nav" aria-label={t("nav.label")} gap="xs" visibleFrom="sm">
-              {links.map((link) => (
-                <NavLink key={link.to} {...link} />
-              ))}
-            </Group>
-
-            <Group visibleFrom="sm">
-              <LanguageSwitcher />
-              <UserMenu />
-            </Group>
-          </Group>
-        </Container>
-      </AppShell.Header>
-
-      <Drawer
-        opened={opened}
-        onClose={close}
-        title={t("app.title")}
-        hiddenFrom="sm"
-        size="xs"
-        closeButtonProps={{ w: 44, h: 44 }}
+    <AppShell
+      navbar={{
+        width: SIDEBAR_WIDTH,
+        breakpoint: "sm",
+        collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
+      }}
+      padding={0}
+    >
+      <AppShell.Navbar
+        p="md"
+        bg="light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-8))"
       >
-        <Stack component="nav" aria-label={t("nav.label")} gap="xs">
+        <Group justify="space-between" wrap="nowrap" mb="md">
+          <Anchor
+            component={Link}
+            to="/"
+            fw={500}
+            fz="xl"
+            ff="heading"
+            c="inherit"
+            underline="never"
+          >
+            {t("app.title")}
+          </Anchor>
+          <Burger opened onClick={closeSidebar} size={44} aria-label={t("nav.close")} />
+        </Group>
+
+        <Stack component="nav" aria-label={t("nav.label")} gap={4} flex={1}>
           {links.map((link) => (
-            <NavLink key={link.to} {...link} onNavigate={close} />
+            <NavLink key={link.to} {...link} />
           ))}
-          <LanguageSwitcher touch />
-          <UserMenu touch onNavigate={close} />
         </Stack>
-      </Drawer>
+
+        <Stack gap="sm" pt="md">
+          <LanguageSwitcher />
+          <UserMenu />
+        </Stack>
+      </AppShell.Navbar>
 
       <AppShell.Main>
-        <Container size="md">{children}</Container>
+        <Group
+          hiddenFrom="sm"
+          h={TOP_BAR_HEIGHT}
+          px="md"
+          wrap="nowrap"
+          pos="sticky"
+          top={0}
+          style={{ zIndex: 10, borderBottom: "1px solid var(--mantine-color-default-border)" }}
+          bg="var(--mantine-color-body)"
+        >
+          <Burger opened={false} onClick={openMobile} size={44} aria-label={t("nav.menu")} />
+          <Anchor
+            component={Link}
+            to="/"
+            fw={500}
+            fz="lg"
+            ff="heading"
+            c="inherit"
+            underline="never"
+          >
+            {t("app.title")}
+          </Anchor>
+        </Group>
+
+        {!desktopOpened && (
+          <Burger
+            visibleFrom="sm"
+            opened={false}
+            onClick={desktop.open}
+            size={44}
+            pos="fixed"
+            top="var(--mantine-spacing-xs)"
+            left="var(--mantine-spacing-xs)"
+            aria-label={t("nav.menu")}
+          />
+        )}
+
+        <Container size="md" px="md">
+          {children}
+        </Container>
       </AppShell.Main>
     </AppShell>
   );

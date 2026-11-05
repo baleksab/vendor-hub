@@ -6,6 +6,7 @@ export const sr = {
   "nav.remoteTest": "Remote test",
   "nav.vendors": "Prodavci",
   "nav.menu": "Otvori navigaciju",
+  "nav.close": "Zatvori navigaciju",
   "nav.label": "Glavna navigacija",
   "language.label": "Jezik",
   "home.title": "Vendor Hub",
