@@ -40,3 +40,22 @@ export async function outcome(
 ): Promise<Response | { data: unknown; init: ResponseInit }> {
   return (await promise) as Response | { data: unknown; init: ResponseInit };
 }
+
+export async function authedForm(
+  values: Record<string, string>,
+  url: string,
+  origin = ORIGIN,
+): Promise<Request> {
+  const { commitToken } = await import("../auth/sessionCookie.server");
+  const cookie = (await commitToken(TOKEN, 60)).split(";")[0] ?? "";
+
+  return new Request(url, {
+    method: "POST",
+    headers: {
+      Origin: origin,
+      Cookie: cookie,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams(values),
+  });
+}

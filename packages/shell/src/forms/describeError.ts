@@ -1,11 +1,24 @@
 import { ApiError } from "../api/ApiError";
 
-export type ErrorContext = "login" | "register" | "generic";
+export type ErrorContext = "login" | "register" | "vendor" | "addOperator" | "generic";
 
 export type ErrorDescription = {
   form: string | null;
   fields: Record<string, string>;
 };
+
+function describeConflict(error: ApiError, context: ErrorContext): ErrorDescription {
+  switch (context) {
+    case "register":
+      return { form: null, fields: { email: "auth.error.emailTaken" } };
+    case "vendor":
+      return { form: null, fields: { slug: "vendor.error.slugTaken" } };
+    case "addOperator":
+      return { form: null, fields: { email: "vendor.error.alreadyMember" } };
+    default:
+      return { form: error.detail || "auth.error.generic", fields: {} };
+  }
+}
 
 export function describeError(error: unknown, context: ErrorContext): ErrorDescription {
   if (!(error instanceof ApiError)) {
@@ -23,14 +36,14 @@ export function describeError(error: unknown, context: ErrorContext): ErrorDescr
         fields: {},
       };
     case "conflict":
-      return context === "register"
-        ? { form: null, fields: { email: "auth.error.emailTaken" } }
-        : { form: error.detail || "auth.error.generic", fields: {} };
+      return describeConflict(error, context);
     case "validation":
       return Object.keys(error.fieldErrors).length > 0
         ? { form: null, fields: error.fieldErrors }
         : { form: error.detail || "auth.error.generic", fields: {} };
     case "client":
-      return { form: error.detail || "auth.error.generic", fields: {} };
+      return context === "addOperator" && error.status === 404
+        ? { form: null, fields: { email: "vendor.error.userNotFound" } }
+        : { form: error.detail || "auth.error.generic", fields: {} };
   }
 }

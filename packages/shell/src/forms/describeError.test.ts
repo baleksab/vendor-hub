@@ -44,3 +44,23 @@ describe("describeError", () => {
     expect(describeError(new Error("x"), "login").form).toBe("auth.error.generic");
   });
 });
+
+describe("describeError for vendors", () => {
+  const make = (kind: ApiError["kind"], status = 1) =>
+    new ApiError({ status, kind, title: "t", detail: "backend detail" });
+
+  it("puts a slug conflict on the slug field", () => {
+    expect(describeError(make("conflict"), "vendor").fields).toEqual({
+      slug: "vendor.error.slugTaken",
+    });
+  });
+
+  it("maps operator errors to the email field", () => {
+    expect(describeError(make("conflict"), "addOperator").fields).toEqual({
+      email: "vendor.error.alreadyMember",
+    });
+    expect(describeError(make("client", 404), "addOperator").fields).toEqual({
+      email: "vendor.error.userNotFound",
+    });
+  });
+});
