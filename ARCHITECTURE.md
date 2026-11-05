@@ -37,7 +37,7 @@ The server's Zod schemas are the single source of truth. `@fastify/swagger` turn
 
 ## UI: Mantine
 
-- The shell owns the theme (`app/theme.ts`), the `MantineProvider`, `ColorSchemeScript` and the global Mantine CSS (`@mantine/core/styles.layer.css`).
+- The shell owns the theme (`src/theme.ts`), the `MantineProvider`, `ColorSchemeScript` and the global Mantine CSS (`@mantine/core/styles.layer.css`).
 - An embedded remote uses Mantine components without its own provider and without importing Mantine CSS. Only a remote's standalone entry (`main.tsx`) adds a provider and the CSS.
 - Tailwind stays for layout. Both CSS files declare `@layer theme, base, mantine, components, utilities;` so utilities can override Mantine.
 - `@mantine/core` and `@mantine/hooks` must always have the same version (catalog).

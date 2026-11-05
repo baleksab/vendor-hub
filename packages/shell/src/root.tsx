@@ -1,13 +1,13 @@
 import {
-  Anchor,
+  Alert,
   ColorSchemeScript,
   Container,
-  Group,
   MantineProvider,
+  Title,
   mantineHtmlProps,
 } from "@mantine/core";
 import {
-  Link,
+  isRouteErrorResponse,
   Links,
   Meta,
   Outlet,
@@ -19,32 +19,38 @@ import {
 import { readShellEnv } from "../env.ts";
 import type { Route } from "./+types/root";
 import "./app.css";
-import { LanguageSwitcher } from "./components/LanguageSwitcher";
-import { createT } from "./i18n";
+import { AppLayout } from "./components/AppLayout/AppLayout";
 import { LOCALES } from "./i18n/locales";
 import { LocaleProvider, useT } from "./i18n/LocaleProvider";
 import { resolveLocale } from "./i18n/server";
 import { theme } from "./theme";
 
+export function links(): Route.LinkDescriptors {
+  return [{ rel: "icon", href: "/favicon.svg", type: "image/svg+xml" }];
+}
+
 export function loader({ request }: Route.LoaderArgs) {
   const env = readShellEnv(process.env);
   const locale = resolveLocale(request, env.defaultLocale);
 
-  return { locale, remoteTestManifestUrl: env.remoteTestManifestUrl };
+  return {
+    locale,
+    origin: env.origin,
+    remoteTestManifestUrl: env.remoteTestManifestUrl,
+  };
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const data = useRouteLoaderData<typeof loader>("root");
   // The loader can fail (e.g. broken env), so the error page has no locale data.
   const locale = data?.locale ?? LOCALES[0];
-  const t = createT(locale);
 
   return (
     <html lang={locale} {...mantineHtmlProps}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>{t("app.title")}</title>
+        <meta name="theme-color" content="#228be6" />
         <ColorSchemeScript />
         <Meta />
         <Links />
@@ -61,21 +67,27 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App(_props: Route.ComponentProps) {
+  return (
+    <AppLayout>
+      <Outlet />
+    </AppLayout>
+  );
+}
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   const t = useT();
+  const status = isRouteErrorResponse(error) ? error.status : 500;
 
   return (
-    <Container size="sm" py="lg">
-      <Group component="nav" mb="lg" gap="md">
-        <Anchor component={Link} to="/">
-          {t("nav.home")}
-        </Anchor>
-        <Anchor component={Link} to="/remote-test">
-          {t("nav.remoteTest")}
-        </Anchor>
-        <LanguageSwitcher />
-      </Group>
-
-      <Outlet />
+    <Container size="sm" py="xl">
+      <title>{t("app.title")}</title>
+      <meta name="robots" content="noindex" />
+      <Title order={1} mb="md">
+        {status === 404 ? t("notFound.title") : t("error.title")}
+      </Title>
+      <Alert color="red" title={String(status)}>
+        {status === 404 ? t("notFound.message") : t("error.message")}
+      </Alert>
     </Container>
   );
 }

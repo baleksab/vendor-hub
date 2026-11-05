@@ -1,0 +1,28 @@
+export const en = {
+  "app.title": "Vendor Hub",
+  "nav.home": "Home",
+  "nav.remoteTest": "Remote test",
+  "nav.menu": "Open navigation",
+  "nav.label": "Main navigation",
+  "language.label": "Language",
+  "home.title": "Vendor Hub",
+  "home.subtitle": "One place for your vendors, built from independently deployed micro frontends.",
+  "home.cta": "Open remote test",
+  "remoteTest.title": "Remote test",
+  "remoteTest.hint": "Shell uses React and Mantine.",
+  "remoteTest.error.title": "Error",
+  "remoteTest.error.message": "Could not load the remote.",
+  "notFound.title": "Page not found",
+  "notFound.message": "The page you are looking for does not exist.",
+  "notFound.back": "Back to home",
+  "error.title": "Something went wrong",
+  "error.message": "An unexpected error occurred. Try again later.",
+  "seo.home.title": "Vendor Hub",
+  "seo.home.description":
+    "One place for your vendors, built from independently deployed micro frontends.",
+  "seo.remoteTest.title": "Remote test",
+  "seo.remoteTest.description":
+    "A micro frontend loaded into the shell at runtime with Module Federation.",
+  "seo.notFound.title": "Page not found",
+  "seo.notFound.description": "The page you are looking for does not exist.",
+} as const;

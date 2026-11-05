@@ -1,10 +1,10 @@
 import { Button } from "@mantine/core";
 import { Form } from "react-router";
 
-import { useLocale, useT } from "../i18n/LocaleProvider";
-import { LOCALES } from "../i18n/locales";
+import { useLocale, useT } from "../../i18n/LocaleProvider";
+import { LOCALES } from "../../i18n/locales";
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ touch = false }: { touch?: boolean }) {
   const t = useT();
   const current = useLocale();
 
@@ -17,7 +17,8 @@ export function LanguageSwitcher() {
             type="submit"
             name="locale"
             value={locale}
-            size="compact-sm"
+            size={touch ? "md" : "compact-sm"}
+            h={touch ? 44 : undefined}
             variant={locale === current ? "filled" : "default"}
             aria-pressed={locale === current}
           >
