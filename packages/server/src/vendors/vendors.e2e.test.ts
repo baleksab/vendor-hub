@@ -170,4 +170,18 @@ describe("vendors against Postgres", () => {
     expect(publicPage.json().members).toHaveLength(2);
     expect(JSON.stringify(publicPage.json())).not.toMatch(/email|phone|address|example\.com/i);
   });
+
+  it("lists only live vendors, newest first", async () => {
+    const first = await bearerFor();
+    const second = await bearerFor(operatorUser);
+
+    await registerVendor(first);
+    await registerVendor(second, { ...acme, slug: "second", name: "Second Shop" });
+    await softDeleteVendor("acme");
+
+    const list = await app.inject({ method: "GET", url: "/api/v1/vendors" });
+
+    expect(list.json().meta.total).toBe(1);
+    expect(list.json().data.map((vendor: { slug: string }) => vendor.slug)).toEqual(["second"]);
+  });
 });

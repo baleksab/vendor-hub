@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { PageMeta, PaginationQuery } from "../shared/pagination.ts";
 import { RESERVED_SLUGS } from "./reserved-slugs.ts";
 import { VendorMemberRoleSchema } from "./vendor-member-role.ts";
 
@@ -71,6 +72,16 @@ export const PublicVendorResponse = z
   })
   .meta({ id: "PublicVendorResponse" });
 
+export const VendorListItemResponse = z
+  .object({ slug: z.string(), name: z.string(), description: z.string() })
+  .meta({ id: "VendorListItemResponse" });
+
+export const VendorListResponse = z
+  .object({ data: z.array(VendorListItemResponse), meta: PageMeta })
+  .meta({ id: "VendorListResponse" });
+
+export const ListVendorsQuery = PaginationQuery;
+
 export const VendorSlugParams = z.object({ slug: z.string().min(1).max(63) });
 
 export const OperatorParams = z.object({ userId: z.uuid() });
@@ -79,4 +90,5 @@ export type RegisterVendorRequest = z.infer<typeof RegisterVendorRequest>;
 export type AddOperatorRequest = z.infer<typeof AddOperatorRequest>;
 export type VendorResponse = z.infer<typeof VendorResponse>;
 export type MyVendorsResponse = z.infer<typeof MyVendorsResponse>;
+export type VendorListResponse = z.infer<typeof VendorListResponse>;
 export type PublicVendorResponse = z.infer<typeof PublicVendorResponse>;

@@ -1,14 +1,16 @@
-import { and, asc, eq, sql, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, sql, type SQL } from "drizzle-orm";
 
 import { notDeleted } from "../db/base-entity.ts";
 import type { Database } from "../db/client.ts";
 import { users, vendorMembers, vendors } from "../db/schema.ts";
 import { findUniqueViolation } from "../db/unique-violation.ts";
 import { ConflictError } from "../shared/errors.ts";
-import type { NewVendor, Vendor, VendorSummary } from "./vendor.ts";
+import type { Page } from "../shared/pagination.ts";
+import type { NewVendor, Vendor, VendorListItem, VendorSummary } from "./vendor.ts";
 
 export type VendorsRepository = {
   create(input: NewVendor): Promise<Vendor>;
+  list(page: Page): Promise<{ items: VendorListItem[]; total: number }>;
   findBySlug(slug: string): Promise<Vendor | undefined>;
   findOwnedBy(userId: string): Promise<Vendor | undefined>;
   listOperatedBy(userId: string): Promise<VendorSummary[]>;
@@ -78,6 +80,23 @@ export class DrizzleVendorsRepository implements VendorsRepository {
     } catch (error) {
       throw toConflict(error);
     }
+  }
+
+  async list(page: Page): Promise<{ items: VendorListItem[]; total: number }> {
+    const items = await this.db
+      .select({ slug: vendors.slug, name: vendors.name, description: vendors.description })
+      .from(vendors)
+      .where(notDeleted(vendors))
+      .orderBy(desc(vendors.createdAt), vendors.id)
+      .limit(page.limit)
+      .offset(page.offset);
+
+    const [totalRow] = await this.db
+      .select({ total: count() })
+      .from(vendors)
+      .where(notDeleted(vendors));
+
+    return { items, total: totalRow?.total ?? 0 };
   }
 
   async findBySlug(slug: string): Promise<Vendor | undefined> {
