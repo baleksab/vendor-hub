@@ -1,11 +1,10 @@
 import { redirect } from "react-router";
 
 import { registerVendor } from "../../api/endpoints/vendors.server";
-import { getEnv } from "../../env.server";
 import { assertSameOrigin } from "../../auth/sameOrigin.server";
 import { requireUser } from "../../auth/session.server";
 import { failed, invalid, readValues } from "../../forms/formErrors.server";
-import { vendorSiteOrigin } from "../../vendor/vendorSite";
+import { vendorPath } from "../../vendor/vendorPaths";
 import { becomeVendorSchema } from "./becomeVendorSchema";
 
 export async function becomeVendorAction(request: Request) {
@@ -22,7 +21,7 @@ export async function becomeVendorAction(request: Request) {
   try {
     const registered = await registerVendor(session.token, vendor.data);
 
-    return redirect(vendorSiteOrigin(getEnv().vendorSiteOrigin, registered.slug));
+    return redirect(vendorPath(registered.slug));
   } catch (error) {
     return failed(error, "vendor", values);
   }

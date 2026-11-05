@@ -3,7 +3,7 @@ import { List, Stack, Text, Title } from "@mantine/core";
 import type { PublicVendorResponse } from "@vendor-hub/types";
 import { useT } from "../../../i18n/LocaleProvider";
 
-export function VendorSite({ vendor }: { vendor: PublicVendorResponse }) {
+export function VendorSiteContent({ vendor }: { vendor: PublicVendorResponse }) {
   const t = useT();
 
   return (

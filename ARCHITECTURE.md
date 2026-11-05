@@ -9,7 +9,7 @@ projekat/
 │   ├── remote-test/    test remote, Vite + Module Federation, client-only
 │   ├── server/         REST API, Fastify + Zod (not part of the microfrontend runtime)
 │   └── types/          API types generated from the server's OpenAPI document (@vendor-hub/types)
-├── infra/nginx/        nginx template for the main site and the vendor subdomains (docker compose service)
+├── infra/nginx/        nginx template for the site (docker compose service)
 ├── pnpm-workspace.yaml workspace + dependency catalog
 ├── tsconfig.base.json  shared compiler options
 ├── .oxlintrc.json      shared lint rules
@@ -28,10 +28,10 @@ The remote's manifest URL is not hardcoded in the shell. The root loader reads i
 ## Vendor sites
 
 ```
-browser --> nginx (vendorhub.localhost, *.vendorhub.localhost) --(X-Vendor-Slug)--> shell SSR --> GET /api/v1/vendors/by-slug/:slug
+browser --> nginx (vendorhub.localhost) --> shell SSR (/vendors/:slug) --> GET /api/v1/vendors/by-slug/:slug
 ```
 
-nginx (`infra/nginx/vendorhub.conf.template`, rendered with `envsubst` from `infra/nginx/.env.local`) is the only public entry. The main site block clears `X-Vendor-Slug`, so a client can never set it. The wildcard block takes the slug from the host and sets the header, and proxies only `/`, the asset paths, `/_root.data`, `/favicon.svg` and `/locale`. Everything else on a vendor subdomain redirects to the main site. The shell port is not published in production. The shell reads the header and renders the public vendor page, see the shell's `ARCHITECTURE.md`.
+nginx (`infra/nginx/vendorhub.conf.template`, rendered with `envsubst` from `infra/nginx/.env.local`) is the only public entry and proxies everything on one domain to the shell. The shell port is not published in production. Every vendor lives under a path of the same domain (`/vendors/:slug`), so adding a vendor never touches the nginx config. The shell renders the public vendor page, see the shell's `ARCHITECTURE.md`.
 
 ## Boundaries
 

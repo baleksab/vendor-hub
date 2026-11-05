@@ -23,7 +23,7 @@ describe("becomeVendorAction", () => {
     const response = (await becomeVendorAction(await authedForm(values, url))) as Response;
     const [path, call] = api.POST.mock.calls[0] as [string, { body: Record<string, string> }];
 
-    expect(response.headers.get("Location")).toBe("http://acme.vendors.test");
+    expect(response.headers.get("Location")).toBe("/vendors/acme");
     expect(path).toBe("/api/v1/vendors");
     expect(call.body).toEqual({ ...values, slug: "acme" });
   });
