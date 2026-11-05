@@ -84,6 +84,7 @@ Breaking changes use `!` after the scope (`feat(shell)!: ...`) and a `BREAKING C
 
 - Keep a PR to one logical change. Unrelated cleanups go in their own PR.
 - The PR title follows the commit format, because we **squash merge** and the title becomes the commit on `main`.
+- Write the PR title and description in English.
 - Fill in the PR template. Link the issue with `Closes #<number>`.
 - Mark it as a draft while it's still in progress.
 - CI and local checks must pass before review: `pnpm check`, `pnpm format:check` and `pnpm test`. CI (`.github/workflows/checks.yml`) runs format, lint, typecheck, build and unit tests as separate jobs on every PR and on pushes to `main`.
