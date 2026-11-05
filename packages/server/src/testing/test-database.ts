@@ -40,5 +40,5 @@ export async function createTestDatabase(): Promise<DatabaseHandle> {
 }
 
 export async function truncateAll(handle: DatabaseHandle): Promise<void> {
-  await handle.db.execute(sql`truncate table users`);
+  await handle.db.execute(sql`truncate table vendor_members, vendors, users`);
 }

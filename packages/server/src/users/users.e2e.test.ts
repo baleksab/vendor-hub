@@ -7,6 +7,7 @@ import type { DatabaseHandle } from "../db/client.ts";
 import { users } from "../db/schema.ts";
 import { TEST_JWT, validUser } from "../testing/build-test-app.ts";
 import { createTestDatabase, truncateAll } from "../testing/test-database.ts";
+import { DrizzleVendorsRepository } from "../vendors/vendors.repository.ts";
 import { DrizzleUsersRepository } from "./users.repository.ts";
 
 describe("users and auth against Postgres", () => {
@@ -19,6 +20,7 @@ describe("users and auth against Postgres", () => {
       logger: false,
       jwt: TEST_JWT,
       usersRepository: new DrizzleUsersRepository(handle.db),
+      vendorsRepository: new DrizzleVendorsRepository(handle.db),
       checkDatabase: async () => {
         await handle.pool.query("select 1");
       },
@@ -161,6 +163,7 @@ describe("users and auth against Postgres", () => {
       logger: false,
       jwt: TEST_JWT,
       usersRepository: new DrizzleUsersRepository(closed.db),
+      vendorsRepository: new DrizzleVendorsRepository(closed.db),
       checkDatabase: async () => {
         await closed.pool.query("select 1");
       },
