@@ -15,7 +15,6 @@ const TOP_BAR_HEIGHT = 52;
 export function AppLayout({ children }: { children: ReactNode }) {
   const t = useT();
   const [mobileOpened, { open: openMobile, close: closeMobile }] = useDisclosure(false);
-  const [desktopOpened, desktop] = useDisclosure(true);
   const location = useLocation();
 
   useEffect(() => {
@@ -34,17 +33,12 @@ export function AppLayout({ children }: { children: ReactNode }) {
     links.push({ to: "/become-vendor", label: t("nav.becomeVendor") });
   }
 
-  const closeSidebar = () => {
-    closeMobile();
-    desktop.close();
-  };
-
   return (
     <AppShell
       navbar={{
         width: SIDEBAR_WIDTH,
         breakpoint: "sm",
-        collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
+        collapsed: { mobile: !mobileOpened },
       }}
       padding={0}
     >
@@ -58,16 +52,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </Anchor>
           <Burger
             opened
-            onClick={closeSidebar}
+            onClick={closeMobile}
             hiddenFrom="sm"
             size={44}
-            aria-label={t("nav.close")}
-          />
-          <Burger
-            opened
-            onClick={closeSidebar}
-            visibleFrom="sm"
-            size={18}
             aria-label={t("nav.close")}
           />
         </Group>
@@ -100,19 +87,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
             {t("app.title")}
           </Anchor>
         </Group>
-
-        {!desktopOpened && (
-          <Burger
-            visibleFrom="sm"
-            opened={false}
-            onClick={desktop.open}
-            size={18}
-            pos="fixed"
-            top="var(--mantine-spacing-md)"
-            left="var(--mantine-spacing-md)"
-            aria-label={t("nav.menu")}
-          />
-        )}
 
         <Container size="md" px="md">
           {children}

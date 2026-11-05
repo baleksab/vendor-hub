@@ -25,6 +25,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const { owned } = await loadMyVendors(request, session);
 
   if (owned !== null) {
+    console.log(owned.slug);
     throw redirect(vendorPath(owned.slug));
   }
 
