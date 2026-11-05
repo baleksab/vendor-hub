@@ -1,7 +1,6 @@
 import { Button, Group, Menu, Stack, Text } from "@mantine/core";
-import { Link } from "react-router";
+import { Link, useNavigation, useSubmit } from "react-router";
 
-import { useLogoutMutation } from "../../hooks/useLogoutMutation/useLogoutMutation";
 import { useSession } from "../../hooks/useSession/useSession";
 import { useT } from "../../i18n/LocaleProvider";
 
@@ -10,13 +9,13 @@ type Props = { touch?: boolean; onNavigate?: () => void };
 export function UserMenu({ touch = false, onNavigate }: Props) {
   const t = useT();
   const { user } = useSession();
-  const logout = useLogoutMutation();
+  const submit = useSubmit();
+  const loggingOut = useNavigation().formAction === "/logout";
   const size = touch ? "md" : "compact-md";
   const height = touch ? 44 : undefined;
 
   const handleLogout = () => {
-    onNavigate?.();
-    void logout.run();
+    void submit(null, { method: "post", action: "/logout" });
   };
 
   if (user === null) {
@@ -47,13 +46,7 @@ export function UserMenu({ touch = false, onNavigate }: Props) {
     return (
       <Stack gap="xs">
         <Text fw={500}>{name}</Text>
-        <Button
-          variant="default"
-          size="md"
-          h={44}
-          onClick={handleLogout}
-          loading={logout.isPending}
-        >
+        <Button variant="default" size="md" h={44} onClick={handleLogout} loading={loggingOut}>
           {t("nav.logout")}
         </Button>
       </Stack>
@@ -68,7 +61,7 @@ export function UserMenu({ touch = false, onNavigate }: Props) {
         </Button>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Item mih={44} onClick={handleLogout} disabled={logout.isPending}>
+        <Menu.Item mih={44} onClick={handleLogout} disabled={loggingOut}>
           {t("nav.logout")}
         </Menu.Item>
       </Menu.Dropdown>

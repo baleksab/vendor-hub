@@ -8,10 +8,7 @@ export function assertSameOrigin(request: Request): void {
     return;
   }
 
-  const contentType = request.headers.get("Content-Type") ?? "";
-  const origin = request.headers.get("Origin");
-
-  if (!contentType.toLowerCase().startsWith("application/json") || origin !== getEnv().origin) {
+  if (request.headers.get("Origin") !== getEnv().origin) {
     throw new Response("Forbidden", { status: FORBIDDEN });
   }
 }

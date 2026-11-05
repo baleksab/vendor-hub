@@ -4,7 +4,7 @@ The host application of Vendor Hub. React Router 8 in framework mode with SSR, b
 
 ## Stack
 
-React 19, React Router 8, Mantine, Tailwind, `@module-federation/runtime`, TanStack Form, axios, Zod, Vitest.
+React 19, React Router 8, Mantine, Tailwind, `@module-federation/runtime`, openapi-fetch, Zod, Vitest.
 
 ## Scripts
 

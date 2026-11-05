@@ -1,11 +1,13 @@
-import { Alert, Anchor, Stack, Text, Title } from "@mantine/core";
-import { Link, useSearchParams } from "react-router";
+import { Alert, Anchor, Button, Stack, Text, Title } from "@mantine/core";
+import { Form, Link, useNavigation, useSearchParams } from "react-router";
 
+import { loginAction } from "../../auth/authActions.server";
 import { redirectIfAuthenticated } from "../../auth/session.server";
+import { FormAlert } from "../../components/FormAlert/FormAlert";
+import { FormField } from "../../components/FormField/FormField";
 import { useT } from "../../i18n/LocaleProvider";
 import { pageMeta } from "../../seo/pageMeta";
 import type { Route } from "./+types/Login";
-import { LoginForm } from "./components/LoginForm";
 
 export function meta({ matches }: Route.MetaArgs) {
   return pageMeta(matches, {
@@ -22,8 +24,13 @@ export async function loader({ request }: Route.LoaderArgs) {
   return null;
 }
 
-export default function Login() {
+export function action({ request }: Route.ActionArgs) {
+  return loginAction(request);
+}
+
+export default function Login({ actionData }: Route.ComponentProps) {
   const t = useT();
+  const navigation = useNavigation();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirectTo");
   const registerTo = redirectTo
@@ -36,7 +43,31 @@ export default function Login() {
 
       {searchParams.has("registered") && <Alert color="green">{t("login.registered")}</Alert>}
 
-      <LoginForm />
+      <Form method="post" noValidate>
+        <Stack gap="md">
+          <FormField
+            name="email"
+            label={t("auth.email")}
+            type="email"
+            autoComplete="email"
+            defaultValue={actionData?.values.email}
+            error={actionData?.fields.email}
+          />
+          <FormField
+            name="password"
+            label={t("auth.password")}
+            kind="password"
+            autoComplete="current-password"
+            error={actionData?.fields.password}
+          />
+
+          <FormAlert message={actionData?.form} />
+
+          <Button type="submit" size="md" mih={44} loading={navigation.state === "submitting"}>
+            {t("login.submit")}
+          </Button>
+        </Stack>
+      </Form>
 
       <Text c="dimmed">
         {t("login.noAccount")}{" "}

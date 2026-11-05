@@ -1,13 +1,10 @@
-import type { AxiosInstance } from "axios";
-
+import type { paths } from "@vendor-hub/types";
 import { getEnv } from "../env.server";
-import { createClient } from "./createClient";
+import { createApiClient } from "./createApiClient";
 
-export const API_PREFIX = "/api/v1";
-
-export function createServerApi(token?: string): AxiosInstance {
-  return createClient({
-    baseURL: `${getEnv().apiUrl}${API_PREFIX}`,
+export function createServerApi(token?: string) {
+  return createApiClient<paths>({
+    baseUrl: getEnv().apiUrl,
     headers: token === undefined ? undefined : { Authorization: `Bearer ${token}` },
   });
 }

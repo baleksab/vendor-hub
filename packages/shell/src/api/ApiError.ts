@@ -1,5 +1,3 @@
-import axios from "axios";
-
 import { ProblemSchema } from "./problem";
 
 export type ApiErrorKind =
@@ -62,19 +60,14 @@ function toFieldErrors(errors: { path: string; message: string }[] | undefined) 
   return fieldErrors;
 }
 
-export function toApiError(error: unknown): ApiError {
-  if (error instanceof ApiError) {
-    return error;
-  }
+export function networkError(cause: unknown): ApiError {
+  const detail = cause instanceof Error ? cause.message : "Request failed";
 
-  if (!axios.isAxiosError(error) || error.response === undefined) {
-    const detail = error instanceof Error ? error.message : "Request failed";
+  return new ApiError({ status: 0, kind: "network", title: "Network error", detail });
+}
 
-    return new ApiError({ status: 0, kind: "network", title: "Network error", detail });
-  }
-
-  const { status, data, statusText } = error.response;
-  const problem = ProblemSchema.safeParse(data);
+export function fromResponse(status: number, statusText: string, body: unknown): ApiError {
+  const problem = ProblemSchema.safeParse(body);
 
   if (!problem.success) {
     return new ApiError({ status, kind: kindOf(status), title: statusText, detail: "" });

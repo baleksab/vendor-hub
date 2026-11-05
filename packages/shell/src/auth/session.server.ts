@@ -1,6 +1,7 @@
 import { redirect } from "react-router";
 
 import { ApiError } from "../api/ApiError";
+import { unwrap } from "../api/createApiClient";
 import { createServerApi } from "../api/createServerApi.server";
 import type { UserResponse } from "../api/types";
 import { safeRedirectTo, loginPath } from "./safeRedirect";
@@ -21,9 +22,9 @@ async function loadSession(request: Request): Promise<SessionResult> {
   }
 
   try {
-    const { data } = await createServerApi(token).get<UserResponse>("/users/me");
+    const user = await unwrap(createServerApi(token).GET("/api/v1/users/me"));
 
-    return { session: { user: data, token }, headers };
+    return { session: { user, token }, headers };
   } catch (error) {
     if (error instanceof ApiError && error.kind === "unauthorized") {
       headers.append("Set-Cookie", await clearToken());
