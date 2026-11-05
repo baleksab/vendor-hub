@@ -37,13 +37,13 @@ describe("loginAction", () => {
     const credentials = { email: "jane@example.com", password: "pw" };
 
     const safe = (await loginAction(
-      form(credentials, `${ORIGIN}/login?redirectTo=%2Fremote-test`),
+      form(credentials, `${ORIGIN}/login?redirectTo=%2Fvendors`),
     )) as Response;
     const evil = (await loginAction(
       form(credentials, `${ORIGIN}/login?redirectTo=%2F%2Fevil.com`),
     )) as Response;
 
-    expect(safe.headers.get("Location")).toBe("/remote-test");
+    expect(safe.headers.get("Location")).toBe("/vendors");
     expect(evil.headers.get("Location")).toBe("/");
   });
 

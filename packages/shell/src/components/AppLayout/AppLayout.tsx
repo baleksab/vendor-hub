@@ -30,7 +30,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const links: { to: string; label: string; icon: NavIconName }[] = [
     { to: "/", label: t("nav.home"), icon: "home" },
     { to: "/vendors", label: t("nav.vendors"), icon: "vendors" },
-    { to: "/remote-test", label: t("nav.remoteTest"), icon: "remoteTest" },
   ];
 
   if (vendors === null || vendors.owned === null) {

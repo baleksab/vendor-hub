@@ -6,7 +6,6 @@ A microfrontend setup in a pnpm workspace, plus a REST API server. One host (the
 projekat/
 ├── packages/
 │   ├── shell/          host app, React Router 8 framework mode, SSR
-│   ├── remote-test/    test remote, Vite + Module Federation, client-only
 │   ├── user-administrator/ remote with the admin user pages (TanStack Query, React Router routes)
 │   ├── server/         REST API, Fastify + Zod (not part of the microfrontend runtime)
 │   └── types/          API types generated from the server's OpenAPI document (@vendor-hub/types)
@@ -22,8 +21,8 @@ projekat/
 
 ## Runtime flow
 
-1. The browser requests a page from the shell. The shell renders HTML on the server (SSR). Routes that need a remote render a skeleton on the server.
-2. After hydration the shell loads the remote's `mf-manifest.json` through `@module-federation/runtime`, then the exposed module, and renders it in place of the skeleton.
+1. The browser requests a page from the shell. The shell renders HTML on the server (SSR). Routes that need a remote render a loading spinner on the server.
+2. After hydration the shell loads the remote's `mf-manifest.json` through `@module-federation/runtime`, then the exposed module, and renders it in place of the spinner.
 3. `react`, `react-dom`, `react-router`, `@mantine/core` and `@mantine/hooks` are `singleton` shared modules: the shell provides its copy, the remote uses it. There is exactly one React and one Mantine at runtime, so remote components see the shell's `MantineProvider` (theme and color scheme).
 
 The remotes' manifest URLs are not hardcoded in the shell. The root loader reads them from env and passes them to the client.

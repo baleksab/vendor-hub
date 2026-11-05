@@ -1,7 +1,6 @@
 export const en = {
   "app.title": "Vendor Hub",
   "nav.home": "Home",
-  "nav.remoteTest": "Remote test",
   "nav.vendors": "Vendors",
   "nav.menu": "Open navigation",
   "nav.close": "Close navigation",
@@ -49,10 +48,6 @@ export const en = {
   "vendors.title": "Vendors",
   "seo.vendors.title": "Vendors",
   "seo.vendors.description": "All vendors on Vendor Hub.",
-  "remoteTest.title": "Remote test",
-  "remoteTest.hint": "Shell uses React and Mantine.",
-  "remoteTest.error.title": "Error",
-  "remoteTest.error.message": "Could not load the remote.",
   "notFound.title": "Page not found",
   "notFound.message": "The page you are looking for does not exist.",
   "notFound.back": "Back to home",
@@ -61,9 +56,6 @@ export const en = {
   "seo.home.title": "Vendor Hub",
   "seo.home.description":
     "Vendor Hub is a multi-vendor platform: every vendor gets its own page, and customers find them all in one place.",
-  "seo.remoteTest.title": "Remote test",
-  "seo.remoteTest.description":
-    "A micro frontend loaded into the shell at runtime with Module Federation.",
   "seo.notFound.title": "Page not found",
   "seo.notFound.description": "The page you are looking for does not exist.",
   "nav.login": "Log in",
