@@ -7,8 +7,6 @@ Object.assign(process.env, {
   API_URL: "http://api.test",
   SESSION_COOKIE_NAME: "session",
   SESSION_COOKIE_SECURE: "true",
-  VENDOR_SITE_ORIGIN: "http://{slug}.vendors.test",
-  VENDOR_SLUG_HEADER: "X-Vendor-Slug",
 });
 
 export const ORIGIN = "http://shell.test";

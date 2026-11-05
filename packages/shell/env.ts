@@ -9,8 +9,6 @@ export type ShellEnv = {
   apiUrl: string;
   sessionCookieName: string;
   sessionCookieSecure: boolean;
-  vendorSiteOrigin: string;
-  vendorSlugHeader: string;
 };
 
 type Source = Record<string, string | undefined>;
@@ -48,24 +46,6 @@ function parseUrl(source: Source, key: string): string {
   }
 }
 
-const SLUG_PLACEHOLDER = "{slug}";
-
-function parseVendorSiteOrigin(source: Source, key: string): string {
-  const raw = required(source, key);
-
-  if (raw.split(SLUG_PLACEHOLDER).length !== 2) {
-    throw new Error(`Env key ${key} must contain exactly one ${SLUG_PLACEHOLDER}, got "${raw}"`);
-  }
-
-  try {
-    new URL(raw.replace(SLUG_PLACEHOLDER, "slug"));
-  } catch {
-    throw new Error(`Env key ${key} must be a valid URL after substituting the slug, got "${raw}"`);
-  }
-
-  return raw;
-}
-
 function parseBoolean(source: Source, key: string): boolean {
   const raw = required(source, key);
 
@@ -96,7 +76,5 @@ export function readShellEnv(source: Source): ShellEnv {
     apiUrl: new URL(parseUrl(source, "API_URL")).origin,
     sessionCookieName: required(source, "SESSION_COOKIE_NAME"),
     sessionCookieSecure: parseBoolean(source, "SESSION_COOKIE_SECURE"),
-    vendorSiteOrigin: parseVendorSiteOrigin(source, "VENDOR_SITE_ORIGIN"),
-    vendorSlugHeader: required(source, "VENDOR_SLUG_HEADER"),
   };
 }

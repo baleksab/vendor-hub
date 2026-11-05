@@ -6,9 +6,8 @@ import { FormAlert } from "../../components/FormAlert/FormAlert";
 import { FormField } from "../../components/FormField/FormField";
 import { useT } from "../../i18n/LocaleProvider";
 import { pageMeta } from "../../seo/pageMeta";
-import { getEnv } from "../../env.server";
 import { loadMyVendors } from "../../vendor/myVendors.server";
-import { vendorSiteOrigin } from "../../vendor/vendorSite";
+import { vendorPath } from "../../vendor/vendorPaths";
 import type { Route } from "./+types/BecomeVendor";
 import { becomeVendorAction } from "./becomeVendorAction.server";
 
@@ -26,7 +25,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const { owned } = await loadMyVendors(request, session);
 
   if (owned !== null) {
-    throw redirect(vendorSiteOrigin(getEnv().vendorSiteOrigin, owned.slug));
+    throw redirect(vendorPath(owned.slug));
   }
 
   return null;

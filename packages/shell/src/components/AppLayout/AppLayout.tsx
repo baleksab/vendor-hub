@@ -20,6 +20,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   const links = [
     { to: "/", label: t("nav.home") },
+    { to: "/vendors", label: t("nav.vendors") },
     { to: "/remote-test", label: t("nav.remoteTest") },
   ];
 

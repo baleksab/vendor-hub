@@ -23,10 +23,8 @@ services:
     restart: unless-stopped
     environment:
       NGINX_PORT: ${NGINX_PORT:?}
-      VENDOR_BASE_DOMAIN: ${VENDOR_BASE_DOMAIN:?}
+      SITE_DOMAIN: ${SITE_DOMAIN:?}
       SHELL_UPSTREAM: ${SHELL_UPSTREAM:?}
-      MAIN_SITE_ORIGIN: ${MAIN_SITE_ORIGIN:?}
-      VENDOR_SLUG_HEADER: ${VENDOR_SLUG_HEADER:?}
     ports:
       - "${NGINX_PORT:?}:${NGINX_PORT:?}"
     extra_hosts:

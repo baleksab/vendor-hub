@@ -1,6 +1,6 @@
 # Vendor Hub
 
-A multi-vendor online store platform. Every vendor gets its own storefront on a reserved subdomain (`<vendor>.vendorhub.localhost` locally). Public pages (landing page, storefronts, catalog, product pages) are rendered on the server. The tools for running a store (vendor admin panel, statistics) are microfrontends, built separately and loaded into the shell in the browser.
+A multi-vendor online store platform. Every vendor gets its own storefront under a reserved path (`vendorhub.localhost/vendors/<vendor>` locally). Public pages (landing page, storefronts, catalog, product pages) are rendered on the server. The tools for running a store (vendor admin panel, statistics) are microfrontends, built separately and loaded into the shell in the browser.
 
 Course project: _Odabrana poglavlja iz projektovanja poslovnih aplikacija_ (2026/27). Chosen base: **online store** (catalog, cart, order, payment, delivery, return).
 
@@ -17,7 +17,7 @@ SSR serves the public side (fast first paint, SEO for storefronts and products).
 ## Architecture
 
 ```
- *.vendorhub.localhost ──► nginx ──┬──► shell (SSR)        pages
+ vendorhub.localhost ──► nginx ──┬──► shell (SSR)        pages
                                     ├──► remotes            admin, statistics
                                     └──► server (REST API) ──► PostgreSQL
 ```
@@ -28,9 +28,9 @@ SSR serves the public side (fast first paint, SEO for storefronts and products).
 | Remotes | `packages/remote-*` | Vendor admin panel and statistics (Module Federation, client) |
 | API     | `packages/server`   | REST API and business rules (Fastify, Zod, Postgres)          |
 | Types   | `packages/types`    | API types generated from the server's OpenAPI document        |
-| Proxy   | nginx               | Wildcard subdomain routing in front of everything             |
+| Proxy   | nginx               | Reverse proxy in front of the shell                           |
 
-Each vendor owns a subdomain, and the bare domain serves the landing page and vendor directory. nginx routes by wildcard, so adding a vendor never changes its config. The base domain is configuration, like every other host and port.
+Each vendor owns a path (`/vendors/<slug>`), and `/vendors` lists them all. Everything is served from one domain, so adding a vendor never changes the nginx config. The domain is configuration, like every other host and port.
 
 Details: [`ARCHITECTURE.md`](ARCHITECTURE.md) and the `ARCHITECTURE.md` of each package.
 
@@ -67,12 +67,12 @@ pnpm nginx:up       # nginx on port 80, open http://vendorhub.localhost
 
 `*.localhost` resolves to `127.0.0.1` in Chrome, Firefox and Safari, so no hosts file or DNS setup is needed.
 
-nginx (`infra/nginx`) sends `vendorhub.localhost` to the shell and `<slug>.vendorhub.localhost` to the shell with the `X-Vendor-Slug` header. `pnpm nginx:down` stops it. Its settings are in `infra/nginx/.env.local`; changing the domain or port also means changing `SHELL_ORIGIN`, `VENDOR_SITE_ORIGIN` (shell) and `REMOTE_TEST_ALLOWED_ORIGINS` (remote).
+nginx (`infra/nginx`) sends `vendorhub.localhost` to the shell. `pnpm nginx:down` stops it. Its settings are in `infra/nginx/.env.local`; changing the domain or port also means changing `SHELL_ORIGIN` (shell) and `REMOTE_TEST_ALLOWED_ORIGINS` (remote). nginx is optional: without it the shell is also reachable on `localhost:4100`.
 
 | Service       | URL                                                             |
 | ------------- | --------------------------------------------------------------- |
 | Shell         | `http://vendorhub.localhost` (nginx), upstream `localhost:4100` |
-| Vendor site   | `http://<slug>.vendorhub.localhost` (nginx)                     |
+| Vendor site   | `http://vendorhub.localhost/vendors/<slug>` (nginx)             |
 | Remote (test) | `http://localhost:4101`                                         |
 | API           | `http://localhost:4200` (docs `/docs`)                          |
 | Postgres      | `localhost:5433`                                                |
@@ -103,7 +103,7 @@ Ports are changed only in the `.env.local` files. The shell needs the API runnin
 | Monorepo, SSR shell, Module Federation | done (test remote only)     |
 | API server, OpenAPI, users and login   | done                        |
 | Shell login, registration, session     | done                        |
-| Vendors, roles, subdomain routing      | in progress (server, shell) |
+| Vendors, roles, vendor pages           | in progress (server, shell) |
 | Catalog, cart, orders, payment         | planned                     |
 | Admin and statistics remotes, reports  | planned                     |
 | Full-stack `docker compose up`         | planned                     |

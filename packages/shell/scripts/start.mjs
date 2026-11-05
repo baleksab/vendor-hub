@@ -21,8 +21,6 @@ required("REMOTE_TEST_MANIFEST_URL");
 required("API_URL");
 required("SESSION_COOKIE_NAME");
 required("SESSION_COOKIE_SECURE");
-required("VENDOR_SITE_ORIGIN");
-required("VENDOR_SLUG_HEADER");
 
 const child = spawn("react-router-serve", ["./build/server/index.js"], {
   stdio: "inherit",

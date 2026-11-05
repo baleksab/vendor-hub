@@ -1,6 +1,4 @@
 import { listVendors } from "../api/endpoints/vendors.server";
-import { getEnv } from "../env.server";
-import { vendorSiteOrigin } from "./vendorSite";
 
 export const VENDORS_PAGE_SIZE = 12;
 
@@ -8,7 +6,6 @@ export type VendorCard = {
   slug: string;
   name: string;
   description: string;
-  siteUrl: string;
 };
 
 export type VendorPage = {
@@ -25,17 +22,13 @@ export function readPage(request: Request): number {
 }
 
 export async function loadVendorPage(page: number): Promise<VendorPage> {
-  const template = getEnv().vendorSiteOrigin;
   const { data, meta } = await listVendors({
     limit: VENDORS_PAGE_SIZE,
     offset: (page - 1) * VENDORS_PAGE_SIZE,
   });
 
   return {
-    items: data.map((vendor) => ({
-      ...vendor,
-      siteUrl: vendorSiteOrigin(template, vendor.slug),
-    })),
+    items: data,
     page,
     pageCount: Math.max(1, Math.ceil(meta.total / VENDORS_PAGE_SIZE)),
   };
