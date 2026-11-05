@@ -17,10 +17,10 @@ export function UserMenu() {
   if (user === null) {
     return (
       <Stack gap="xs">
-        <Button component={Link} to="/login" variant="default" size="md" h={44}>
+        <Button component={Link} to="/login" variant="default" size="sm" h={{ base: 44, sm: 34 }}>
           {t("nav.login")}
         </Button>
-        <Button component={Link} to="/register" size="md" h={44}>
+        <Button component={Link} to="/register" size="sm" h={{ base: 44, sm: 34 }}>
           {t("nav.register")}
         </Button>
       </Stack>
@@ -34,20 +34,20 @@ export function UserMenu() {
       <Menu.Target>
         <UnstyledButton
           aria-label={t("nav.account")}
-          mih={44}
+          mih={{ base: 44, sm: 36 }}
           p="xs"
           style={{ borderRadius: "var(--mantine-radius-md)" }}
         >
           <Group gap="sm" wrap="nowrap">
-            <Avatar name={name} radius="xl" />
-            <Text fw={500} truncate>
+            <Avatar name={name} size="sm" radius="xl" />
+            <Text fw={500} size="sm" truncate>
               {name}
             </Text>
           </Group>
         </UnstyledButton>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Item mih={44} onClick={handleLogout} disabled={loggingOut}>
+        <Menu.Item mih={{ base: 44, sm: 34 }} onClick={handleLogout} disabled={loggingOut}>
           {t("nav.logout")}
         </Menu.Item>
       </Menu.Dropdown>

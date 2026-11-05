@@ -56,16 +56,16 @@ export const theme = createTheme({
   headings: {
     fontWeight: "600",
     sizes: {
-      h1: { fontSize: "2rem", lineHeight: "1.2" },
-      h2: { fontSize: "1.5rem", lineHeight: "1.2" },
-      h3: { fontSize: "1.25rem", lineHeight: "1.2" },
+      h1: { fontSize: "1.75rem", lineHeight: "1.2" },
+      h2: { fontSize: "1.375rem", lineHeight: "1.2" },
+      h3: { fontSize: "1.125rem", lineHeight: "1.2" },
     },
   },
   components: {
     Card: Card.extend({
       defaultProps: {
         radius: "lg",
-        padding: 20,
+        padding: "md",
         withBorder: true,
         bg: "light-dark(var(--mantine-color-white), var(--mantine-color-dark-6))",
       },

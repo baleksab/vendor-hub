@@ -75,7 +75,7 @@ Forms are a plain `<Form method="post">` with Mantine inputs. The action validat
 
 `AppLayout` wraps the `Outlet` in a Mantine `AppShell` with a left sidebar, like a chat app. The sidebar has the title, the `NavLink`s (active state from `useMatch`) and, at the bottom, the `LanguageSwitcher` and the `UserMenu` (log in / register buttons, or an avatar with the user name and a log out item). A `Burger` collapses it on desktop, and a floating `Burger` brings it back. Below `sm` the sidebar is hidden and opens full width from a sticky top bar, closing again on navigation. Content sits in a centered `Container`.
 
-`theme.ts` follows the Neutral Modern design system: a cobalt primary color, neutral gray and dark scales, Inter (`@fontsource-variable/inter`, imported in `root.tsx`) at weight 600 for headings, 12px card radius and flat bordered cards (`Card` defaults). `cssVariablesResolver` sets the `#fafafa` light background. Design is mobile first. Unknown URLs hit the splat route `NotFound` (status 404, `noindex`), and the root `ErrorBoundary` renders other errors, also `noindex`.
+`theme.ts` follows the Neutral Modern design system: a cobalt primary color, neutral gray and dark scales, Inter (`@fontsource-variable/inter`, imported in `root.tsx`) at weight 600 for headings, 12px card radius, compact sizes from `sm` up, compact sizes from `sm` up and flat bordered cards (`Card` defaults). `cssVariablesResolver` sets the `#fafafa` light background. Design is mobile first. Unknown URLs hit the splat route `NotFound` (status 404, `noindex`), and the root `ErrorBoundary` renders other errors, also `noindex`.
 
 ## SEO
 

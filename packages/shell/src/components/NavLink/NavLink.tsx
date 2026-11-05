@@ -14,7 +14,8 @@ export function NavLink({ to, label, onNavigate }: Props) {
       active={active}
       aria-current={active ? "page" : undefined}
       onClick={onNavigate}
-      mih={44}
+      mih={{ base: 44, sm: 34 }}
+      py={0}
       w="auto"
     />
   );

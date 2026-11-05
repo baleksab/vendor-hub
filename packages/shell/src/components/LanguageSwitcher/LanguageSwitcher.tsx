@@ -17,10 +17,10 @@ export function LanguageSwitcher() {
             type="submit"
             name="locale"
             value={locale}
-            size="md"
-            h={44}
+            size="compact-sm"
+            h={{ base: 44, sm: 28 }}
             flex={1}
-            variant={locale === current ? "filled" : "default"}
+            variant={locale === current ? "light" : "default"}
             aria-pressed={locale === current}
           >
             {locale.toUpperCase()}

@@ -9,8 +9,8 @@ import { LanguageSwitcher } from "../LanguageSwitcher/LanguageSwitcher";
 import { NavLink } from "../NavLink/NavLink";
 import { UserMenu } from "../UserMenu/UserMenu";
 
-const SIDEBAR_WIDTH = 280;
-const TOP_BAR_HEIGHT = 56;
+const SIDEBAR_WIDTH = 240;
+const TOP_BAR_HEIGHT = 52;
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const t = useT();
@@ -52,20 +52,33 @@ export function AppLayout({ children }: { children: ReactNode }) {
         p="md"
         bg="light-dark(var(--mantine-color-white), var(--mantine-color-dark-8))"
       >
-        <Group justify="space-between" wrap="nowrap" mb="md">
-          <Anchor component={Link} to="/" fw={500} fz="xl" c="inherit" underline="never">
+        <Group justify="space-between" wrap="nowrap" mb="sm">
+          <Anchor component={Link} to="/" fw={600} fz="lg" c="inherit" underline="never">
             {t("app.title")}
           </Anchor>
-          <Burger opened onClick={closeSidebar} size={44} aria-label={t("nav.close")} />
+          <Burger
+            opened
+            onClick={closeSidebar}
+            hiddenFrom="sm"
+            size={44}
+            aria-label={t("nav.close")}
+          />
+          <Burger
+            opened
+            onClick={closeSidebar}
+            visibleFrom="sm"
+            size={18}
+            aria-label={t("nav.close")}
+          />
         </Group>
 
-        <Stack component="nav" aria-label={t("nav.label")} gap={4} flex={1}>
+        <Stack component="nav" aria-label={t("nav.label")} gap={2} flex={1}>
           {links.map((link) => (
             <NavLink key={link.to} {...link} />
           ))}
         </Stack>
 
-        <Stack gap="sm" pt="md">
+        <Stack gap="xs" pt="sm">
           <LanguageSwitcher />
           <UserMenu />
         </Stack>
@@ -83,7 +96,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           bg="var(--mantine-color-body)"
         >
           <Burger opened={false} onClick={openMobile} size={44} aria-label={t("nav.menu")} />
-          <Anchor component={Link} to="/" fw={500} fz="lg" c="inherit" underline="never">
+          <Anchor component={Link} to="/" fw={600} fz="lg" c="inherit" underline="never">
             {t("app.title")}
           </Anchor>
         </Group>
@@ -93,10 +106,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
             visibleFrom="sm"
             opened={false}
             onClick={desktop.open}
-            size={44}
+            size={18}
             pos="fixed"
-            top="var(--mantine-spacing-xs)"
-            left="var(--mantine-spacing-xs)"
+            top="var(--mantine-spacing-md)"
+            left="var(--mantine-spacing-md)"
             aria-label={t("nav.menu")}
           />
         )}
