@@ -45,14 +45,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
       }}
       padding={0}
     >
-      <AppShell.Navbar
-        p="md"
-        bg="light-dark(var(--mantine-color-white), var(--mantine-color-dark-8))"
-      >
-        <Group justify="space-between" wrap="nowrap" mb="sm">
-          <Anchor component={Link} to="/" fw={600} fz="lg" c="inherit" underline="never">
-            {t("app.title")}
-          </Anchor>
+      <AppShell.Navbar bg="light-dark(var(--mantine-color-white), var(--mantine-color-dark-8))">
+        <Group h={TOP_BAR_HEIGHT} px="md" wrap="nowrap" style={{ flexShrink: 0 }}>
           <Burger
             opened
             onClick={closeMobile}
@@ -61,15 +55,18 @@ export function AppLayout({ children }: { children: ReactNode }) {
             style={burgerStyle}
             aria-label={t("nav.close")}
           />
+          <Anchor component={Link} to="/" fw={600} fz="lg" c="inherit" underline="never">
+            {t("app.title")}
+          </Anchor>
         </Group>
 
-        <Stack component="nav" aria-label={t("nav.label")} gap={2} flex={1}>
+        <Stack component="nav" aria-label={t("nav.label")} gap={2} flex={1} px="md">
           {links.map((link) => (
             <NavLink key={link.to} {...link} />
           ))}
         </Stack>
 
-        <Stack gap="xs" pt="sm">
+        <Stack gap="xs" p="md">
           <LanguageSwitcher />
           <UserMenu />
         </Stack>
