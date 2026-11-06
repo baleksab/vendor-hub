@@ -29,6 +29,11 @@ describe("isProxied", () => {
     ["GET", `/api/v1/products/${ID}/reviews`],
     ["GET", "/api/v1/vendors/by-slug/acme/products"],
     ["GET", `/api/v1/product-images/${ID}`],
+    ["GET", `/api/v1/vendors/${ID}/orders`],
+    ["GET", `/api/v1/orders/${ID}`],
+    ["POST", `/api/v1/orders/${ID}/deliver`],
+    ["POST", `/api/v1/orders/${ID}/returns/approve`],
+    ["POST", `/api/v1/orders/${ID}/returns/reject`],
   ])("allows %s %s", (method, path) => {
     expect(isProxied(method, path)).toBe(true);
   });
@@ -38,6 +43,14 @@ describe("isProxied", () => {
     ["POST", `/api/v1/products/${ID}`],
     ["GET", "/api/v1/product-images/nope"],
     ["DELETE", `/api/v1/product-images/${ID}`],
+    ["GET", "/api/v1/orders"],
+    ["POST", "/api/v1/orders"],
+    ["POST", `/api/v1/orders/${ID}/payments`],
+    ["POST", `/api/v1/orders/${ID}/cancel`],
+    ["POST", `/api/v1/orders/${ID}/confirm-receipt`],
+    ["POST", `/api/v1/orders/${ID}/return-requests`],
+    ["POST", `/api/v1/orders/${ID}/returns/delete`],
+    ["POST", "/api/v1/cart/quote"],
   ])("rejects %s %s", (method, path) => {
     expect(isProxied(method, path)).toBe(false);
   });

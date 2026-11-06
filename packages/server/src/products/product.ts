@@ -67,3 +67,15 @@ export type ProductSearch = {
 export type CategoryCount = { category: string; count: number };
 
 export type NewProductImage = { contentType: string; byteSize: number };
+
+export type ProductSnapshot = {
+  id: string;
+  vendorId: string;
+  vendorSlug: string;
+  vendorName: string;
+  name: string;
+  priceMinor: number;
+  currency: Currency;
+  stock: number;
+  coverImageId: string | null;
+};

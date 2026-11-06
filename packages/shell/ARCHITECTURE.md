@@ -16,16 +16,23 @@ packages/shell/
 │   │   ├── ProductPage/    `/vendors/:slug/products/:productId`, the product page with a back link labelled with the vendor name (history back when the user came from inside the app, else the vendor page; product cards pass the active filters as query params and the link keeps them), a "Manage product" button to `/manage/vendors/:vendorId/products/:productId` for administrators, owners and operators of the vendor, gallery, rating and reviews
 │   │   ├── BecomeVendor/   vendor registration form, becomeVendorAction.server.ts, noindex
 │   │   ├── Login/          login form, loginAction.server.ts, noindex
-│   │   ├── Register/       registration form, registerAction.server.ts, countries from the API, noindex
+│   │   ├── Register/       registration form, registerAction.server.ts, countries from the API, prefilled from the stored checkout details, noindex
+│   │   ├── Cart/           `/cart`, lines grouped by vendor, totals per currency, quantity and remove forms (components/CartLineForms), noindex
+│   │   ├── Checkout/       `/checkout`, shipping form and summary, checkoutAction.server.ts, checkoutSchema.ts, noindex
+│   │   ├── Orders/         `/orders`, the buyer's orders with a status filter and pages in the URL, noindex
+│   │   ├── OrderPage/      `/orders/:id`, items, shipping, timeline, payments and the buyer actions (components/OrderActions, orderAction.server.ts), noindex
+│   │   ├── Payment/        `/orders/:id/pay`, the simulated payment form, paymentAction.server.ts, noindex
 │   │   ├── Admin/          `/admin/*`, loader allows administrators only, mounts the user-administrator remote, noindex
 │   │   ├── ManageVendors/  `/manage/*`, loader needs a session only, mounts the vendor-administrator remote, noindex
 │   │   └── NotFound/       splat route, 404 + noindex
-│   ├── components/         shared: AppLayout, NavLink, LanguageSwitcher, UserMenu, FormField, FormAlert, RemoteSlot, RemoteErrorBoundary, RemoteFallback
-│   ├── hooks/              shared: useIsClient, useSession
+│   ├── components/         shared: AppLayout, NavLink, LanguageSwitcher, UserMenu, FormField, FormAlert, ContactFields (name, email, phone, address, country), CartLink, AddToCartForm, RemoteSlot, RemoteErrorBoundary, RemoteFallback
+│   ├── hooks/              shared: useIsClient, useSession (user, vendors, cart count), useCountryOptions
 │   ├── api/                createServerApi (client from `@vendor-hub/api-client`)
-│   │   └── endpoints/      one `*.server.ts` per resource (auth, users, countries, vendors), the only place that knows API paths
+│   │   └── endpoints/      one `*.server.ts` per resource (auth, users, countries, vendors, products, reviews, cart, orders), the only place that knows API paths
 │   ├── forms/              shared form helpers: readValues, invalid, failed, FormErrors, describeError, common Zod fields
 │   ├── auth/               session cookie, getSession/requireUser, signIn, same-origin check, safeRedirect
+│   ├── cart/               cartLines.ts (pure add, set, remove, count, parse, reconcile), cartSession.server.ts (signed cart cookie), cartAction.server.ts, checkoutDetails.ts, cartPaths.ts
+│   ├── orders/             orderLabels.ts (status, timeline and payment texts), orderFilters.ts, testCards.ts
 │   ├── testing/            shared helpers for action tests
 │   ├── vendor/             vendorPaths.ts (`/vendors` and `vendorPath(slug)`), myVendors.server.ts (per-request cache), vendorFilters.ts (`parseVendorFilters` and the vendor list URL and API query), vendorList.server.ts (vendor list page)
 │   ├── env.server.ts       cached env for server-only code
@@ -39,9 +46,10 @@ packages/shell/
 ├── public/                 favicon.svg
 ├── env.ts                  typed, validated env (throws on a missing key)
 ├── react-router.config.ts  appDirectory: "src", ssr: true
-├── vite.config.ts          Tailwind + reactRouter(), server host/port from env
+├── vite.config.ts          Tailwind + reactRouter(), server host/port from env, loads .env.secret into process.env for dev
 ├── scripts/start.mjs       validates env, starts react-router-serve
 ├── .env / .env.local       env contract / local values
+├── .env.secret.example     template for the gitignored .env.secret (SHELL_SESSION_SECRET)
 └── tsconfig.json
 ```
 
@@ -141,3 +149,11 @@ CI (`.github/workflows/checks.yml`) runs format, lint, typecheck, build and unit
 The vendor page reads its state from the URL (`tab`, `q`, `category`, `minRating`, `minPrice`, `maxPrice`, `inStock`, `sort`, `page`) in the loader (`vendor/products/productFilters.ts`; invalid values fall back to the default, prices in the URL are in major units and become minor units for the API), so the page is rendered on the server with its results. On `md` and up the filters are a sidebar, below it they open in a `Drawer`, and active filters are removable chips (links). Categories come from `GET /categories` and are named by the active locale. Product cards, prices, stock badges, stars and the review list come from `@vendor-hub/ui`.
 
 Reviews on the vendor and on the product page share `components/ReviewSection` and one action, `reviews/reviewAction.server.ts`, with the intents `saveProductReview`, `deleteProductReview`, `saveVendorReview` and `deleteVendorReview`. The action calls the API with the session token on the server, so it needs no proxy entry. A `403` from the API becomes the message that a vendor cannot review itself. The sitemap lists every vendor and product (`seo/dynamicPaths.server.ts`).
+
+## Cart, checkout and orders
+
+- **Cart cookie.** `cartSession.server.ts` uses `createCookieSessionStorage` with its own HttpOnly cookie (`CART_COOKIE_NAME`, `SameSite=Lax`), signed with `SHELL_SESSION_SECRET`. `env.ts` reads that secret through `readShellSecrets`, only at runtime (`getEnv()`), so the build and `react-router typegen` never need it. The cookie holds `cart` (`{ v: 1, lines: [{ productId, quantity }] }`, never prices), the guest's `checkout` details (never a password) and the `checkoutKey`. A tampered, unsigned or old-version cookie is an empty cart. `parseLines` applies `CART_MAX_LINES` and `CART_MAX_QUANTITY_PER_LINE`, and `commitCart` refuses to write a cookie over 4 KB (a form error instead of a dropped cookie). A test pins a full cart with the longest checkout details under that size.
+- **Cart route.** `/cart` loads a fresh `POST /cart/quote` and shows warnings per line. The action (`cartAction.server.ts`, intents `add`, `setQuantity`, `remove`, `clear`, `reconcile`) is a plain route action used with `useFetcher` from the product page, the product cards and the cart itself, so it works without JavaScript and needs no proxy entry. Checkout is enabled only when every line is `ok`; otherwise the cart offers "Update the cart", which applies the quote (`reconcile`). The header badge reads the count from the cookie in the root loader, without an API call. On mobile the cart link sits in the top bar.
+- **Checkout.** The loader redirects an empty or changed cart to `/cart`, creates the idempotency key in the cookie and prefills the form from the stored checkout details, else from the profile. A logged out submit only validates (shared fields from `forms/fields.ts`), stores the details and redirects to `/register?redirectTo=/checkout`. Register prefills its fields from them and shows a note with a login link that keeps `redirectTo`. A logged in submit calls `POST /orders`, then clears the cart, the details and the key and goes to the order (one) or to `/orders` (several). A `409` reconciles the cart with a fresh quote and redirects to `/cart?changed=1`.
+- **Orders.** `/orders`, `/orders/:id` and `/orders/:id/pay` need a session (`requireUser`). The buttons come only from the order's `allowedActions`. Buyer actions (cancel, confirm receipt, request a return with a reason) are route actions. The payment page shows the test cards, sends the card number to the API once and never echoes it back. Logout clears the cart cookie too.
+- **Proxy.** Only the routes the `vendor-administrator` remote needs for fulfilment are in the allowlist (`GET /vendors/:id/orders`, `GET /orders/:id`, `POST /orders/:id/deliver`, `POST /orders/:id/returns/approve|reject`). Buyer routes and `/cart/quote` are not proxied. `robots.txt` disallows `/cart`, `/checkout` and `/orders`, and all those pages are `noindex`.

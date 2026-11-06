@@ -41,6 +41,6 @@ export async function createTestDatabase(): Promise<DatabaseHandle> {
 
 export async function truncateAll(handle: DatabaseHandle): Promise<void> {
   await handle.db.execute(
-    sql`truncate table product_reviews, vendor_reviews, product_images, products, vendor_members, vendors, users`,
+    sql`truncate table order_events, payments, order_items, orders, product_reviews, vendor_reviews, product_images, products, vendor_members, vendors, users`,
   );
 }

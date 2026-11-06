@@ -8,6 +8,10 @@ Object.assign(process.env, {
   API_URL: "http://api.test",
   SESSION_COOKIE_NAME: "session",
   SESSION_COOKIE_SECURE: "true",
+  SHELL_SESSION_SECRET: "test-session-secret-test-session-secret",
+  CART_COOKIE_NAME: "cart",
+  CART_MAX_LINES: "3",
+  CART_MAX_QUANTITY_PER_LINE: "10",
 });
 
 export const ORIGIN = "http://shell.test";

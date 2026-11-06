@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
+import { parseEnv } from "node:util";
 
 import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
@@ -26,7 +27,19 @@ function installedVersion(packageName: string): string {
   }
 }
 
+const SECRET_ENV_FILE = ".env.secret";
+
+function loadSecrets(): Record<string, string> {
+  return existsSync(SECRET_ENV_FILE)
+    ? (parseEnv(readFileSync(SECRET_ENV_FILE, "utf8")) as Record<string, string>)
+    : {};
+}
+
 export default defineConfig(({ mode }) => {
+  for (const [key, value] of Object.entries(loadSecrets())) {
+    process.env[key] ??= value;
+  }
+
   const env = readShellEnv({ ...loadEnv(mode, process.cwd(), ""), ...process.env });
 
   return {

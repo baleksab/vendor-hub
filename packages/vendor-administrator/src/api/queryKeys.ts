@@ -1,4 +1,4 @@
-import type { ManagedVendorListQuery } from "@vendor-hub/types";
+import type { ManagedVendorListQuery, OrderStatus } from "@vendor-hub/types";
 
 export type VendorListParams = Required<Pick<ManagedVendorListQuery, "limit" | "offset">> &
   Omit<ManagedVendorListQuery, "limit" | "offset">;
@@ -32,4 +32,19 @@ export const productKeys = {
 
 export const categoryKeys = {
   all: ["categories"] as const,
+};
+
+export type OrderListParams = {
+  status?: OrderStatus;
+  limit: number;
+  offset: number;
+};
+
+export const orderKeys = {
+  all: ["orders"] as const,
+  lists: () => [...orderKeys.all, "list"] as const,
+  list: (vendorId: string, params: OrderListParams) =>
+    [...orderKeys.lists(), vendorId, params] as const,
+  details: () => [...orderKeys.all, "detail"] as const,
+  detail: (id: string) => [...orderKeys.details(), id] as const,
 };

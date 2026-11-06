@@ -21,6 +21,7 @@ import { cssVariablesResolver, theme } from "@vendor-hub/ui";
 
 import { getEnv } from "./env.server";
 import { getSession } from "./auth/session.server";
+import { cartItemCount } from "./cart/cartSession.server";
 import type { Route } from "./+types/root";
 import "./app.css";
 import { AppLayout } from "./components/AppLayout/AppLayout";
@@ -40,6 +41,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const { session, headers } = await getSession(request);
   const vendors = session === null ? null : await loadMyVendors(request, session).catch(() => null);
+  const cartCount = await cartItemCount(request);
 
   return routeData(
     {
@@ -51,6 +53,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       },
       user: session?.user ?? null,
       vendors,
+      cartCount,
     },
     { headers },
   );

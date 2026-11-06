@@ -10,9 +10,12 @@ import {
   text,
   uniqueIndex,
   uuid,
+  timestamp,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
 
+import { ORDER_ACTORS, ORDER_STATUSES } from "../orders/order-status.ts";
+import { PAYMENT_FAILURE_REASONS, PAYMENT_KINDS, PAYMENT_STATUSES } from "../payments/payment.ts";
 import { USER_ROLES } from "../users/user-role.ts";
 import { VENDOR_MEMBER_ROLES } from "../vendors/vendor-member-role.ts";
 import { baseEntity, baseEntityChecks } from "./base-entity.ts";
@@ -20,6 +23,16 @@ import { baseEntity, baseEntityChecks } from "./base-entity.ts";
 export const userRoleEnum = pgEnum("user_role", USER_ROLES);
 
 export const vendorMemberRoleEnum = pgEnum("vendor_member_role", VENDOR_MEMBER_ROLES);
+
+export const orderStatusEnum = pgEnum("order_status", ORDER_STATUSES);
+
+export const orderActorEnum = pgEnum("order_actor", ORDER_ACTORS);
+
+export const paymentKindEnum = pgEnum("payment_kind", PAYMENT_KINDS);
+
+export const paymentStatusEnum = pgEnum("payment_status", PAYMENT_STATUSES);
+
+export const paymentFailureReasonEnum = pgEnum("payment_failure_reason", PAYMENT_FAILURE_REASONS);
 
 export const users = pgTable(
   "users",
@@ -164,3 +177,121 @@ function reviewTable(name: string, targetColumn: string, target: () => AnyPgColu
 export const productReviews = reviewTable("product_reviews", "product_id", () => products.id);
 
 export const vendorReviews = reviewTable("vendor_reviews", "vendor_id", () => vendors.id);
+
+const timestampTz = (name: string) => timestamp(name, { withTimezone: true });
+
+export const orders = pgTable(
+  "orders",
+  {
+    ...baseEntity,
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id),
+    vendorId: uuid("vendor_id")
+      .notNull()
+      .references(() => vendors.id),
+    status: orderStatusEnum("status").notNull().default("created"),
+    currency: char("currency", { length: 3 }).notNull(),
+    totalMinor: integer("total_minor").notNull(),
+    idempotencyKey: uuid("idempotency_key").notNull(),
+    shipFirstName: text("ship_first_name").notNull(),
+    shipLastName: text("ship_last_name").notNull(),
+    shipEmail: text("ship_email").notNull(),
+    shipPhone: text("ship_phone").notNull(),
+    shipAddress: text("ship_address").notNull(),
+    shipCountry: char("ship_country", { length: 2 }).notNull(),
+    paymentAttempts: integer("payment_attempts").notNull().default(0),
+    paidAt: timestampTz("paid_at"),
+    deliveredAt: timestampTz("delivered_at"),
+    closedAt: timestampTz("closed_at"),
+    cancelledAt: timestampTz("cancelled_at"),
+  },
+  (table) => [
+    uniqueIndex("orders_idempotency_unique")
+      .on(table.userId, table.idempotencyKey, table.vendorId, table.currency)
+      .where(sql`${table.isDeleted} = false`),
+    index("orders_user_created_idx").on(table.userId, sql`${table.createdAt} desc`),
+    index("orders_vendor_status_created_idx").on(
+      table.vendorId,
+      table.status,
+      sql`${table.createdAt} desc`,
+    ),
+    index("orders_status_created_idx").on(table.status, table.createdAt),
+    index("orders_status_delivered_idx").on(table.status, table.deliveredAt),
+    check("orders_total_non_negative", sql`${table.totalMinor} >= 0`),
+    check("orders_payment_attempts_non_negative", sql`${table.paymentAttempts} >= 0`),
+    check("orders_currency_format", sql`${table.currency} ~ '^[A-Z]{3}$'`),
+    check("orders_ship_country_format", sql`${table.shipCountry} ~ '^[A-Z]{2}$'`),
+    baseEntityChecks("orders", table),
+  ],
+);
+
+export const orderItems = pgTable(
+  "order_items",
+  {
+    ...baseEntity,
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => orders.id),
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id),
+    name: text("name").notNull(),
+    unitPriceMinor: integer("unit_price_minor").notNull(),
+    quantity: integer("quantity").notNull(),
+  },
+  (table) => [
+    index("order_items_order_idx").on(table.orderId),
+    check("order_items_quantity_positive", sql`${table.quantity} >= 1`),
+    check("order_items_unit_price_non_negative", sql`${table.unitPriceMinor} >= 0`),
+    baseEntityChecks("order_items", table),
+  ],
+);
+
+export const payments = pgTable(
+  "payments",
+  {
+    ...baseEntity,
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => orders.id),
+    kind: paymentKindEnum("kind").notNull(),
+    status: paymentStatusEnum("status").notNull(),
+    amountMinor: integer("amount_minor").notNull(),
+    currency: char("currency", { length: 3 }).notNull(),
+    failureReason: paymentFailureReasonEnum("failure_reason"),
+  },
+  (table) => [
+    index("payments_order_created_idx").on(table.orderId, table.createdAt),
+    check("payments_amount_non_negative", sql`${table.amountMinor} >= 0`),
+    check("payments_currency_format", sql`${table.currency} ~ '^[A-Z]{3}$'`),
+    check(
+      "payments_failure_reason_consistent",
+      sql`(${table.status} = 'failed') = (${table.failureReason} is not null)`,
+    ),
+    baseEntityChecks("payments", table),
+  ],
+);
+
+export const orderEvents = pgTable(
+  "order_events",
+  {
+    ...baseEntity,
+    orderId: uuid("order_id")
+      .notNull()
+      .references(() => orders.id),
+    fromStatus: orderStatusEnum("from_status"),
+    toStatus: orderStatusEnum("to_status").notNull(),
+    actor: orderActorEnum("actor").notNull(),
+    actorUserId: uuid("actor_user_id").references(() => users.id),
+    note: text("note"),
+  },
+  (table) => [
+    index("order_events_order_created_idx").on(table.orderId, table.createdAt),
+    check(
+      "order_events_actor_consistent",
+      sql`(${table.actor} = 'system') = (${table.actorUserId} is null)`,
+    ),
+    baseEntityChecks("order_events", table),
+  ],
+);

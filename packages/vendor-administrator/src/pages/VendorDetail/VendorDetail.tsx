@@ -6,7 +6,7 @@ import { Link, useParams } from "react-router";
 import { RoleBadge } from "../../components/RoleBadge";
 import { useT } from "../../context/MessagesContext";
 import { useVendor } from "../../hooks/useVendor";
-import { VENDORS_PATH, productsPath, vendorSitePath } from "../../paths";
+import { VENDORS_PATH, ordersPath, productsPath, vendorSitePath } from "../../paths";
 import { AddOperatorForm } from "./AddOperatorForm";
 import { DeleteVendor } from "./DeleteVendor";
 import { MembersTable } from "./MembersTable";
@@ -74,6 +74,21 @@ export default function VendorDetail() {
           </div>
           <Button component={Link} to={productsPath(vendor.id)} variant="light" mih={44}>
             {t("products.manage")}
+          </Button>
+        </Group>
+      </Paper>
+      <Paper withBorder radius="md" p="lg">
+        <Group justify="space-between" align="center">
+          <div>
+            <Title order={2} size="h4">
+              {t("orders.manage")}
+            </Title>
+            <Text size="sm" c="dimmed">
+              {t("orders.manageDescription")}
+            </Text>
+          </div>
+          <Button component={Link} to={ordersPath(vendor.id)} variant="light" mih={44}>
+            {t("orders.manage")}
           </Button>
         </Group>
       </Paper>

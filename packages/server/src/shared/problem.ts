@@ -62,6 +62,7 @@ export function registerProblemHandler(app: FastifyInstance): void {
 
     if (error instanceof AppError) {
       problem = {
+        ...error.extensions,
         type: "about:blank",
         title: error.title,
         status: error.status,

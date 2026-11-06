@@ -10,17 +10,21 @@ packages/vendor-administrator/
 │   ├── VendorAdministrator.tsx   exposed component: contexts, lazy <Routes>, 401 handler
 │   ├── main.tsx                  standalone entry: BrowserRouter, ui theme, MantineProvider
 │   ├── paths.ts                  VENDORS_PATH, vendorPath (the remote is mounted at /manage)
-│   ├── api/                      client.ts, queryKeys.ts (vendorKeys), vendors.ts
+│   ├── api/                      client.ts, queryKeys.ts (vendorKeys, productKeys, categoryKeys, orderKeys), vendors.ts, products.ts, orders.ts
 │   ├── hooks/                    useManagedVendors, useVendor, useUpdateVendor, useDeleteVendor,
-│   │                             useAddOperator, useRemoveOperator
+│   │                             useAddOperator, useRemoveOperator, product hooks, useVendorOrders, useOrder,
+│   │                             useOrderMutation, useDeliverOrder, useApproveReturn, useRejectReturn
 │   ├── context/                  ApiContext, LocaleContext, MessagesContext
 │   ├── components/               RoleBadge
 │   ├── i18n/messages.ts          en and sr texts, createT(locale)
+│   ├── orderLabels.ts            order statuses, timeline and payment texts
 │   └── pages/
 │       ├── VendorList/           VendorList, VendorTable, VendorQuickView, filters.ts
 │       ├── VendorDetail/         VendorDetail, VendorForm, MembersTable, AddOperatorForm, DeleteVendor
 │       ├── ProductList/          ProductList (table, inline stock edit, delete modal), filters.ts
-│       └── ProductForm/         ProductForm (create and edit), ImagesEditor, ReviewsModeration
+│       ├── ProductForm/         ProductForm (create and edit), ImagesEditor, ReviewsModeration
+│       ├── OrderList/           OrderList (table from sm, cards below), filters.ts (status, page)
+│       └── OrderDetail/         OrderDetail (items, shipping, timeline, payments, deliver, approve and reject return)
 ├── env.ts, vite.config.ts, index.html
 ├── .env / .env.local / .env.secret.example
 └── tsconfig.json, .oxlintrc.json
@@ -44,6 +48,10 @@ The shared modules are the same as in `user-administrator`: `react`, `react-dom`
 ### Products
 
 Reached from the vendor detail page: `/manage/vendors/:id/products`, `.../products/new` and `.../products/:productId`. The list reads the public search (`GET /vendors/by-slug/:slug/products`, the slug comes from the vendor), its state (`q`, `category`, `inStock`, `sort`, `order`, `page`) lives in the URL (`pages/ProductList/filters.ts`) and the stock cell saves on blur. The form sends only changed fields, and after a create it navigates to the edit page where images can be added. `ImagesEditor` uploads one file per request as multipart through the shell proxy and shows a readable message per file for `413`, `415` and `409`, images are reordered with buttons and the first one is the cover. `ReviewsModeration` lists the product reviews with a delete button. Query keys come from `productKeys` and `categoryKeys`, mutations update the detail with `setQueryData` and invalidate `productKeys.lists()`.
+
+### Orders
+
+Reached from the vendor detail page by the Orders section: `/manage/vendors/:id/orders` and `.../orders/:orderId`. The list reads `GET /vendors/:id/orders` (order number, buyer name from the shipping snapshot, total, status, date), with the status and the page in the URL (`pages/OrderList/filters.ts`). The detail reads `GET /orders/:id` and shows the shipping details the vendor needs to ship. Its buttons come only from `allowedActions`: Mark as delivered, Approve return (confirm modal, because it refunds) and Reject return (a modal with a required reason). Mutations write the returned order into `orderKeys.detail` and invalidate `orderKeys.lists()`. The routes are in the shell proxy allowlist.
 
 ## Two ways to run
 

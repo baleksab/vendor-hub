@@ -5,7 +5,7 @@ function required(key) {
 
   if (!value) {
     throw new Error(
-      `Missing required env key ${key} (set it in .env.local or the process environment)`,
+      `Missing required env key ${key} (set it in .env.local, .env.secret or the process environment)`,
     );
   }
 
@@ -22,6 +22,10 @@ required("VENDOR_ADMINISTRATOR_MANIFEST_URL");
 required("API_URL");
 required("SESSION_COOKIE_NAME");
 required("SESSION_COOKIE_SECURE");
+required("SHELL_SESSION_SECRET");
+required("CART_COOKIE_NAME");
+required("CART_MAX_LINES");
+required("CART_MAX_QUANTITY_PER_LINE");
 
 const child = spawn("react-router-serve", ["./build/server/index.js"], {
   stdio: "inherit",

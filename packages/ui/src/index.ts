@@ -14,3 +14,16 @@ export { ReviewSummary } from "./components/ReviewSummary/ReviewSummary";
 export { StarRating } from "./components/StarRating/StarRating";
 export { StarRatingInput } from "./components/StarRatingInput/StarRatingInput";
 export { LOW_STOCK_THRESHOLD, StockBadge } from "./components/StockBadge/StockBadge";
+export { AddToCartButton } from "./components/AddToCartButton/AddToCartButton";
+export { CartLine } from "./components/CartLine/CartLine";
+export { CartSummary } from "./components/CartSummary/CartSummary";
+export { OrderItemsTable } from "./components/OrderItemsTable/OrderItemsTable";
+export { OrderStatusBadge, orderNumber } from "./components/OrderStatusBadge/OrderStatusBadge";
+export {
+  OrderTimeline,
+  orderEventKind,
+  type OrderEventKind,
+} from "./components/OrderTimeline/OrderTimeline";
+export { PaymentAttemptList } from "./components/PaymentAttemptList/PaymentAttemptList";
+export { QuantityStepper } from "./components/QuantityStepper/QuantityStepper";
+export { ShippingDetails } from "./components/ShippingDetails/ShippingDetails";

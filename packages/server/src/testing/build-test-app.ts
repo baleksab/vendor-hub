@@ -1,7 +1,11 @@
 import type { FastifyInstance } from "fastify";
 
-import type { JwtEnv } from "../../env.ts";
+import type { CartEnv, JwtEnv, OrdersEnv } from "../../env.ts";
 import { buildApp } from "../app.ts";
+import { CartService } from "../cart/cart.service.ts";
+import { OrdersService } from "../orders/orders.service.ts";
+import { SimulatedPaymentGateway } from "../payments/simulated-payment-gateway.ts";
+import { InMemoryOrdersRepository } from "./in-memory-orders.repository.ts";
 import { InMemoryUsersRepository } from "./in-memory-users.repository.ts";
 import { InMemoryImageStorage } from "./in-memory-image-storage.ts";
 import { InMemoryProductsRepository } from "./in-memory-products.repository.ts";
@@ -15,6 +19,26 @@ export const TEST_JWT: JwtEnv = {
 
 export const TEST_IMAGES = { maxBytes: 1024, maxPerProduct: 2 };
 
+export const TEST_CART: CartEnv = { maxLines: 5 };
+
+export const TEST_ORDERS: OrdersEnv = {
+  paymentTtlMinutes: 30,
+  paymentMaxAttempts: 3,
+  returnWindowDays: 14,
+  schedulerIntervalSeconds: 60,
+  schedulerBatchSize: 10,
+};
+
+export class TestClock {
+  current = new Date("2026-01-01T12:00:00.000Z");
+
+  now = () => new Date(this.current);
+
+  advanceMinutes(minutes: number): void {
+    this.current = new Date(this.current.getTime() + minutes * 60_000);
+  }
+}
+
 export type TestApp = {
   app: FastifyInstance;
   repository: InMemoryUsersRepository;
@@ -22,6 +46,9 @@ export type TestApp = {
   productsRepository: InMemoryProductsRepository;
   reviewsRepository: InMemoryReviewsRepository;
   imageStorage: InMemoryImageStorage;
+  ordersRepository: InMemoryOrdersRepository;
+  ordersService: OrdersService;
+  clock: TestClock;
 };
 
 export async function buildTestApp(
@@ -39,6 +66,12 @@ export async function buildTestApp(
     vendorsRepository,
   );
   const imageStorage = new InMemoryImageStorage();
+  const clock = new TestClock();
+  const ordersRepository = new InMemoryOrdersRepository(
+    productsRepository,
+    vendorsRepository,
+    clock.now,
+  );
   const app = await buildApp({
     logger: false,
     jwt: TEST_JWT,
@@ -48,10 +81,25 @@ export async function buildTestApp(
     reviewsRepository,
     imageStorage,
     images: TEST_IMAGES,
+    ordersRepository,
+    paymentGateway: new SimulatedPaymentGateway(),
+    cart: TEST_CART,
+    orders: TEST_ORDERS,
+    clock: clock.now,
+    runOrderScheduler: false,
     checkDatabase,
   });
 
   await app.ready();
+
+  const ordersService = new OrdersService(
+    ordersRepository,
+    vendorsRepository,
+    new CartService(productsRepository, TEST_CART),
+    new SimulatedPaymentGateway(),
+    TEST_ORDERS,
+    clock.now,
+  );
 
   return {
     app,
@@ -60,6 +108,9 @@ export async function buildTestApp(
     productsRepository,
     reviewsRepository,
     imageStorage,
+    ordersRepository,
+    ordersService,
+    clock,
   };
 }
 

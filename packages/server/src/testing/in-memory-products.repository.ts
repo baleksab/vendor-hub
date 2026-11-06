@@ -7,6 +7,7 @@ import type {
   ProductListItem,
   ProductPatch,
   ProductSearch,
+  ProductSnapshot,
 } from "../products/product.ts";
 import type { ProductsRepository } from "../products/products.repository.ts";
 import type { InMemoryVendorsRepository } from "./in-memory-vendors.repository.ts";
@@ -38,6 +39,28 @@ export class InMemoryProductsRepository implements ProductsRepository {
 
   async findById(id: string): Promise<Product | undefined> {
     return this.toProduct(this.rows.find((row) => row.id === id));
+  }
+
+  async findManyByIds(ids: string[]): Promise<ProductSnapshot[]> {
+    return ids.flatMap((id) => {
+      const product = this.toProduct(this.rows.find((row) => row.id === id));
+
+      return product === undefined
+        ? []
+        : [
+            {
+              id: product.id,
+              vendorId: product.vendorId,
+              vendorSlug: product.vendorSlug,
+              vendorName: product.vendorName,
+              name: product.name,
+              priceMinor: product.priceMinor,
+              currency: product.currency,
+              stock: product.stock,
+              coverImageId: product.images[0]?.id ?? null,
+            },
+          ];
+    });
   }
 
   async update(id: string, patch: ProductPatch): Promise<Product | undefined> {

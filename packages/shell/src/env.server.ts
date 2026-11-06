@@ -1,9 +1,9 @@
-import { readShellEnv, type ShellEnv } from "../env.ts";
+import { readShellEnv, readShellSecrets, type ShellEnv, type ShellSecrets } from "../env.ts";
 
-let cached: ShellEnv | undefined;
+let cached: (ShellEnv & ShellSecrets) | undefined;
 
-export function getEnv(): ShellEnv {
-  cached ??= readShellEnv(process.env);
+export function getEnv(): ShellEnv & ShellSecrets {
+  cached ??= { ...readShellEnv(process.env), ...readShellSecrets(process.env) };
 
   return cached;
 }

@@ -22,6 +22,13 @@
       "when": 1793965033829,
       "tag": "0002_unique_ricochet",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793996155595,
+      "tag": "0003_bent_mister_fear",
+      "breakpoints": true
     }
   ]
 }
