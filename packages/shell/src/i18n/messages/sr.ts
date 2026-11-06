@@ -25,7 +25,7 @@ export const sr = {
     "Javne stranice se renderuju na serveru, pa se brzo otvaraju i dobro se vide u pretrazi.",
   "home.feature.modules.title": "Nezavisni alati",
   "home.feature.modules.text":
-    "Admin panel i statistika su zasebni moduli koji se razvijaju i isporučuju samostalno.",
+    "Administracija korisnika i upravljanje prodavcima su zasebni moduli koji se razvijaju i isporučuju samostalno.",
   "home.feature.languages.title": "Vaš jezik, vaša tema",
   "home.feature.languages.text": "Ceo sajt radi na srpskom i engleskom, u svetloj i tamnoj temi.",
   "home.steps.title": "Kako to radi",
@@ -37,11 +37,11 @@ export const sr = {
   "home.step.share.text": "Kupci vas nalaze na listi prodavaca ili na vašoj adresi.",
   "home.architecture.title": "Modularno od početka",
   "home.architecture.text":
-    "Shell renderuje javne stranice na serveru. Alati za prodavce se u njega učitavaju kao nezavisni moduli u browseru, a sve komunicira sa jednim API-jem.",
+    "Shell renderuje javne stranice na serveru. Alati za prodavce i korisnike se u njega učitavaju kao nezavisni moduli u browseru, a sve komunicira sa jednim API-jem preko shell-a.",
   "home.architecture.shell": "Shell, renderovan na serveru",
   "home.architecture.pages": "Javne stranice",
-  "home.architecture.admin": "Admin za prodavce",
-  "home.architecture.stats": "Statistika",
+  "home.architecture.vendors": "Upravljanje prodavcima",
+  "home.architecture.users": "Administracija korisnika",
   "home.architecture.modules": "Moduli koji se učitavaju u browseru",
   "home.architecture.api": "REST API i baza",
   "home.cta.title": "Spremni da otvorite stranicu?",
