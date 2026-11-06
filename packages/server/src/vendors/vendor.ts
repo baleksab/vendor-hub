@@ -33,3 +33,25 @@ export type VendorListItem = {
   name: string;
   description: string;
 };
+
+export type VendorPatch = {
+  name?: string;
+  description?: string;
+};
+
+export type VendorOwner = {
+  userId: string;
+  firstName: string;
+  lastName: string;
+};
+
+export type ManagedVendorRow = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  owner: VendorOwner;
+  memberCount: number;
+  callerRole: VendorMemberRole | undefined;
+  createdAt: Date;
+};

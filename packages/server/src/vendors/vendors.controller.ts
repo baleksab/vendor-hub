@@ -3,15 +3,25 @@ import type { ZodTypeProvider } from "fastify-type-provider-zod";
 import { z } from "zod";
 
 import { ProblemResponse } from "../shared/problem.ts";
-import { toMyVendorsResponse, toPublicVendorResponse, toVendorResponse } from "./vendors.mapper.ts";
+import {
+  toManagedVendorListResponse,
+  toMyVendorsResponse,
+  toPublicVendorResponse,
+  toVendorResponse,
+} from "./vendors.mapper.ts";
 import {
   AddOperatorRequest,
+  ListManagedVendorsQuery,
   ListVendorsQuery,
+  ManagedVendorListResponse,
   MyVendorsResponse,
   OperatorParams,
   PublicVendorResponse,
   RegisterVendorRequest,
+  UpdateVendorRequest,
+  VendorIdParams,
   VendorListResponse,
+  VendorOperatorParams,
   VendorResponse,
   VendorSlugParams,
 } from "./vendors.schemas.ts";
@@ -138,6 +148,150 @@ export function vendorsController(service: VendorsService) {
       },
       async (request, reply) => {
         await service.removeOperator(request.auth.userId, request.params.userId);
+
+        return reply.status(204).send(null);
+      },
+    );
+
+    typed.get(
+      "/vendors/managed",
+      {
+        schema: {
+          tags: ["vendors"],
+          security,
+          querystring: ListManagedVendorsQuery,
+          response: { 200: ManagedVendorListResponse, 400: ProblemResponse, 401: ProblemResponse },
+        },
+      },
+      async (request) => {
+        const { items, total } = await service.listManaged(request.auth, request.query);
+
+        return toManagedVendorListResponse(
+          items,
+          total,
+          request.query,
+          request.auth.role === "administrator" ? "all" : "mine",
+        );
+      },
+    );
+
+    typed.get(
+      "/vendors/:id",
+      {
+        schema: {
+          tags: ["vendors"],
+          security,
+          params: VendorIdParams,
+          response: {
+            200: VendorResponse,
+            400: ProblemResponse,
+            401: ProblemResponse,
+            404: ProblemResponse,
+          },
+        },
+      },
+      async (request) => {
+        const { vendor, access } = await service.getManaged(request.auth, request.params.id);
+
+        return toVendorResponse(vendor, access);
+      },
+    );
+
+    typed.patch(
+      "/vendors/:id",
+      {
+        schema: {
+          tags: ["vendors"],
+          security,
+          params: VendorIdParams,
+          body: UpdateVendorRequest,
+          response: {
+            200: VendorResponse,
+            400: ProblemResponse,
+            401: ProblemResponse,
+            404: ProblemResponse,
+          },
+        },
+      },
+      async (request) => {
+        const { vendor, access } = await service.update(
+          request.auth,
+          request.params.id,
+          request.body,
+        );
+
+        return toVendorResponse(vendor, access);
+      },
+    );
+
+    typed.delete(
+      "/vendors/:id",
+      {
+        schema: {
+          tags: ["vendors"],
+          security,
+          params: VendorIdParams,
+          response: {
+            204: z.null(),
+            400: ProblemResponse,
+            401: ProblemResponse,
+            403: ProblemResponse,
+            404: ProblemResponse,
+          },
+        },
+      },
+      async (request, reply) => {
+        await service.delete(request.auth, request.params.id);
+
+        return reply.status(204).send(null);
+      },
+    );
+
+    typed.post(
+      "/vendors/:id/operators",
+      {
+        schema: {
+          tags: ["vendors"],
+          security,
+          params: VendorIdParams,
+          body: AddOperatorRequest,
+          response: {
+            201: VendorResponse,
+            400: ProblemResponse,
+            401: ProblemResponse,
+            404: ProblemResponse,
+            409: ProblemResponse,
+          },
+        },
+      },
+      async (request, reply) => {
+        const { vendor, access } = await service.addOperatorTo(
+          request.auth,
+          request.params.id,
+          request.body,
+        );
+
+        return reply.status(201).send(toVendorResponse(vendor, access));
+      },
+    );
+
+    typed.delete(
+      "/vendors/:id/operators/:userId",
+      {
+        schema: {
+          tags: ["vendors"],
+          security,
+          params: VendorOperatorParams,
+          response: {
+            204: z.null(),
+            400: ProblemResponse,
+            401: ProblemResponse,
+            404: ProblemResponse,
+          },
+        },
+      },
+      async (request, reply) => {
+        await service.removeOperatorFrom(request.auth, request.params.id, request.params.userId);
 
         return reply.status(204).send(null);
       },
