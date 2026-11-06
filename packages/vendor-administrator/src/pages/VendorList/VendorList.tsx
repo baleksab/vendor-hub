@@ -109,11 +109,13 @@ export default function VendorList() {
           clearable
         />
         <Group align="flex-end" justify="flex-end">
-          {filtered || searchInput !== "" ? (
-            <Button variant="default" onClick={resetFilters}>
-              {t("vendors.filter.reset")}
-            </Button>
-          ) : null}
+          <Button
+            variant="default"
+            onClick={resetFilters}
+            disabled={!filtered && searchInput === ""}
+          >
+            {t("vendors.filter.reset")}
+          </Button>
         </Group>
       </SimpleGrid>
     </Paper>
