@@ -15,6 +15,8 @@ const VendorList = lazy(() => import("./pages/VendorList/VendorList"));
 const VendorDetail = lazy(() => import("./pages/VendorDetail/VendorDetail"));
 const ProductList = lazy(() => import("./pages/ProductList/ProductList"));
 const ProductForm = lazy(() => import("./pages/ProductForm/ProductForm"));
+const OrderList = lazy(() => import("./pages/OrderList/OrderList"));
+const OrderDetail = lazy(() => import("./pages/OrderDetail/OrderDetail"));
 
 export default function VendorAdministrator({
   locale,
@@ -37,6 +39,8 @@ export default function VendorAdministrator({
               <Route path="vendors/:id/products" element={<ProductList />} />
               <Route path="vendors/:id/products/new" element={<ProductForm />} />
               <Route path="vendors/:id/products/:productId" element={<ProductForm />} />
+              <Route path="vendors/:id/orders" element={<OrderList />} />
+              <Route path="vendors/:id/orders/:orderId" element={<OrderDetail />} />
               <Route path="*" element={<Navigate to={VENDORS_PATH} replace />} />
             </Routes>
           </Suspense>

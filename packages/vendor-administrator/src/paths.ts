@@ -14,3 +14,8 @@ export const productPath = (vendorId: string, productId: string) =>
   `${productsPath(vendorId)}/${productId}`;
 
 export const productImagePath = (imageId: string) => `/api/v1/product-images/${imageId}`;
+
+export const ordersPath = (vendorId: string) => `${vendorPath(vendorId)}/orders`;
+
+export const orderPath = (vendorId: string, orderId: string) =>
+  `${ordersPath(vendorId)}/${orderId}`;
