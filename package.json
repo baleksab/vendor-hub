@@ -13,6 +13,7 @@
     "stack:deploy": "bash scripts/deploy.sh deploy",
     "stack:down": "bash scripts/deploy.sh down",
     "nginx:down": "docker compose --env-file infra/nginx/.env.local --env-file packages/server/.env.local --env-file packages/server/.env.secret rm -sf nginx",
+    "clean:vite": "rm -rf packages/*/node_modules/.vite",
     "lint": "oxlint --type-aware",
     "lint:fix": "oxlint --type-aware --fix",
     "format": "oxfmt",
