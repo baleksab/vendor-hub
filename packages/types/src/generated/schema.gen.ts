@@ -229,6 +229,10 @@ export interface paths {
                 query?: {
                     limit?: number;
                     offset?: number;
+                    search?: string;
+                    category?: "electronics" | "phones" | "computers" | "tv-audio" | "appliances" | "home-garden" | "furniture" | "tools" | "garden" | "fashion" | "clothing" | "shoes" | "accessories" | "sports-leisure" | "fitness" | "outdoor" | "books-media" | "auto" | "car-parts" | "car-accessories" | "other";
+                    minRating?: number;
+                    sort?: "newest" | "name" | "rating" | "productCount";
                 };
                 header?: never;
                 path?: never;
@@ -2303,6 +2307,10 @@ export interface components {
             slug: string;
             name: string;
             description: string;
+            ratingAvg: number;
+            ratingCount: number;
+            productCount: number;
+            categories: string[];
         };
         VendorListResponseInput: {
             data: components["schemas"]["VendorListItemResponseInput"][];
@@ -2604,6 +2612,10 @@ export interface components {
             slug: string;
             name: string;
             description: string;
+            ratingAvg: number;
+            ratingCount: number;
+            productCount: number;
+            categories: string[];
         };
         VendorListResponse: {
             data: components["schemas"]["VendorListItemResponse"][];

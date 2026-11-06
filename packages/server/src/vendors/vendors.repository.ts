@@ -1,13 +1,27 @@
-import { and, asc, count, desc, eq, ilike, isNotNull, or, sql, type SQL } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  exists,
+  gte,
+  ilike,
+  inArray,
+  isNotNull,
+  or,
+  sql,
+  type SQL,
+} from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
+import { expandCategory } from "../categories/categories.ts";
 import { notDeleted } from "../db/base-entity.ts";
 import type { Database } from "../db/client.ts";
 import { products, users, vendorMembers, vendors } from "../db/schema.ts";
 import { findUniqueViolation } from "../db/unique-violation.ts";
 import { ConflictError } from "../shared/errors.ts";
 import { escapeLike } from "../shared/like.ts";
-import type { Page } from "../shared/pagination.ts";
 import type { Actor } from "./vendor-access.ts";
 import type {
   ManagedVendorRow,
@@ -17,11 +31,15 @@ import type {
   VendorPatch,
   VendorSummary,
 } from "./vendor.ts";
-import { resolveOrder, type ListManagedVendorsQuery } from "./vendors.schemas.ts";
+import {
+  resolveOrder,
+  type ListManagedVendorsQuery,
+  type ListVendorsQuery,
+} from "./vendors.schemas.ts";
 
 export type VendorsRepository = {
   create(input: NewVendor): Promise<Vendor>;
-  list(page: Page): Promise<{ items: VendorListItem[]; total: number }>;
+  list(query: ListVendorsQuery): Promise<{ items: VendorListItem[]; total: number }>;
   listManaged(
     actor: Actor,
     query: ListManagedVendorsQuery,
@@ -100,21 +118,91 @@ export class DrizzleVendorsRepository implements VendorsRepository {
     }
   }
 
-  async list(page: Page): Promise<{ items: VendorListItem[]; total: number }> {
-    const items = await this.db
-      .select({ slug: vendors.slug, name: vendors.name, description: vendors.description })
-      .from(vendors)
-      .where(notDeleted(vendors))
-      .orderBy(desc(vendors.createdAt), vendors.id)
-      .limit(page.limit)
-      .offset(page.offset);
+  async list(query: ListVendorsQuery): Promise<{ items: VendorListItem[]; total: number }> {
+    const productStats = this.db
+      .select({
+        vendorId: products.vendorId,
+        total: count().as("product_total"),
+        categories: sql<string[]>`array_agg(distinct ${products.category})`.as(
+          "product_categories",
+        ),
+      })
+      .from(products)
+      .where(notDeleted(products))
+      .groupBy(products.vendorId)
+      .as("product_stats");
 
-    const [totalRow] = await this.db
-      .select({ total: count() })
-      .from(vendors)
-      .where(notDeleted(vendors));
+    const conditions: (SQL | undefined)[] = [notDeleted(vendors)];
 
-    return { items, total: totalRow?.total ?? 0 };
+    if (query.search !== undefined) {
+      const pattern = `%${escapeLike(query.search)}%`;
+
+      conditions.push(
+        or(
+          ilike(vendors.name, pattern),
+          ilike(vendors.slug, pattern),
+          ilike(vendors.description, pattern),
+        ),
+      );
+    }
+
+    if (query.category !== undefined) {
+      conditions.push(
+        exists(
+          this.db
+            .select({ one: sql`1` })
+            .from(products)
+            .where(
+              and(
+                eq(products.vendorId, vendors.id),
+                notDeleted(products),
+                inArray(products.category, expandCategory(query.category)),
+              ),
+            ),
+        ),
+      );
+    }
+
+    if (query.minRating !== undefined) {
+      conditions.push(gte(vendors.ratingAvg, query.minRating));
+    }
+
+    const where = and(...conditions);
+    const productCount = sql<number>`coalesce(${productStats.total}, 0)`;
+    const orderBy = {
+      newest: [desc(vendors.createdAt), asc(vendors.id)],
+      name: [asc(sql`lower(${vendors.name})`), asc(vendors.id)],
+      rating: [desc(vendors.ratingAvg), desc(vendors.ratingCount), asc(vendors.id)],
+      productCount: [desc(productCount), asc(vendors.id)],
+    }[query.sort];
+
+    const rows = await this.db
+      .select({
+        slug: vendors.slug,
+        name: vendors.name,
+        description: vendors.description,
+        ratingAvg: vendors.ratingAvg,
+        ratingCount: vendors.ratingCount,
+        productCount,
+        categories: productStats.categories,
+      })
+      .from(vendors)
+      .leftJoin(productStats, eq(productStats.vendorId, vendors.id))
+      .where(where)
+      .orderBy(...orderBy)
+      .limit(query.limit)
+      .offset(query.offset);
+
+    const [totalRow] = await this.db.select({ total: count() }).from(vendors).where(where);
+
+    return {
+      items: rows.map((row) => ({
+        ...row,
+        productCount: Number(row.productCount),
+        categories: [...(row.categories ?? [])].sort(),
+      })),
+      total: totalRow?.total ?? 0,
+    };
   }
 
   async listManaged(

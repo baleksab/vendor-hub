@@ -34,6 +34,10 @@ export type VendorListItem = {
   slug: string;
   name: string;
   description: string;
+  ratingAvg: number;
+  ratingCount: number;
+  productCount: number;
+  categories: string[];
 };
 
 export type VendorPatch = {

@@ -1,7 +1,7 @@
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import type { FastifyInstance } from "fastify";
 
-import { buildTestApp, validUser } from "../testing/build-test-app.ts";
+import { buildTestApp, validUser, type TestApp } from "../testing/build-test-app.ts";
 
 const acme = {
   slug: "acme",
@@ -13,10 +13,12 @@ const operatorUser = { ...validUser, email: "op@example.com", firstName: "Oscar"
 
 describe("vendors routes", () => {
   let app: FastifyInstance;
+  let productsRepository: TestApp["productsRepository"];
+  let vendorsRepository: TestApp["vendorsRepository"];
 
   beforeEach(async () => {
     await app?.close();
-    ({ app } = await buildTestApp());
+    ({ app, productsRepository, vendorsRepository } = await buildTestApp());
   });
 
   afterAll(async () => {
@@ -251,7 +253,15 @@ describe("vendors routes", () => {
       "acme",
     ]);
     expect(page.json().data).toEqual([
-      { slug: "acme", name: "Acme Inc", description: acme.description },
+      {
+        slug: "acme",
+        name: "Acme Inc",
+        description: acme.description,
+        ratingAvg: 0,
+        ratingCount: 0,
+        productCount: 0,
+        categories: [],
+      },
     ]);
     expect(page.json().meta).toEqual({ total: 2, limit: 1, offset: 1 });
     expect(JSON.stringify(all.json())).not.toMatch(/email|phone|address|userId|example\.com/i);
@@ -261,5 +271,92 @@ describe("vendors routes", () => {
     const response = await app.inject({ method: "GET", url: "/api/v1/vendors?limit=0" });
 
     expect(response.statusCode).toBe(400);
+  });
+
+  describe("public list filters", () => {
+    async function seed() {
+      const first = await bearerFor();
+      const second = await bearerFor(operatorUser);
+
+      await registerVendor(first);
+      await registerVendor(second, { ...acme, slug: "zeta", name: "Zeta Store" });
+
+      const [acmeVendor, zetaVendor] = vendorsRepository.vendors;
+
+      for (const [vendor, category] of [
+        [acmeVendor, "phones"],
+        [acmeVendor, "computers"],
+        [acmeVendor, "phones"],
+        [zetaVendor, "shoes"],
+      ] as const) {
+        await productsRepository.create({
+          vendorId: vendor!.id,
+          category,
+          name: "Thing",
+          description: "A thing",
+          priceMinor: 100,
+          currency: "EUR",
+          stock: 1,
+        });
+      }
+
+      zetaVendor!.ratingAvg = 4.5;
+      zetaVendor!.ratingCount = 2;
+    }
+
+    const slugs = async (query: string) => {
+      const response = await app.inject({ method: "GET", url: `/api/v1/vendors?${query}` });
+
+      return response.json().data.map((vendor: { slug: string }) => vendor.slug);
+    };
+
+    it("returns the distinct categories and the product count of each vendor", async () => {
+      await seed();
+
+      const response = await app.inject({ method: "GET", url: "/api/v1/vendors?sort=name" });
+
+      expect(response.json().data[0]).toMatchObject({
+        slug: "acme",
+        productCount: 3,
+        categories: ["computers", "phones"],
+      });
+    });
+
+    it("searches by name", async () => {
+      await seed();
+
+      expect(await slugs("search=zeta")).toEqual(["zeta"]);
+      expect(await slugs("search=nothing-like-this")).toEqual([]);
+    });
+
+    it("filters by a leaf category and by its parent", async () => {
+      await seed();
+
+      expect(await slugs("category=shoes")).toEqual(["zeta"]);
+      expect(await slugs("category=electronics")).toEqual(["acme"]);
+      expect(await slugs("category=fashion")).toEqual(["zeta"]);
+    });
+
+    it("filters by minimum rating", async () => {
+      await seed();
+
+      expect(await slugs("minRating=4")).toEqual(["zeta"]);
+    });
+
+    it("sorts by name, rating and product count", async () => {
+      await seed();
+
+      expect(await slugs("sort=name")).toEqual(["acme", "zeta"]);
+      expect(await slugs("sort=rating")).toEqual(["zeta", "acme"]);
+      expect(await slugs("sort=productCount")).toEqual(["acme", "zeta"]);
+    });
+
+    it("rejects an unknown category or sort", async () => {
+      const category = await app.inject({ method: "GET", url: "/api/v1/vendors?category=nope" });
+      const sort = await app.inject({ method: "GET", url: "/api/v1/vendors?sort=nope" });
+
+      expect(category.statusCode).toBe(400);
+      expect(sort.statusCode).toBe(400);
+    });
   });
 });

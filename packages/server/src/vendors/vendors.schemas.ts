@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { FilterCategorySchema } from "../categories/categories.ts";
 import { PageMeta, PaginationQuery } from "../shared/pagination.ts";
 import { RESERVED_SLUGS } from "./reserved-slugs.ts";
 import { VENDOR_MEMBER_ROLES, VendorMemberRoleSchema } from "./vendor-member-role.ts";
@@ -88,16 +89,31 @@ export const PublicVendorResponse = z
   .meta({ id: "PublicVendorResponse" });
 
 export const VendorListItemResponse = z
-  .object({ slug: z.string(), name: z.string(), description: z.string() })
+  .object({
+    slug: z.string(),
+    name: z.string(),
+    description: z.string(),
+    ratingAvg: z.number(),
+    ratingCount: z.number().int(),
+    productCount: z.number().int(),
+    categories: z.array(z.string()),
+  })
   .meta({ id: "VendorListItemResponse" });
 
 export const VendorListResponse = z
   .object({ data: z.array(VendorListItemResponse), meta: PageMeta })
   .meta({ id: "VendorListResponse" });
 
-export const ListVendorsQuery = PaginationQuery;
-
 const SEARCH_MAX_LENGTH = 100;
+
+export const PUBLIC_VENDOR_SORTS = ["newest", "name", "rating", "productCount"] as const;
+
+export const ListVendorsQuery = PaginationQuery.extend({
+  search: z.string().trim().min(1).max(SEARCH_MAX_LENGTH).optional(),
+  category: FilterCategorySchema.optional(),
+  minRating: z.coerce.number().int().min(1).max(5).optional(),
+  sort: z.enum(PUBLIC_VENDOR_SORTS).default("newest"),
+});
 
 export const VENDOR_SORT_FIELDS = ["name", "createdAt", "memberCount"] as const;
 
@@ -146,6 +162,7 @@ export const OperatorParams = z.object({ userId: z.uuid() });
 export type RegisterVendorRequest = z.infer<typeof RegisterVendorRequest>;
 export type AddOperatorRequest = z.infer<typeof AddOperatorRequest>;
 export type UpdateVendorRequest = z.infer<typeof UpdateVendorRequest>;
+export type ListVendorsQuery = z.infer<typeof ListVendorsQuery>;
 export type ListManagedVendorsQuery = z.infer<typeof ListManagedVendorsQuery>;
 export type ManagedVendorListResponse = z.infer<typeof ManagedVendorListResponse>;
 export type VendorResponse = z.infer<typeof VendorResponse>;

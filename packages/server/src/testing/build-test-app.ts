@@ -30,6 +30,9 @@ export async function buildTestApp(
   const repository = new InMemoryUsersRepository();
   const vendorsRepository = new InMemoryVendorsRepository(repository);
   const productsRepository = new InMemoryProductsRepository(vendorsRepository);
+  vendorsRepository.productCategoriesOf = (vendorId) =>
+    productsRepository.rows.filter((row) => row.vendorId === vendorId).map((row) => row.category);
+
   const reviewsRepository = new InMemoryReviewsRepository(
     repository,
     productsRepository,

@@ -4,7 +4,7 @@ import type { FastifyInstance } from "fastify";
 
 import { buildApp } from "../app.ts";
 import type { DatabaseHandle } from "../db/client.ts";
-import { vendorMembers, vendors } from "../db/schema.ts";
+import { products, vendorMembers, vendors } from "../db/schema.ts";
 import { validUser } from "../testing/build-test-app.ts";
 import { DrizzleVendorsRepository } from "./vendors.repository.ts";
 import { drizzleAppOptions } from "../testing/drizzle-app-options.ts";
@@ -175,5 +175,63 @@ describe("vendors against Postgres", () => {
 
     expect(list.json().meta.total).toBe(1);
     expect(list.json().data.map((vendor: { slug: string }) => vendor.slug)).toEqual(["second"]);
+  });
+
+  it("filters, searches and sorts the public list, with categories and product counts", async () => {
+    await registerVendor(await bearerFor());
+    await registerVendor(await bearerFor(operatorUser), {
+      ...acme,
+      slug: "zeta",
+      name: "Zeta Store",
+    });
+
+    const [acmeRow] = await handle.db.select().from(vendors).where(eq(vendors.slug, "acme"));
+    const [zetaRow] = await handle.db.select().from(vendors).where(eq(vendors.slug, "zeta"));
+    const product = (vendorId: string, category: string, isDeleted = false) => ({
+      vendorId,
+      category,
+      name: "Thing",
+      description: "A thing",
+      priceMinor: 100,
+      currency: "EUR",
+      stock: 1,
+      isDeleted,
+      ...(isDeleted ? { deletedAt: new Date() } : {}),
+    });
+
+    await handle.db
+      .insert(products)
+      .values([
+        product(acmeRow!.id, "phones"),
+        product(acmeRow!.id, "phones"),
+        product(acmeRow!.id, "computers"),
+        product(acmeRow!.id, "shoes", true),
+        product(zetaRow!.id, "shoes"),
+      ]);
+    await handle.db
+      .update(vendors)
+      .set({ ratingAvg: 4.5, ratingCount: 2 })
+      .where(eq(vendors.id, zetaRow!.id));
+
+    const slugs = async (query: string) =>
+      (await app.inject({ method: "GET", url: `/api/v1/vendors?${query}` }))
+        .json()
+        .data.map((vendor: { slug: string }) => vendor.slug);
+
+    const all = await app.inject({ method: "GET", url: "/api/v1/vendors?sort=name" });
+
+    expect(all.json().data[0]).toMatchObject({
+      slug: "acme",
+      productCount: 3,
+      categories: ["computers", "phones"],
+    });
+    expect(all.json().meta.total).toBe(2);
+    expect(await slugs("search=ZETA")).toEqual(["zeta"]);
+    expect(await slugs("category=electronics")).toEqual(["acme"]);
+    expect(await slugs("category=shoes")).toEqual(["zeta"]);
+    expect(await slugs("minRating=4")).toEqual(["zeta"]);
+    expect(await slugs("sort=rating")).toEqual(["zeta", "acme"]);
+    expect(await slugs("sort=productCount")).toEqual(["acme", "zeta"]);
+    expect(await slugs("sort=name&limit=1&offset=1")).toEqual(["zeta"]);
   });
 });

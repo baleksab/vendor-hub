@@ -1,6 +1,5 @@
 import { ConflictError } from "../shared/errors.ts";
 import type { VendorMemberRole } from "../vendors/vendor-member-role.ts";
-import type { Page } from "../shared/pagination.ts";
 import type { Actor } from "../vendors/vendor-access.ts";
 import type {
   ManagedVendorRow,
@@ -10,7 +9,12 @@ import type {
   VendorPatch,
   VendorSummary,
 } from "../vendors/vendor.ts";
-import { resolveOrder, type ListManagedVendorsQuery } from "../vendors/vendors.schemas.ts";
+import { expandCategory } from "../categories/categories.ts";
+import {
+  resolveOrder,
+  type ListManagedVendorsQuery,
+  type ListVendorsQuery,
+} from "../vendors/vendors.schemas.ts";
 import {
   ALREADY_MEMBER_MESSAGE,
   ALREADY_OWNER_MESSAGE,
@@ -31,6 +35,7 @@ export class InMemoryVendorsRepository implements VendorsRepository {
   readonly vendors: StoredVendor[] = [];
   readonly members: StoredMember[] = [];
   private readonly users: InMemoryUsersRepository;
+  productCategoriesOf: (vendorId: string) => string[] = () => [];
 
   constructor(users: InMemoryUsersRepository) {
     this.users = users;
@@ -61,14 +66,55 @@ export class InMemoryVendorsRepository implements VendorsRepository {
     return this.toVendor(vendor);
   }
 
-  async list(page: Page): Promise<{ items: VendorListItem[]; total: number }> {
-    const newestFirst = [...this.vendors].reverse();
+  async list(query: ListVendorsQuery): Promise<{ items: VendorListItem[]; total: number }> {
+    const search = query.search?.toLowerCase();
+    const wanted = query.category === undefined ? undefined : expandCategory(query.category);
+
+    const matching = this.vendors
+      .map((vendor, index) => {
+        const productCategories = this.productCategoriesOf(vendor.id);
+
+        return {
+          index,
+          vendor,
+          categories: [...new Set(productCategories)].sort(),
+          productCount: productCategories.length,
+        };
+      })
+      .filter(
+        ({ vendor, categories }) =>
+          (search === undefined ||
+            [vendor.name, vendor.slug, vendor.description].some((field) =>
+              field.toLowerCase().includes(search),
+            )) &&
+          (wanted === undefined || categories.some((category) => wanted.includes(category))) &&
+          (query.minRating === undefined || vendor.ratingAvg >= query.minRating),
+      );
+
+    const compare = {
+      newest: (a: (typeof matching)[number], b: (typeof matching)[number]) => b.index - a.index,
+      name: (a: (typeof matching)[number], b: (typeof matching)[number]) =>
+        a.vendor.name.toLowerCase().localeCompare(b.vendor.name.toLowerCase()),
+      rating: (a: (typeof matching)[number], b: (typeof matching)[number]) =>
+        b.vendor.ratingAvg - a.vendor.ratingAvg || b.vendor.ratingCount - a.vendor.ratingCount,
+      productCount: (a: (typeof matching)[number], b: (typeof matching)[number]) =>
+        b.productCount - a.productCount,
+    }[query.sort];
 
     return {
-      items: newestFirst
-        .slice(page.offset, page.offset + page.limit)
-        .map(({ slug, name, description }) => ({ slug, name, description })),
-      total: newestFirst.length,
+      items: matching
+        .sort((a, b) => compare(a, b) || b.index - a.index)
+        .slice(query.offset, query.offset + query.limit)
+        .map(({ vendor, categories, productCount }) => ({
+          slug: vendor.slug,
+          name: vendor.name,
+          description: vendor.description,
+          ratingAvg: vendor.ratingAvg,
+          ratingCount: vendor.ratingCount,
+          productCount,
+          categories,
+        })),
+      total: matching.length,
     };
   }
 
