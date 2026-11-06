@@ -22,7 +22,7 @@ export const en = {
     "Public pages are rendered on the server, so they open quickly and show up well in search.",
   "home.feature.modules.title": "Independent tools",
   "home.feature.modules.text":
-    "The admin panel and statistics are separate modules, built and deployed on their own.",
+    "User administration and vendor management are separate modules, built and deployed on their own.",
   "home.feature.languages.title": "Your language, your theme",
   "home.feature.languages.text":
     "The whole site works in English and Serbian, in a light or a dark theme.",
@@ -35,11 +35,11 @@ export const en = {
   "home.step.share.text": "Customers find you in the vendor list or at your own address.",
   "home.architecture.title": "Modular by design",
   "home.architecture.text":
-    "The shell renders the public pages on the server. Vendor tools load into it as independent modules in the browser, and everything talks to one API.",
+    "The shell renders the public pages on the server. Vendor and user tools load into it as independent modules in the browser, and everything talks to one API through the shell.",
   "home.architecture.shell": "Shell, rendered on the server",
   "home.architecture.pages": "Public pages",
-  "home.architecture.admin": "Vendor admin",
-  "home.architecture.stats": "Statistics",
+  "home.architecture.vendors": "Vendor management",
+  "home.architecture.users": "User administration",
   "home.architecture.modules": "Modules loaded in the browser",
   "home.architecture.api": "REST API and database",
   "home.cta.title": "Ready to open your page?",
