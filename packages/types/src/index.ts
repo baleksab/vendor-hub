@@ -28,6 +28,19 @@ export type ManagedVendorListQuery = NonNullable<
   paths["/api/v1/vendors/managed"]["get"]["parameters"]["query"]
 >;
 
+export type CategoryListResponse = Schemas["CategoryListResponse"];
+export type CategoryResponse = Schemas["CategoryResponse"];
+export type CreateProductRequest = Schemas["CreateProductRequestInput"];
+export type UpdateProductRequest = Schemas["UpdateProductRequestInput"];
+export type ProductResponse = Schemas["ProductResponse"];
+export type ProductImageResponse = Schemas["ProductImageResponse"];
+export type ProductListResponse = Schemas["ProductListResponse"];
+export type ProductListItemResponse = Schemas["ProductListItemResponse"];
+export type ProductCategoryCountListResponse = Schemas["ProductCategoryCountListResponse"];
+export type PutReviewRequest = Schemas["PutReviewRequestInput"];
+export type ReviewResponse = Schemas["ReviewResponse"];
+export type ReviewListResponse = Schemas["ReviewListResponse"];
+
 export type Locale = "en" | "sr";
 
 export type UserAdministratorProps = {

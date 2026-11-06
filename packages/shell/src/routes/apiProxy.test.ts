@@ -34,6 +34,50 @@ afterEach(() => {
   fetchMock.mockReset();
 });
 
+describe("api proxy public routes", () => {
+  const IMAGE = "/api/v1/product-images/0b4fd4a1-8e8f-4f4a-9a52-6f1c4a5d2c11";
+
+  it("serves a public image without a session and keeps the immutable cache header", async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response("bytes", {
+        status: 200,
+        headers: {
+          "Content-Type": "image/jpeg",
+          "Cache-Control": "public, max-age=31536000, immutable",
+        },
+      }),
+    );
+
+    const response = await call(await proxied(IMAGE, {}, false));
+    const [, init] = fetchMock.mock.calls[0] as [URL, RequestInit];
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe("public, max-age=31536000, immutable");
+    expect(new Headers(init.headers).get("Authorization")).toBeNull();
+  });
+
+  it("keeps no-store on other public routes", async () => {
+    fetchMock.mockResolvedValueOnce(json({ data: [] }));
+
+    const response = await call(await proxied("/api/v1/categories", {}, false));
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toBe("no-store");
+  });
+
+  it("still needs a session for product writes", async () => {
+    const response = await call(
+      await proxied(
+        "/api/v1/products/0b4fd4a1-8e8f-4f4a-9a52-6f1c4a5d2c11",
+        { method: "DELETE", headers: { Origin: ORIGIN } },
+        false,
+      ),
+    );
+
+    expect(response.status).toBe(401);
+  });
+});
+
 describe("api proxy", () => {
   it("answers 401 without a session cookie", async () => {
     const response = await call(await proxied("/api/v1/users", {}, false));

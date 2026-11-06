@@ -15,6 +15,7 @@ export type PageMetaInput = {
   locale: Locale;
   siteName: string;
   noindex?: boolean;
+  image?: string;
 };
 
 export function createPageMeta(input: PageMetaInput): MetaDescriptor[] {
@@ -29,8 +30,15 @@ export function createPageMeta(input: PageMetaInput): MetaDescriptor[] {
     { property: "og:url", content: url },
     { property: "og:site_name", content: input.siteName },
     { property: "og:locale", content: OG_LOCALES[input.locale] },
-    { name: "twitter:card", content: "summary" },
+    {
+      name: "twitter:card",
+      content: input.image === undefined ? "summary" : "summary_large_image",
+    },
   ];
+
+  if (input.image !== undefined) {
+    meta.push({ property: "og:image", content: new URL(input.image, input.origin).toString() });
+  }
 
   if (input.noindex) {
     meta.push({ name: "robots", content: "noindex" });

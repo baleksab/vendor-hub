@@ -10,6 +10,10 @@ type ParamNames<S extends string> = S extends `${string}{${infer Name}}${infer R
   ? Name | ParamNames<Rest>
   : never;
 
+export type PlainMessageKey = {
+  [K in MessageKey]: [ParamNames<(typeof en)[K]>] extends [never] ? K : never;
+}[MessageKey];
+
 type Params<K extends MessageKey> = Record<ParamNames<(typeof en)[K]>, string | number>;
 
 type TArgs<K extends MessageKey> = [ParamNames<(typeof en)[K]>] extends [never]
@@ -30,6 +34,6 @@ export function createT(locale: Locale): T {
   };
 }
 
-export function isMessageKey(value: string): value is MessageKey {
-  return Object.hasOwn(en, value);
+export function isMessageKey(value: string): value is PlainMessageKey {
+  return Object.hasOwn(en, value) && !/\{\w+\}/.test(en[value as MessageKey]);
 }
