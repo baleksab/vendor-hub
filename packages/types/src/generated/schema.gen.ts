@@ -902,6 +902,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/cart/quote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CartQuoteRequestInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CartQuoteResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/users/me": {
         parameters: {
             query?: never;
@@ -2220,6 +2268,777 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    limit?: number;
+                    offset?: number;
+                    status?: "created" | "paid" | "delivered" | "closed" | "cancelled" | "return_requested" | "return_approved" | "return_rejected";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderListResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateOrdersRequestInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CreateOrdersResponse"];
+                    };
+                };
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CreateOrdersResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CartConflictProblem"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vendors/{id}/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    limit?: number;
+                    offset?: number;
+                    status?: "created" | "paid" | "delivered" | "closed" | "cancelled" | "return_requested" | "return_approved" | "return_rejected";
+                };
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderListResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PayOrderRequestInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["PaymentOutcomeResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/confirm-receipt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/return-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["OrderReasonRequestInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/deliver": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/returns/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/returns/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["OrderReasonRequestInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["OrderResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2351,25 +3170,6 @@ export interface components {
             /** @enum {string} */
             scope: "all" | "mine";
         };
-        CategoryNamesResponseInput: {
-            en: string;
-            sr: string;
-        };
-        ChildCategoryResponseInput: {
-            slug: string;
-            names: components["schemas"]["CategoryNamesResponseInput"];
-        };
-        CategoryResponseInput: {
-            slug: string;
-            names: components["schemas"]["CategoryNamesResponseInput"];
-            children: components["schemas"]["ChildCategoryResponseInput"][];
-        };
-        CategoryListResponseInput: {
-            data: components["schemas"]["CategoryResponseInput"][];
-        };
-        CountryListResponseInput: {
-            data: string[];
-        };
         CreateProductRequestInput: {
             name: string;
             description: string;
@@ -2451,36 +3251,66 @@ export interface components {
         ReorderImagesRequestInput: {
             imageIds: string[];
         };
-        PutReviewRequestInput: {
-            rating: number;
-            comment?: string | null;
+        CartLineRequestInput: {
+            /** Format: uuid */
+            productId: string;
+            quantity: number;
         };
-        ReviewResponseInput: {
+        CartQuoteRequestInput: {
+            lines: components["schemas"]["CartLineRequestInput"][];
+        };
+        CartProductResponseInput: {
             /** Format: uuid */
             id: string;
+            name: string;
             /** Format: uuid */
-            userId: string;
-            authorName: string;
-            rating: number;
-            comment: string | null;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
+            vendorId: string;
+            vendorSlug: string;
+            vendorName: string;
+            priceMinor: number;
+            /** @enum {string} */
+            currency: "EUR" | "RSD" | "USD";
+            stock: number;
+            coverImageId: string | null;
         };
-        ReviewSummaryResponseInput: {
-            ratingAvg: number;
-            ratingCount: number;
-            distribution: number[];
+        CartQuoteLineResponseInput: {
+            /** Format: uuid */
+            productId: string;
+            requestedQuantity: number;
+            quantity: number;
+            /** @enum {string} */
+            status: "ok" | "quantityReduced" | "outOfStock" | "unavailable";
+            product: components["schemas"]["CartProductResponseInput"] | null;
+            lineTotalMinor: number;
         };
-        ReviewListResponseInput: {
-            data: components["schemas"]["ReviewResponseInput"][];
-            meta: {
-                total: number;
-                limit: number;
-                offset: number;
-            };
-            summary: components["schemas"]["ReviewSummaryResponseInput"];
+        CurrencyTotalResponseInput: {
+            /** @enum {string} */
+            currency: "EUR" | "RSD" | "USD";
+            totalMinor: number;
+        };
+        CartQuoteResponseInput: {
+            lines: components["schemas"]["CartQuoteLineResponseInput"][];
+            totals: components["schemas"]["CurrencyTotalResponseInput"][];
+            canCheckout: boolean;
+        };
+        CategoryNamesResponseInput: {
+            en: string;
+            sr: string;
+        };
+        ChildCategoryResponseInput: {
+            slug: string;
+            names: components["schemas"]["CategoryNamesResponseInput"];
+        };
+        CategoryResponseInput: {
+            slug: string;
+            names: components["schemas"]["CategoryNamesResponseInput"];
+            children: components["schemas"]["ChildCategoryResponseInput"][];
+        };
+        CategoryListResponseInput: {
+            data: components["schemas"]["CategoryResponseInput"][];
+        };
+        CountryListResponseInput: {
+            data: string[];
         };
         CreateUserRequestInput: {
             email: string;
@@ -2527,6 +3357,185 @@ export interface components {
                 limit: number;
                 offset: number;
             };
+        };
+        ShippingDetailsInput: {
+            firstName: string;
+            lastName: string;
+            email: string;
+            phoneNumber: string;
+            address: string;
+            /** @enum {string} */
+            country: "AD" | "AE" | "AF" | "AG" | "AI" | "AL" | "AM" | "AO" | "AQ" | "AR" | "AS" | "AT" | "AU" | "AW" | "AX" | "AZ" | "BA" | "BB" | "BD" | "BE" | "BF" | "BG" | "BH" | "BI" | "BJ" | "BL" | "BM" | "BN" | "BO" | "BQ" | "BR" | "BS" | "BT" | "BV" | "BW" | "BY" | "BZ" | "CA" | "CC" | "CD" | "CF" | "CG" | "CH" | "CI" | "CK" | "CL" | "CM" | "CN" | "CO" | "CR" | "CU" | "CV" | "CW" | "CX" | "CY" | "CZ" | "DE" | "DJ" | "DK" | "DM" | "DO" | "DZ" | "EC" | "EE" | "EG" | "EH" | "ER" | "ES" | "ET" | "FI" | "FJ" | "FK" | "FM" | "FO" | "FR" | "GA" | "GB" | "GD" | "GE" | "GF" | "GG" | "GH" | "GI" | "GL" | "GM" | "GN" | "GP" | "GQ" | "GR" | "GS" | "GT" | "GU" | "GW" | "GY" | "HK" | "HM" | "HN" | "HR" | "HT" | "HU" | "ID" | "IE" | "IL" | "IM" | "IN" | "IO" | "IQ" | "IR" | "IS" | "IT" | "JE" | "JM" | "JO" | "JP" | "KE" | "KG" | "KH" | "KI" | "KM" | "KN" | "KP" | "KR" | "KW" | "KY" | "KZ" | "LA" | "LB" | "LC" | "LI" | "LK" | "LR" | "LS" | "LT" | "LU" | "LV" | "LY" | "MA" | "MC" | "MD" | "ME" | "MF" | "MG" | "MH" | "MK" | "ML" | "MM" | "MN" | "MO" | "MP" | "MQ" | "MR" | "MS" | "MT" | "MU" | "MV" | "MW" | "MX" | "MY" | "MZ" | "NA" | "NC" | "NE" | "NF" | "NG" | "NI" | "NL" | "NO" | "NP" | "NR" | "NU" | "NZ" | "OM" | "PA" | "PE" | "PF" | "PG" | "PH" | "PK" | "PL" | "PM" | "PN" | "PR" | "PS" | "PT" | "PW" | "PY" | "QA" | "RE" | "RO" | "RS" | "RU" | "RW" | "SA" | "SB" | "SC" | "SD" | "SE" | "SG" | "SH" | "SI" | "SJ" | "SK" | "SL" | "SM" | "SN" | "SO" | "SR" | "SS" | "ST" | "SV" | "SX" | "SY" | "SZ" | "TC" | "TD" | "TF" | "TG" | "TH" | "TJ" | "TK" | "TL" | "TM" | "TN" | "TO" | "TR" | "TT" | "TV" | "TW" | "TZ" | "UA" | "UG" | "UM" | "US" | "UY" | "UZ" | "VA" | "VC" | "VE" | "VG" | "VI" | "VN" | "VU" | "WF" | "WS" | "YE" | "YT" | "ZA" | "ZM" | "ZW";
+        };
+        ShippingDetailsResponseInput: {
+            firstName: string;
+            lastName: string;
+            email: string;
+            phoneNumber: string;
+            address: string;
+            country: string;
+        };
+        CreateOrdersRequestInput: {
+            lines: components["schemas"]["CartLineRequestInput"][];
+            shipping: components["schemas"]["ShippingDetailsInput"];
+            /** Format: uuid */
+            idempotencyKey: string;
+        };
+        PayOrderRequestInput: {
+            cardNumber: string;
+        };
+        OrderReasonRequestInput: {
+            reason: string;
+        };
+        OrderSummaryResponseInput: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            vendorId: string;
+            vendorSlug: string;
+            vendorName: string;
+            /** @enum {string} */
+            status: "created" | "paid" | "delivered" | "closed" | "cancelled" | "return_requested" | "return_approved" | "return_rejected";
+            /** @enum {string} */
+            currency: "EUR" | "RSD" | "USD";
+            totalMinor: number;
+            itemCount: number;
+            buyerName: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        OrderListResponseInput: {
+            data: components["schemas"]["OrderSummaryResponseInput"][];
+            meta: {
+                total: number;
+                limit: number;
+                offset: number;
+            };
+        };
+        CreateOrdersResponseInput: {
+            data: components["schemas"]["OrderSummaryResponseInput"][];
+        };
+        OrderItemResponseInput: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            productId: string;
+            name: string;
+            unitPriceMinor: number;
+            quantity: number;
+            lineTotalMinor: number;
+        };
+        PaymentResponseInput: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "charge" | "refund";
+            /** @enum {string} */
+            status: "succeeded" | "failed";
+            amountMinor: number;
+            /** @enum {string} */
+            currency: "EUR" | "RSD" | "USD";
+            failureReason: ("declined" | "unknownCard") | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        OrderEventResponseInput: {
+            /** Format: uuid */
+            id: string;
+            fromStatus: ("created" | "paid" | "delivered" | "closed" | "cancelled" | "return_requested" | "return_approved" | "return_rejected") | null;
+            /** @enum {string} */
+            toStatus: "created" | "paid" | "delivered" | "closed" | "cancelled" | "return_requested" | "return_approved" | "return_rejected";
+            /** @enum {string} */
+            actor: "buyer" | "vendor" | "system";
+            note: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        OrderResponseInput: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            vendorId: string;
+            vendorSlug: string;
+            vendorName: string;
+            /** @enum {string} */
+            status: "created" | "paid" | "delivered" | "closed" | "cancelled" | "return_requested" | "return_approved" | "return_rejected";
+            /** @enum {string} */
+            currency: "EUR" | "RSD" | "USD";
+            totalMinor: number;
+            itemCount: number;
+            buyerName: string;
+            /** Format: date-time */
+            createdAt: string;
+            shipping: components["schemas"]["ShippingDetailsResponseInput"];
+            items: components["schemas"]["OrderItemResponseInput"][];
+            payments: components["schemas"]["PaymentResponseInput"][];
+            events: components["schemas"]["OrderEventResponseInput"][];
+            paymentAttempts: number;
+            paymentAttemptsLeft: number;
+            paymentDeadline: string | null;
+            returnDeadline: string | null;
+            paidAt: string | null;
+            deliveredAt: string | null;
+            closedAt: string | null;
+            cancelledAt: string | null;
+            viewer: {
+                buyer: boolean;
+                vendor: boolean;
+            };
+            allowedActions: ("pay" | "cancel" | "confirmReceipt" | "requestReturn" | "deliver" | "approveReturn" | "rejectReturn")[];
+        };
+        PaymentOutcomeResponseInput: {
+            order: components["schemas"]["OrderResponseInput"];
+            payment: {
+                /** @enum {string} */
+                status: "succeeded" | "failed";
+                failureReason: ("declined" | "unknownCard") | null;
+                attemptsLeft: number;
+            };
+        };
+        CartConflictProblemInput: {
+            type: string;
+            title: string;
+            status: number;
+            detail: string;
+            instance: string;
+            errors?: {
+                path: string;
+                message: string;
+            }[];
+            quote: components["schemas"]["CartQuoteResponseInput"];
+        };
+        PutReviewRequestInput: {
+            rating: number;
+            comment?: string | null;
+        };
+        ReviewResponseInput: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            userId: string;
+            authorName: string;
+            rating: number;
+            comment: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        ReviewSummaryResponseInput: {
+            ratingAvg: number;
+            ratingCount: number;
+            distribution: number[];
+        };
+        ReviewListResponseInput: {
+            data: components["schemas"]["ReviewResponseInput"][];
+            meta: {
+                total: number;
+                limit: number;
+                offset: number;
+            };
+            summary: components["schemas"]["ReviewSummaryResponseInput"];
         };
         LoginRequest: {
             email: string;
@@ -2656,25 +3665,6 @@ export interface components {
             /** @enum {string} */
             scope: "all" | "mine";
         };
-        CategoryNamesResponse: {
-            en: string;
-            sr: string;
-        };
-        ChildCategoryResponse: {
-            slug: string;
-            names: components["schemas"]["CategoryNamesResponse"];
-        };
-        CategoryResponse: {
-            slug: string;
-            names: components["schemas"]["CategoryNamesResponse"];
-            children: components["schemas"]["ChildCategoryResponse"][];
-        };
-        CategoryListResponse: {
-            data: components["schemas"]["CategoryResponse"][];
-        };
-        CountryListResponse: {
-            data: string[];
-        };
         CreateProductRequest: {
             name: string;
             description: string;
@@ -2756,36 +3746,66 @@ export interface components {
         ReorderImagesRequest: {
             imageIds: string[];
         };
-        PutReviewRequest: {
-            rating: number;
-            comment: unknown;
+        CartLineRequest: {
+            /** Format: uuid */
+            productId: string;
+            quantity: number;
         };
-        ReviewResponse: {
+        CartQuoteRequest: {
+            lines: components["schemas"]["CartLineRequest"][];
+        };
+        CartProductResponse: {
             /** Format: uuid */
             id: string;
+            name: string;
             /** Format: uuid */
-            userId: string;
-            authorName: string;
-            rating: number;
-            comment: string | null;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
+            vendorId: string;
+            vendorSlug: string;
+            vendorName: string;
+            priceMinor: number;
+            /** @enum {string} */
+            currency: "EUR" | "RSD" | "USD";
+            stock: number;
+            coverImageId: string | null;
         };
-        ReviewSummaryResponse: {
-            ratingAvg: number;
-            ratingCount: number;
-            distribution: number[];
+        CartQuoteLineResponse: {
+            /** Format: uuid */
+            productId: string;
+            requestedQuantity: number;
+            quantity: number;
+            /** @enum {string} */
+            status: "ok" | "quantityReduced" | "outOfStock" | "unavailable";
+            product: components["schemas"]["CartProductResponse"] | null;
+            lineTotalMinor: number;
         };
-        ReviewListResponse: {
-            data: components["schemas"]["ReviewResponse"][];
-            meta: {
-                total: number;
-                limit: number;
-                offset: number;
-            };
-            summary: components["schemas"]["ReviewSummaryResponse"];
+        CurrencyTotalResponse: {
+            /** @enum {string} */
+            currency: "EUR" | "RSD" | "USD";
+            totalMinor: number;
+        };
+        CartQuoteResponse: {
+            lines: components["schemas"]["CartQuoteLineResponse"][];
+            totals: components["schemas"]["CurrencyTotalResponse"][];
+            canCheckout: boolean;
+        };
+        CategoryNamesResponse: {
+            en: string;
+            sr: string;
+        };
+        ChildCategoryResponse: {
+            slug: string;
+            names: components["schemas"]["CategoryNamesResponse"];
+        };
+        CategoryResponse: {
+            slug: string;
+            names: components["schemas"]["CategoryNamesResponse"];
+            children: components["schemas"]["ChildCategoryResponse"][];
+        };
+        CategoryListResponse: {
+            data: components["schemas"]["CategoryResponse"][];
+        };
+        CountryListResponse: {
+            data: string[];
         };
         CreateUserRequest: {
             /** Format: email */
@@ -2834,6 +3854,186 @@ export interface components {
                 limit: number;
                 offset: number;
             };
+        };
+        ShippingDetails: {
+            firstName: string;
+            lastName: string;
+            /** Format: email */
+            email: string;
+            phoneNumber: string;
+            address: string;
+            /** @enum {string} */
+            country: "AD" | "AE" | "AF" | "AG" | "AI" | "AL" | "AM" | "AO" | "AQ" | "AR" | "AS" | "AT" | "AU" | "AW" | "AX" | "AZ" | "BA" | "BB" | "BD" | "BE" | "BF" | "BG" | "BH" | "BI" | "BJ" | "BL" | "BM" | "BN" | "BO" | "BQ" | "BR" | "BS" | "BT" | "BV" | "BW" | "BY" | "BZ" | "CA" | "CC" | "CD" | "CF" | "CG" | "CH" | "CI" | "CK" | "CL" | "CM" | "CN" | "CO" | "CR" | "CU" | "CV" | "CW" | "CX" | "CY" | "CZ" | "DE" | "DJ" | "DK" | "DM" | "DO" | "DZ" | "EC" | "EE" | "EG" | "EH" | "ER" | "ES" | "ET" | "FI" | "FJ" | "FK" | "FM" | "FO" | "FR" | "GA" | "GB" | "GD" | "GE" | "GF" | "GG" | "GH" | "GI" | "GL" | "GM" | "GN" | "GP" | "GQ" | "GR" | "GS" | "GT" | "GU" | "GW" | "GY" | "HK" | "HM" | "HN" | "HR" | "HT" | "HU" | "ID" | "IE" | "IL" | "IM" | "IN" | "IO" | "IQ" | "IR" | "IS" | "IT" | "JE" | "JM" | "JO" | "JP" | "KE" | "KG" | "KH" | "KI" | "KM" | "KN" | "KP" | "KR" | "KW" | "KY" | "KZ" | "LA" | "LB" | "LC" | "LI" | "LK" | "LR" | "LS" | "LT" | "LU" | "LV" | "LY" | "MA" | "MC" | "MD" | "ME" | "MF" | "MG" | "MH" | "MK" | "ML" | "MM" | "MN" | "MO" | "MP" | "MQ" | "MR" | "MS" | "MT" | "MU" | "MV" | "MW" | "MX" | "MY" | "MZ" | "NA" | "NC" | "NE" | "NF" | "NG" | "NI" | "NL" | "NO" | "NP" | "NR" | "NU" | "NZ" | "OM" | "PA" | "PE" | "PF" | "PG" | "PH" | "PK" | "PL" | "PM" | "PN" | "PR" | "PS" | "PT" | "PW" | "PY" | "QA" | "RE" | "RO" | "RS" | "RU" | "RW" | "SA" | "SB" | "SC" | "SD" | "SE" | "SG" | "SH" | "SI" | "SJ" | "SK" | "SL" | "SM" | "SN" | "SO" | "SR" | "SS" | "ST" | "SV" | "SX" | "SY" | "SZ" | "TC" | "TD" | "TF" | "TG" | "TH" | "TJ" | "TK" | "TL" | "TM" | "TN" | "TO" | "TR" | "TT" | "TV" | "TW" | "TZ" | "UA" | "UG" | "UM" | "US" | "UY" | "UZ" | "VA" | "VC" | "VE" | "VG" | "VI" | "VN" | "VU" | "WF" | "WS" | "YE" | "YT" | "ZA" | "ZM" | "ZW";
+        };
+        ShippingDetailsResponse: {
+            firstName: string;
+            lastName: string;
+            email: string;
+            phoneNumber: string;
+            address: string;
+            country: string;
+        };
+        CreateOrdersRequest: {
+            lines: components["schemas"]["CartLineRequest"][];
+            shipping: components["schemas"]["ShippingDetails"];
+            /** Format: uuid */
+            idempotencyKey: string;
+        };
+        PayOrderRequest: {
+            cardNumber: string;
+        };
+        OrderReasonRequest: {
+            reason: string;
+        };
+        OrderSummaryResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            vendorId: string;
+            vendorSlug: string;
+            vendorName: string;
+            /** @enum {string} */
+            status: "created" | "paid" | "delivered" | "closed" | "cancelled" | "return_requested" | "return_approved" | "return_rejected";
+            /** @enum {string} */
+            currency: "EUR" | "RSD" | "USD";
+            totalMinor: number;
+            itemCount: number;
+            buyerName: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        OrderListResponse: {
+            data: components["schemas"]["OrderSummaryResponse"][];
+            meta: {
+                total: number;
+                limit: number;
+                offset: number;
+            };
+        };
+        CreateOrdersResponse: {
+            data: components["schemas"]["OrderSummaryResponse"][];
+        };
+        OrderItemResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            productId: string;
+            name: string;
+            unitPriceMinor: number;
+            quantity: number;
+            lineTotalMinor: number;
+        };
+        PaymentResponse: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "charge" | "refund";
+            /** @enum {string} */
+            status: "succeeded" | "failed";
+            amountMinor: number;
+            /** @enum {string} */
+            currency: "EUR" | "RSD" | "USD";
+            failureReason: ("declined" | "unknownCard") | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        OrderEventResponse: {
+            /** Format: uuid */
+            id: string;
+            fromStatus: ("created" | "paid" | "delivered" | "closed" | "cancelled" | "return_requested" | "return_approved" | "return_rejected") | null;
+            /** @enum {string} */
+            toStatus: "created" | "paid" | "delivered" | "closed" | "cancelled" | "return_requested" | "return_approved" | "return_rejected";
+            /** @enum {string} */
+            actor: "buyer" | "vendor" | "system";
+            note: string | null;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        OrderResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            vendorId: string;
+            vendorSlug: string;
+            vendorName: string;
+            /** @enum {string} */
+            status: "created" | "paid" | "delivered" | "closed" | "cancelled" | "return_requested" | "return_approved" | "return_rejected";
+            /** @enum {string} */
+            currency: "EUR" | "RSD" | "USD";
+            totalMinor: number;
+            itemCount: number;
+            buyerName: string;
+            /** Format: date-time */
+            createdAt: string;
+            shipping: components["schemas"]["ShippingDetailsResponse"];
+            items: components["schemas"]["OrderItemResponse"][];
+            payments: components["schemas"]["PaymentResponse"][];
+            events: components["schemas"]["OrderEventResponse"][];
+            paymentAttempts: number;
+            paymentAttemptsLeft: number;
+            paymentDeadline: string | null;
+            returnDeadline: string | null;
+            paidAt: string | null;
+            deliveredAt: string | null;
+            closedAt: string | null;
+            cancelledAt: string | null;
+            viewer: {
+                buyer: boolean;
+                vendor: boolean;
+            };
+            allowedActions: ("pay" | "cancel" | "confirmReceipt" | "requestReturn" | "deliver" | "approveReturn" | "rejectReturn")[];
+        };
+        PaymentOutcomeResponse: {
+            order: components["schemas"]["OrderResponse"];
+            payment: {
+                /** @enum {string} */
+                status: "succeeded" | "failed";
+                failureReason: ("declined" | "unknownCard") | null;
+                attemptsLeft: number;
+            };
+        };
+        CartConflictProblem: {
+            type: string;
+            title: string;
+            status: number;
+            detail: string;
+            instance: string;
+            errors?: {
+                path: string;
+                message: string;
+            }[];
+            quote: components["schemas"]["CartQuoteResponse"];
+        };
+        PutReviewRequest: {
+            rating: number;
+            comment: unknown;
+        };
+        ReviewResponse: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            userId: string;
+            authorName: string;
+            rating: number;
+            comment: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        ReviewSummaryResponse: {
+            ratingAvg: number;
+            ratingCount: number;
+            distribution: number[];
+        };
+        ReviewListResponse: {
+            data: components["schemas"]["ReviewResponse"][];
+            meta: {
+                total: number;
+                limit: number;
+                offset: number;
+            };
+            summary: components["schemas"]["ReviewSummaryResponse"];
         };
     };
     responses: never;

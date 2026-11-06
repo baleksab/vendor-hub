@@ -41,6 +41,24 @@ export type PutReviewRequest = Schemas["PutReviewRequestInput"];
 export type ReviewResponse = Schemas["ReviewResponse"];
 export type ReviewListResponse = Schemas["ReviewListResponse"];
 
+export type CartLineRequest = Schemas["CartLineRequestInput"];
+export type CartQuoteResponse = Schemas["CartQuoteResponse"];
+export type CartQuoteLineResponse = Schemas["CartQuoteLineResponse"];
+export type CurrencyTotalResponse = Schemas["CurrencyTotalResponse"];
+export type ShippingDetails = Schemas["ShippingDetailsInput"];
+export type CreateOrdersRequest = Schemas["CreateOrdersRequestInput"];
+export type CreateOrdersResponse = Schemas["CreateOrdersResponse"];
+export type OrderSummaryResponse = Schemas["OrderSummaryResponse"];
+export type OrderListResponse = Schemas["OrderListResponse"];
+export type OrderResponse = Schemas["OrderResponse"];
+export type OrderItemResponse = Schemas["OrderItemResponse"];
+export type OrderEventResponse = Schemas["OrderEventResponse"];
+export type PaymentResponse = Schemas["PaymentResponse"];
+export type PaymentOutcomeResponse = Schemas["PaymentOutcomeResponse"];
+export type OrderStatus = OrderResponse["status"];
+export type OrderAction = OrderResponse["allowedActions"][number];
+export type OrderListQuery = NonNullable<paths["/api/v1/orders"]["get"]["parameters"]["query"]>;
+
 export type Locale = "en" | "sr";
 
 export type UserAdministratorProps = {
