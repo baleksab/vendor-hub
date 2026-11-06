@@ -11,13 +11,14 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
-import { EmptyState, ErrorAlert, PageHeader } from "@vendor-hub/ui";
+import type { ManageVendorsNavigationState } from "@vendor-hub/types";
+import { BackLink, EmptyState, ErrorAlert, PageHeader } from "@vendor-hub/ui";
 import { useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import { Link, useLocation, useSearchParams } from "react-router";
 
 import { useT } from "../../context/MessagesContext";
 import { useManagedVendors } from "../../hooks/useManagedVendors";
-import { BECOME_VENDOR_PATH } from "../../paths";
+import { BECOME_VENDOR_PATH, PUBLIC_VENDORS_PATH } from "../../paths";
 import {
   PAGE_SIZES,
   hasActiveFilters,
@@ -38,6 +39,9 @@ const TITLE_SKELETON_HEIGHT = 36;
 export default function VendorList() {
   const t = useT();
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const cameFromVendors =
+    (location.state as Partial<ManageVendorsNavigationState> | null)?.from === "vendors";
   const filters = readFilters(searchParams);
   const [searchInput, setSearchInput] = useState(filters.search);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -51,7 +55,10 @@ export default function VendorList() {
   });
 
   const applyFilters = (patch: Partial<Filters>) => {
-    setSearchParams(writeFilters({ ...filters, page: 1, ...patch }), { replace: true });
+    setSearchParams(writeFilters({ ...filters, page: 1, ...patch }), {
+      replace: true,
+      state: location.state,
+    });
   };
 
   const commitSearch = useDebouncedCallback((value: string) => {
@@ -72,7 +79,7 @@ export default function VendorList() {
   const filtered = hasActiveFilters(filters);
   const selected = data?.data.find((vendor) => vendor.id === selectedId) ?? null;
 
-  const header =
+  const title =
     data === undefined ? (
       <Skeleton width={TITLE_SKELETON_WIDTH} height={TITLE_SKELETON_HEIGHT} mb="lg" />
     ) : (
@@ -81,6 +88,17 @@ export default function VendorList() {
         description={t("vendors.total", { total: data.meta.total })}
       />
     );
+
+  const header = (
+    <>
+      {cameFromVendors ? (
+        <BackLink to={PUBLIC_VENDORS_PATH} linkComponent={Link}>
+          {t("vendors.back")}
+        </BackLink>
+      ) : null}
+      {title}
+    </>
+  );
 
   const filterBar = (
     <Paper withBorder radius="md" p="md">

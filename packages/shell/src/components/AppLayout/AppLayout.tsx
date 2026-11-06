@@ -3,6 +3,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { useEffect, type ReactNode } from "react";
 import { Link, useLocation } from "react-router";
 
+import { MANAGE_VENDORS_PATH, manageVendorsLabelKey } from "../../vendor/manageVendorsLink";
 import { useSession } from "../../hooks/useSession/useSession";
 import { useT } from "../../i18n/LocaleProvider";
 import { LanguageSwitcher } from "../LanguageSwitcher/LanguageSwitcher";
@@ -38,6 +39,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   if (user?.role === "administrator") {
     links.push({ to: "/admin/users", label: t("nav.administration"), icon: "administration" });
+  }
+
+  if (manageVendorsLabelKey(user, vendors) !== null) {
+    links.push({
+      to: MANAGE_VENDORS_PATH,
+      label: t("nav.vendorAdministration"),
+      icon: "vendorAdministration",
+    });
   }
 
   return (

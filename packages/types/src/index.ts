@@ -36,6 +36,8 @@ export type UserAdministratorProps = {
   onUnauthorized: () => void;
 };
 
+export type ManageVendorsNavigationState = { from: "vendors" };
+
 export type VendorAdministratorProps = {
   locale: Locale;
   apiBaseUrl: string;

@@ -30,6 +30,12 @@ const ICONS = {
       <path d="M16 3.13a4 4 0 0 1 0 7.75" />
     </>
   ),
+  vendorAdministration: (
+    <>
+      <path d="M12 3 4 7v5c0 4.5 3.2 8.2 8 9 4.8-.8 8-4.5 8-9V7z" />
+      <path d="m9 12 2 2 4-4" />
+    </>
+  ),
 } satisfies Record<string, ReactNode>;
 
 export type NavIconName = keyof typeof ICONS;
