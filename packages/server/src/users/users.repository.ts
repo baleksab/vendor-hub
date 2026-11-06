@@ -1,4 +1,4 @@
-import { and, count, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
 
 import { notDeleted } from "../db/base-entity.ts";
 import type { Database } from "../db/client.ts";
@@ -6,7 +6,7 @@ import { users } from "../db/schema.ts";
 import { findUniqueViolation } from "../db/unique-violation.ts";
 import { ConflictError } from "../shared/errors.ts";
 import { escapeLike } from "../shared/like.ts";
-import type { ListUsersQuery } from "./users.schemas.ts";
+import { resolveUserOrder, type ListUsersQuery } from "./users.schemas.ts";
 import type { NewUser, User, UserCredentials, UserCredentialsLookup, UserPatch } from "./user.ts";
 
 export type UsersRepository = UserCredentialsLookup & {
@@ -56,6 +56,24 @@ function listFilter(query: ListUsersQuery): SQL | undefined {
   return and(...conditions);
 }
 
+function listOrder(query: ListUsersQuery): SQL[] {
+  const direction = resolveUserOrder(query) === "asc" ? asc : desc;
+
+  if (query.sort === "name") {
+    return [
+      direction(sql`lower(${users.lastName})`),
+      direction(sql`lower(${users.firstName})`),
+      asc(users.id),
+    ];
+  }
+
+  const column = { role: users.role, country: users.country, createdAt: users.createdAt }[
+    query.sort
+  ];
+
+  return [direction(column), asc(users.id)];
+}
+
 function emailTaken(): ConflictError {
   return new ConflictError("A user with this email already exists");
 }
@@ -96,7 +114,7 @@ export class DrizzleUsersRepository implements UsersRepository {
       .select(publicColumns)
       .from(users)
       .where(where)
-      .orderBy(desc(users.createdAt), users.id)
+      .orderBy(...listOrder(query))
       .limit(query.limit)
       .offset(query.offset);
 

@@ -1,6 +1,6 @@
 import { ConflictError } from "../shared/errors.ts";
 import type { NewUser, User, UserCredentials, UserPatch } from "../users/user.ts";
-import type { ListUsersQuery } from "../users/users.schemas.ts";
+import { resolveUserOrder, type ListUsersQuery } from "../users/users.schemas.ts";
 import type { UsersRepository } from "../users/users.repository.ts";
 
 type StoredUser = User & { passwordHash: string; isDeleted: boolean };
@@ -41,10 +41,22 @@ export class InMemoryUsersRepository implements UsersRepository {
         (query.country === undefined || row.country === query.country),
     );
 
+    const direction = resolveUserOrder(query) === "asc" ? 1 : -1;
+    const sorted = matching.sort((left, right) => {
+      const difference =
+        query.sort === "name"
+          ? `${left.lastName} ${left.firstName}`.localeCompare(
+              `${right.lastName} ${right.firstName}`,
+            )
+          : query.sort === "createdAt"
+            ? left.createdAt.getTime() - right.createdAt.getTime()
+            : left[query.sort].localeCompare(right[query.sort]);
+
+      return difference * direction;
+    });
+
     return {
-      items: matching
-        .slice(query.offset, query.offset + query.limit)
-        .map((row) => this.toUser(row)),
+      items: sorted.slice(query.offset, query.offset + query.limit).map((row) => this.toUser(row)),
       total: matching.length,
     };
   }

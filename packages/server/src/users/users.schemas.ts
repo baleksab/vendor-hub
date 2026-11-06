@@ -66,13 +66,21 @@ export const UserListResponse = z
 
 const SEARCH_MAX_LENGTH = 100;
 
+export const USER_SORT_FIELDS = ["name", "role", "country", "createdAt"] as const;
+
 export const ListUsersQuery = PaginationQuery.extend({
   search: z.string().trim().min(1).max(SEARCH_MAX_LENGTH).optional(),
   role: UserRoleSchema.optional(),
   country: country.optional(),
+  sort: z.enum(USER_SORT_FIELDS).default("createdAt"),
+  order: z.enum(["asc", "desc"]).optional(),
 });
 
 export type ListUsersQuery = z.infer<typeof ListUsersQuery>;
+
+export function resolveUserOrder(query: ListUsersQuery): "asc" | "desc" {
+  return query.order ?? (query.sort === "createdAt" ? "desc" : "asc");
+}
 
 export const UserIdParams = z.object({ id: z.uuid() });
 
