@@ -16,11 +16,19 @@ const vendor = {
 
 describe("resolveAccess", () => {
   it("gives the owner full access", () => {
-    expect(resolveAccess(owner, vendor)).toEqual({ viewerRole: "owner", canDelete: true });
+    expect(resolveAccess(owner, vendor)).toEqual({
+      viewerRole: "owner",
+      memberRole: "owner",
+      canDelete: true,
+    });
   });
 
   it("lets the operator manage but not delete", () => {
-    expect(resolveAccess(operator, vendor)).toEqual({ viewerRole: "operator", canDelete: false });
+    expect(resolveAccess(operator, vendor)).toEqual({
+      viewerRole: "operator",
+      memberRole: "operator",
+      canDelete: false,
+    });
   });
 
   it("gives an outsider no access", () => {
@@ -30,6 +38,7 @@ describe("resolveAccess", () => {
   it("gives the administrator full access without a membership", () => {
     expect(resolveAccess(administrator, vendor)).toEqual({
       viewerRole: "administrator",
+      memberRole: null,
       canDelete: true,
     });
   });
@@ -39,6 +48,7 @@ describe("resolveAccess", () => {
 
     expect(resolveAccess(memberAdmin, vendor)).toEqual({
       viewerRole: "administrator",
+      memberRole: "operator",
       canDelete: true,
     });
   });

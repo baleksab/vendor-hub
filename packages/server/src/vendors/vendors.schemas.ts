@@ -50,6 +50,7 @@ export const VendorResponse = z
     description: z.string(),
     members: z.array(VendorMemberResponse),
     viewerRole: ViewerRoleSchema,
+    memberRole: VendorMemberRoleSchema.nullable(),
     canDelete: z.boolean(),
     createdAt: z.iso.datetime(),
   })
@@ -110,6 +111,7 @@ export const ManagedVendorListItemResponse = z
     owner: ManagedVendorOwnerResponse,
     memberCount: z.number().int().min(1),
     viewerRole: ViewerRoleSchema,
+    memberRole: VendorMemberRoleSchema.nullable(),
     canDelete: z.boolean(),
     createdAt: z.iso.datetime(),
   })

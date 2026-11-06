@@ -1,15 +1,23 @@
 import { Badge } from "@mantine/core";
-import type { ManagedVendorListItemResponse } from "@vendor-hub/types";
+import type { VendorResponse } from "@vendor-hub/types";
 
 import { useT } from "../context/MessagesContext";
 
-const COLORS = { administrator: "primer", owner: "teal", operator: "gray" } as const;
+type Props = { role: VendorResponse["memberRole"] };
 
-export function RoleBadge({ role }: { role: ManagedVendorListItemResponse["viewerRole"] }) {
+export function RoleBadge({ role }: Props) {
   const t = useT();
 
+  if (role === null) {
+    return (
+      <Badge variant="light" color="gray">
+        {t("role.none")}
+      </Badge>
+    );
+  }
+
   return (
-    <Badge variant={role === "administrator" ? "filled" : "light"} color={COLORS[role]}>
+    <Badge variant="light" color={role === "owner" ? "teal" : "primer"}>
       {t(`role.${role}`)}
     </Badge>
   );

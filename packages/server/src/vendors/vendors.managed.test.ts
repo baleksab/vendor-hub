@@ -99,12 +99,14 @@ describe("managed vendors routes", () => {
     expect(
       all.data.every((item: { viewerRole: string }) => item.viewerRole === "administrator"),
     ).toBe(true);
+    expect(all.data.every((item: { memberRole: unknown }) => item.memberRole === null)).toBe(true);
     expect(ownerList.scope).toBe("mine");
     expect(ownerList.data).toHaveLength(1);
     expect(ownerList.data[0]).toMatchObject({
       slug: "acme",
       memberCount: 2,
       viewerRole: "owner",
+      memberRole: "owner",
       canDelete: true,
       owner: { firstName: "Olga" },
     });

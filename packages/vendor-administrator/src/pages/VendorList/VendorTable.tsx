@@ -89,7 +89,7 @@ export function VendorTable({ vendors, filters, stale, onSort, onOpen }: Props) 
                     <Text size="sm">{vendor.memberCount}</Text>
                   </Table.Td>
                   <Table.Td>
-                    <RoleBadge role={vendor.viewerRole} />
+                    <RoleBadge role={vendor.memberRole} />
                   </Table.Td>
                   <Table.Td>
                     <Text size="sm">{dateFormat.format(new Date(vendor.createdAt))}</Text>
@@ -110,7 +110,7 @@ export function VendorTable({ vendors, filters, stale, onSort, onOpen }: Props) 
                 <Text size="sm" c="dimmed">
                   {ownerName(vendor)}
                 </Text>
-                <RoleBadge role={vendor.viewerRole} />
+                <RoleBadge role={vendor.memberRole} />
               </Group>
               <Text size="xs" c="dimmed">
                 {t("vendors.col.users")}: {vendor.memberCount} ·{" "}
