@@ -46,12 +46,13 @@ Requirements: Node 24 (`.nvmrc`), the pnpm version from `packageManager`, and Do
 
 ```sh
 cp packages/server/.env.secret.example packages/server/.env.secret
+cp packages/shell/.env.secret.example packages/shell/.env.secret
 # fill in the secrets, they are never committed
 
 pnpm stack:deploy
 ```
 
-The script (`scripts/deploy.sh`) checks Docker and the secrets file, builds the images, starts Postgres, applies the migrations, seeds the administrator, then starts the server, the shell, the remote and nginx, and waits until all of them are healthy. Then open `http://vendorhub.localhost`. `pnpm stack:down` stops everything. It runs as its own compose project (`vendor-hub-stack`), separate from the containers of `pnpm db:up` and `pnpm nginx:up`, so stop `pnpm nginx:up` first (nginx needs port 80). The deploy does not publish Postgres on the host. Uploaded product images live in the `product-images` volume.
+The script (`scripts/deploy.sh`) checks Docker and both secrets files, builds the images, starts Postgres, applies the migrations, seeds the administrator, then starts the server, the shell, the remote and nginx, and waits until all of them are healthy. Then open `http://vendorhub.localhost`. `pnpm stack:down` stops everything. It runs as its own compose project (`vendor-hub-stack`), separate from the containers of `pnpm db:up` and `pnpm nginx:up`, so stop `pnpm nginx:up` first (nginx needs port 80). The deploy does not publish Postgres on the host. Uploaded product images live in the `product-images` volume.
 
 ### Development
 
@@ -59,6 +60,7 @@ The script (`scripts/deploy.sh`) checks Docker and the secrets file, builds the 
 pnpm install
 
 cp packages/server/.env.secret.example packages/server/.env.secret
+cp packages/shell/.env.secret.example packages/shell/.env.secret
 # fill in the secrets, they are never committed
 
 pnpm db:up
@@ -82,6 +84,7 @@ nginx (`infra/nginx`) sends `vendorhub.localhost` to the shell. `pnpm nginx:down
 | Remote (vendors)    | `http://localhost:4103`                                         |
 | Admin pages         | `http://vendorhub.localhost/admin/users` (administrators only)  |
 | Vendor management   | `http://vendorhub.localhost/manage/vendors` (logged in)         |
+| Cart and orders     | `http://vendorhub.localhost/cart`, `/orders` (orders logged in) |
 | API                 | `http://localhost:4200` (docs `/docs`)                          |
 | Postgres            | `localhost:5433`                                                |
 
@@ -93,6 +96,10 @@ Ports are changed only in the `.env.local` files. The shell needs the API runnin
 | `pnpm test`                          | unit tests                       |
 | `pnpm --filter @mfe/server test:e2e` | API integration tests (Postgres) |
 | `pnpm format`                        | format with oxfmt                |
+
+## Shopping
+
+A visitor fills the cart without an account. At checkout a logged out visitor enters the shipping details and goes on to registration with the form already filled, then comes back to the checkout logged in. The cart becomes one order per vendor and currency. Payment is simulated: card `4242 4242 4242 4242` succeeds, `4000 0000 0000 0002` is declined. The vendor marks paid orders as delivered and decides on returns in `/manage`. Unpaid orders are cancelled after `ORDER_PAYMENT_TTL_MINUTES` and delivered ones close after `ORDER_RETURN_WINDOW_DAYS` (server env).
 
 ## Test users
 
@@ -112,7 +119,7 @@ Ports are changed only in the `.env.local` files. The shell needs the API runnin
 | API server, OpenAPI, users and login   | done                        |
 | Shell login, registration, session     | done                        |
 | Vendors, roles, vendor pages           | in progress (server, shell) |
-| Catalog, cart, orders, payment         | planned                     |
+| Catalog, cart, orders, payment         | done (simulated payment)    |
 | Admin and statistics remotes, reports  | planned                     |
 | Full-stack Docker deploy               | done (`pnpm stack:deploy`)  |
 | Specialist track                       | undecided                   |

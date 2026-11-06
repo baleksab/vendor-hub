@@ -8,7 +8,7 @@ Requirements: Node 24 (see `.nvmrc`) and the pnpm version from `packageManager` 
 
 ```sh
 pnpm install
-pnpm dev      # shell and remotes in parallel
+pnpm dev      # shell and remotes in parallel (the shell needs packages/shell/.env.secret)
 pnpm server:dev  # API server (not started by pnpm dev)
 pnpm db:up    # Postgres in Docker (needs packages/server/.env.secret)
 pnpm check    # lint + typecheck + build
@@ -102,7 +102,7 @@ These come from the repo's architecture and are checked in review.
 - **Versions live in the catalog.** Add or bump dependencies in `pnpm-workspace.yaml` and use `catalog:` in packages (`catalogMode: strict`). The only exception is the React Router packages, pinned in `packages/shell/package.json`, and they must all match each other.
 - **Root has only framework-agnostic devDependencies** (`typescript`, `oxlint`, `oxlint-tsgolint`, `oxfmt`, `husky`). No react, vite, tailwind or router there.
 - **No magic values.** No hosts, ports or URLs in code, configs or scripts. They come from the package's `.env` / `.env.local` through its `env.ts`, which throws on a missing key. No fallbacks.
-- **No secrets in committed env files.** `.env.local` is committed on purpose, so it holds non-secret local values only. Secrets go to the gitignored `.env.secret`; copy `.env.secret.example` to create it.
+- **No secrets in committed env files.** `.env.local` is committed on purpose, so it holds non-secret local values only. Secrets go to the gitignored `.env.secret` (server and shell); copy `.env.secret.example` to create it. Secrets are read at runtime only, so `pnpm check` and CI run without them.
 - **Browser API calls go through the shell proxy.** The token stays in an HttpOnly cookie. A new path for remotes is added to the allowlist in `packages/shell/src/proxy/proxyAllowlist.ts` on purpose.
 - **Only the shell is SSR.** Remotes load client-side after hydration.
 - **Shared singletons.** `react`, `react-dom`, `@mantine/core` and `@mantine/hooks` stay `singleton` in every `shared` config, and the two Mantine packages share one version. `react-router` is a singleton too in every remote that uses it, with the same version as the shell, and so is `@tanstack/react-query`: the shell owns the `QueryClient`, so every remote shares one cache.

@@ -108,3 +108,17 @@ No hosts, ports or URLs in code. Each package has `.env` (keys with empty values
 ## Product images
 
 Vendor members upload product images from the `vendor-administrator` remote as multipart requests through the shell proxy to the server, which checks the type by the file's first bytes and stores the file through its `ImageStorage` (a directory, `PRODUCT_IMAGE_DIR`). Browsers load images from the public `GET /api/v1/product-images/:id`, also through the proxy, with immutable caching. In the Docker deploy the directory is the `product-images` volume.
+
+## Cart, checkout and orders
+
+```
+browser --> shell /cart, /checkout   (signed cart cookie: product ids and quantities)
+              |  loaders and actions --> POST /api/v1/cart/quote, POST /api/v1/orders, /orders/:id/...
+browser --> shell /manage/vendors/:id/orders --> vendor-administrator remote --> /api/v1/* proxy
+```
+
+- **Cart.** The shell keeps the cart in its own HttpOnly cookie, signed with `SHELL_SESSION_SECRET` and separate from the login cookie, so it works for anonymous visitors and survives login and registration. It holds only ids and quantities. Every cart view asks the public `POST /cart/quote` for live prices, stock and a status per line (`ok`, `quantityReduced`, `outOfStock`, `unavailable`). Cart mutations are shell route actions (no proxy). Logout clears the cart.
+- **Checkout.** Only a logged in user can buy. A logged out visitor fills the shipping form, the shell stores it in the cart cookie and redirects to `/register?redirectTo=/checkout`, which is prefilled from it. After registering (or logging in) the visitor is back on the checkout. An idempotency key kept in the cookie protects against double submits.
+- **Orders.** `POST /orders` quotes again, decrements stock with a conditional update and creates one order per vendor and currency in one transaction (`409` with a fresh quote when something changed). The status machine lives in one module on the server: created, paid, delivered, closed, cancelled, return requested, return approved or rejected. Payment is simulated behind a `PaymentGateway` interface. Every change writes an `order_events` row that drives the timeline.
+- **Scheduler.** An in-process interval job in the server cancels unpaid orders after the payment TTL (stock restored) and closes delivered orders after the return window. It picks rows with `FOR UPDATE SKIP LOCKED`, so several server instances never process the same order twice. Pay and return requests check the deadlines themselves, so a late job never lets a stale order through.
+- **Fulfilment.** Vendor members see the orders of their vendor in the `vendor-administrator` remote, mark them delivered and approve (refund, stock restored) or reject returns.
