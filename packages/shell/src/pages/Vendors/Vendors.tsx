@@ -1,4 +1,5 @@
 import { Button, Group, Stack, Title } from "@mantine/core";
+import type { ManageVendorsNavigationState } from "@vendor-hub/types";
 import { Link, redirect } from "react-router";
 
 import { useSession } from "../../hooks/useSession/useSession";
@@ -52,7 +53,12 @@ export default function Vendors({ loaderData }: Route.ComponentProps) {
       <Group justify="space-between" align="center" wrap="wrap">
         <Title order={1}>{t("vendors.title")}</Title>
         {manageLabelKey === null ? null : (
-          <Button component={Link} to={MANAGE_VENDORS_PATH} mih={44}>
+          <Button
+            component={Link}
+            to={MANAGE_VENDORS_PATH}
+            state={{ from: "vendors" } satisfies ManageVendorsNavigationState}
+            mih={44}
+          >
             {t(manageLabelKey)}
           </Button>
         )}

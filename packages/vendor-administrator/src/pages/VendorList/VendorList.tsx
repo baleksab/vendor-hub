@@ -11,9 +11,10 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
+import type { ManageVendorsNavigationState } from "@vendor-hub/types";
 import { BackLink, EmptyState, ErrorAlert, PageHeader } from "@vendor-hub/ui";
 import { useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import { Link, useLocation, useSearchParams } from "react-router";
 
 import { useT } from "../../context/MessagesContext";
 import { useManagedVendors } from "../../hooks/useManagedVendors";
@@ -38,6 +39,9 @@ const TITLE_SKELETON_HEIGHT = 36;
 export default function VendorList() {
   const t = useT();
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const cameFromVendors =
+    (location.state as Partial<ManageVendorsNavigationState> | null)?.from === "vendors";
   const filters = readFilters(searchParams);
   const [searchInput, setSearchInput] = useState(filters.search);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -51,7 +55,10 @@ export default function VendorList() {
   });
 
   const applyFilters = (patch: Partial<Filters>) => {
-    setSearchParams(writeFilters({ ...filters, page: 1, ...patch }), { replace: true });
+    setSearchParams(writeFilters({ ...filters, page: 1, ...patch }), {
+      replace: true,
+      state: location.state,
+    });
   };
 
   const commitSearch = useDebouncedCallback((value: string) => {
@@ -84,9 +91,11 @@ export default function VendorList() {
 
   const header = (
     <>
-      <BackLink to={PUBLIC_VENDORS_PATH} linkComponent={Link}>
-        {t("vendors.back")}
-      </BackLink>
+      {cameFromVendors ? (
+        <BackLink to={PUBLIC_VENDORS_PATH} linkComponent={Link}>
+          {t("vendors.back")}
+        </BackLink>
+      ) : null}
       {title}
     </>
   );
