@@ -9,6 +9,8 @@ export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-vendor-hub-stack}"
 
 secret_file="packages/server/.env.secret"
 secret_example="packages/server/.env.secret.example"
+shell_secret_file="packages/shell/.env.secret"
+shell_secret_example="packages/shell/.env.secret.example"
 
 env_files=(
   infra/nginx/.env.local
@@ -42,12 +44,19 @@ require_docker() {
   docker info >/dev/null 2>&1 || fail "docker daemon is not running"
 }
 
-require_secrets() {
-  [[ -f "$secret_file" ]] || fail "$secret_file is missing, copy $secret_example and fill in the values"
+require_secret() {
+  local file="$1" example="$2"
 
-  if grep -q "change-me" "$secret_file"; then
-    echo "warning: $secret_file still has change-me placeholders, do not use this deployment outside your machine" >&2
+  [[ -f "$file" ]] || fail "$file is missing, copy $example and fill in the values"
+
+  if grep -q "change-me" "$file"; then
+    echo "warning: $file still has change-me placeholders, do not use this deployment outside your machine" >&2
   fi
+}
+
+require_secrets() {
+  require_secret "$secret_file" "$secret_example"
+  require_secret "$shell_secret_file" "$shell_secret_example"
 }
 
 deploy() {

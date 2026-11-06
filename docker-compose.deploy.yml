@@ -54,6 +54,7 @@ services:
     env_file:
       - packages/shell/.env
       - packages/shell/.env.local
+      - packages/shell/.env.secret
     environment:
       SHELL_HOST: 0.0.0.0
       API_URL: http://server:${SERVER_PORT:?}
