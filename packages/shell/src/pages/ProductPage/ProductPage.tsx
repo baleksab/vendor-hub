@@ -7,6 +7,7 @@ import { ApiError } from "@vendor-hub/api-client";
 import { getProduct } from "../../api/endpoints/products.server";
 import { listProductReviews } from "../../api/endpoints/reviews.server";
 import { loginPath } from "../../auth/safeRedirect";
+import { AddToCartForm } from "../../components/AddToCartForm/AddToCartForm";
 import { ReviewSection } from "../../components/ReviewSection/ReviewSection";
 import { manageProductPath } from "../../vendor/manageVendorsLink";
 import { useSession } from "../../hooks/useSession/useSession";
@@ -149,6 +150,12 @@ export default function ProductPage({ loaderData, params }: Route.ComponentProps
               lowStockLabel={(count) => t("stock.low", { count })}
             />
           </Group>
+          <AddToCartForm
+            productId={product.id}
+            name={product.name}
+            stock={product.stock}
+            withQuantity
+          />
           <Text size="sm" c="dimmed">
             {t("product.vendor", { vendor: product.vendorName })}
           </Text>

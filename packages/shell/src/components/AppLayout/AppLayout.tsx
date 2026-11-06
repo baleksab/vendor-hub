@@ -3,8 +3,10 @@ import { useDisclosure } from "@mantine/hooks";
 import { useEffect, type ReactNode } from "react";
 import { Link, useLocation } from "react-router";
 
+import { ORDERS_PATH } from "../../cart/cartPaths";
 import { useSession } from "../../hooks/useSession/useSession";
 import { useT } from "../../i18n/LocaleProvider";
+import { CartLink } from "../CartLink/CartLink";
 import { LanguageSwitcher } from "../LanguageSwitcher/LanguageSwitcher";
 import type { NavIconName } from "../NavIcon/NavIcon";
 import { NavLink } from "../NavLink/NavLink";
@@ -31,6 +33,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
     { to: "/", label: t("nav.home"), icon: "home" },
     { to: "/vendors", label: t("nav.vendors"), icon: "vendors" },
   ];
+
+  if (user !== null) {
+    links.push({ to: ORDERS_PATH, label: t("nav.orders"), icon: "orders" });
+  }
 
   if (vendors === null || vendors.owned === null) {
     links.push({ to: "/become-vendor", label: t("nav.becomeVendor"), icon: "becomeVendor" });
@@ -71,6 +77,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
         </Stack>
 
         <Stack gap="xs" p="md">
+          <Group visibleFrom="sm">
+            <CartLink />
+          </Group>
           <LanguageSwitcher />
           <UserMenu />
         </Stack>
@@ -97,6 +106,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <Anchor component={Link} to="/" fw={600} fz="lg" c="inherit" underline="never" px="xs">
             {t("app.title")}
           </Anchor>
+          <Group ml="auto">
+            <CartLink />
+          </Group>
         </Group>
 
         <Container

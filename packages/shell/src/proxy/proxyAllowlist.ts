@@ -23,6 +23,10 @@ const AUTHENTICATED_ROUTES: readonly Omit<AllowedRoute, "access">[] = [
   { method: "PUT", pattern: new RegExp(`^/api/v1/products/${UUID}/images/order$`) },
   { method: "DELETE", pattern: new RegExp(`^/api/v1/products/${UUID}/images/${UUID}$`) },
   { method: "DELETE", pattern: new RegExp(`^/api/v1/products/${UUID}/reviews/${UUID}$`) },
+  { method: "GET", pattern: new RegExp(`^/api/v1/vendors/${UUID}/orders$`) },
+  { method: "GET", pattern: new RegExp(`^/api/v1/orders/${UUID}$`) },
+  { method: "POST", pattern: new RegExp(`^/api/v1/orders/${UUID}/deliver$`) },
+  { method: "POST", pattern: new RegExp(`^/api/v1/orders/${UUID}/returns/(approve|reject)$`) },
 ];
 
 const PUBLIC_ROUTES: readonly Omit<AllowedRoute, "access">[] = [

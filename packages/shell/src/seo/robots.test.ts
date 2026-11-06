@@ -14,4 +14,8 @@ describe("buildRobots", () => {
   it("blocks the locale endpoint", () => {
     expect(buildRobots("https://example.com")).toContain("Disallow: /locale");
   });
+
+  it.each(["/cart", "/checkout", "/orders"])("blocks %s", (path) => {
+    expect(buildRobots("https://example.com")).toContain(`Disallow: ${path}`);
+  });
 });

@@ -12,7 +12,10 @@ describe("logoutAction", () => {
 
     expect(response.status).toBe(302);
     expect(response.headers.get("Location")).toBe("/");
-    expect(response.headers.get("Set-Cookie")).toMatch(/^session=;.*Max-Age=0/);
+    const cookies = response.headers.getSetCookie();
+
+    expect(cookies[0]).toMatch(/^session=;.*Max-Age=0/);
+    expect(cookies[1]).toMatch(/^cart=;.*Expires=Thu, 01 Jan 1970/);
   });
 
   it("rejects a foreign origin", async () => {

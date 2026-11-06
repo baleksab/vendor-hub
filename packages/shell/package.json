@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "react-router dev",
     "build": "react-router build",
-    "start": "node --env-file=.env --env-file=.env.local scripts/start.mjs",
+    "start": "node --env-file=.env --env-file=.env.local --env-file=.env.secret scripts/start.mjs",
     "typecheck": "react-router typegen && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest"

@@ -19,6 +19,7 @@ import type {
 } from "@vendor-hub/types";
 import { Form, Link, useNavigate } from "react-router";
 
+import { AddToCartForm } from "../../../components/AddToCartForm/AddToCartForm";
 import { useLocale, useT } from "../../../i18n/LocaleProvider";
 import {
   PRODUCT_PAGE_SIZE,
@@ -237,6 +238,9 @@ export function ProductsTab({ slug, filters, categories, counts, products }: Pro
                 ratingCount={product.ratingCount}
                 ratingLabel={t("review.aria", { rating: product.ratingAvg.toFixed(1) })}
                 noImageLabel={t("products.noImage")}
+                action={
+                  <AddToCartForm productId={product.id} name={product.name} stock={product.stock} />
+                }
                 outOfStockLabel={t("stock.out")}
                 inStockLabel={t("stock.in")}
                 lowStockLabel={(count) => t("stock.low", { count })}
