@@ -1,7 +1,7 @@
 import { and, desc, count, eq, sql } from "drizzle-orm";
 
 import { notDeleted } from "../db/base-entity.ts";
-import type { Database } from "../db/client.ts";
+import type { Database, Transaction } from "../db/client.ts";
 import { productReviews, products, users, vendorReviews, vendors } from "../db/schema.ts";
 import type { NewReview, Review, ReviewSummary, ReviewTarget } from "./review.ts";
 import type { Page } from "../shared/pagination.ts";
@@ -17,8 +17,6 @@ export type ReviewsRepository = {
   findById(target: ReviewTarget, targetId: string, reviewId: string): Promise<Review | undefined>;
   delete(target: ReviewTarget, targetId: string, reviewId: string): Promise<boolean>;
 };
-
-type Transaction = Parameters<Parameters<Database["transaction"]>[0]>[0];
 
 export class DrizzleReviewsRepository implements ReviewsRepository {
   private readonly db: Database;

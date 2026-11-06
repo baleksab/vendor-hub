@@ -14,7 +14,7 @@ export const PRODUCT_SORTS = [
 ] as const;
 
 const MAX_PRICE_MINOR = 2_000_000_000;
-const MAX_STOCK = 1_000_000;
+export const MAX_STOCK = 1_000_000;
 const SEARCH_MAX_LENGTH = 100;
 
 const name = z.string().trim().min(2).max(120);

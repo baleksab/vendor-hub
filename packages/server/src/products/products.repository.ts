@@ -13,11 +13,13 @@ import type {
   ProductListItem,
   ProductPatch,
   ProductSearch,
+  ProductSnapshot,
 } from "./product.ts";
 
 export type ProductsRepository = {
   create(input: NewProduct): Promise<Product>;
   findById(id: string): Promise<Product | undefined>;
+  findManyByIds(ids: string[]): Promise<ProductSnapshot[]>;
   update(id: string, patch: ProductPatch): Promise<Product | undefined>;
   softDelete(id: string): Promise<boolean>;
   search(
@@ -164,6 +166,35 @@ export class DrizzleProductsRepository implements ProductsRepository {
     };
   }
 
+  async findManyByIds(ids: string[]): Promise<ProductSnapshot[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+
+    const rows = await this.db
+      .select({
+        id: products.id,
+        vendorId: products.vendorId,
+        vendorSlug: vendors.slug,
+        vendorName: vendors.name,
+        name: products.name,
+        priceMinor: products.priceMinor,
+        currency: products.currency,
+        stock: products.stock,
+      })
+      .from(products)
+      .innerJoin(vendors, and(eq(vendors.id, products.vendorId), notDeleted(vendors)))
+      .where(and(inArray(products.id, ids), notDeleted(products)));
+
+    const covers = await this.coverImages(rows.map((row) => row.id));
+
+    return rows.map((row) => ({
+      ...row,
+      currency: row.currency as ProductSnapshot["currency"],
+      coverImageId: covers.get(row.id) ?? null,
+    }));
+  }
+
   async update(id: string, patch: ProductPatch): Promise<Product | undefined> {
     const rows = await this.db
       .update(products)
@@ -210,27 +241,7 @@ export class DrizzleProductsRepository implements ProductsRepository {
 
     const [totalRow] = await this.db.select({ total: count() }).from(products).where(where);
 
-    const covers = new Map<string, string>();
-
-    if (rows.length > 0) {
-      const images = await this.db
-        .select({ id: productImages.id, productId: productImages.productId })
-        .from(productImages)
-        .where(
-          and(
-            inArray(
-              productImages.productId,
-              rows.map((row) => row.id),
-            ),
-            notDeleted(productImages),
-          ),
-        )
-        .orderBy(desc(productImages.position));
-
-      for (const image of images) {
-        covers.set(image.productId, image.id);
-      }
-    }
+    const covers = await this.coverImages(rows.map((row) => row.id));
 
     return {
       items: rows.map((row) => ({
@@ -240,6 +251,26 @@ export class DrizzleProductsRepository implements ProductsRepository {
       })),
       total: totalRow?.total ?? 0,
     };
+  }
+
+  private async coverImages(productIds: string[]): Promise<Map<string, string>> {
+    const covers = new Map<string, string>();
+
+    if (productIds.length === 0) {
+      return covers;
+    }
+
+    const images = await this.db
+      .select({ id: productImages.id, productId: productImages.productId })
+      .from(productImages)
+      .where(and(inArray(productImages.productId, productIds), notDeleted(productImages)))
+      .orderBy(desc(productImages.position));
+
+    for (const image of images) {
+      covers.set(image.productId, image.id);
+    }
+
+    return covers;
   }
 
   async categoryCounts(vendorId: string, search: ProductSearch): Promise<CategoryCount[]> {

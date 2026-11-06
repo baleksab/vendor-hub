@@ -40,4 +40,8 @@ Run with `pnpm --filter @mfe/server <script>`.
 
 Values come from `.env`, `.env.local` and the gitignored `.env.secret` through `env.ts`, which throws on a missing key. Secrets never go into committed files.
 
+Cart and orders: `CART_MAX_LINES` (products per cart), `ORDER_PAYMENT_TTL_MINUTES` (time to pay before an order is cancelled), `ORDER_PAYMENT_MAX_ATTEMPTS` (failed payments before it is cancelled), `ORDER_RETURN_WINDOW_DAYS` (days after delivery for a return), `ORDER_SCHEDULER_INTERVAL_SECONDS` and `ORDER_SCHEDULER_BATCH_SIZE` (the timeout job). Set the timeouts small in `.env.local` to watch the job work.
+
+Payments are simulated. Test cards: `4242 4242 4242 4242` succeeds, `4000 0000 0000 0002` is declined, any other number fails as not supported. Card numbers are never stored or logged.
+
 See [`ARCHITECTURE.md`](ARCHITECTURE.md) for modules, auth, the database and testing.

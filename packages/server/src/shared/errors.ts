@@ -1,12 +1,19 @@
 export class AppError extends Error {
   readonly status: number;
   readonly title: string;
+  readonly extensions: Record<string, unknown>;
 
-  constructor(status: number, title: string, detail: string) {
+  constructor(
+    status: number,
+    title: string,
+    detail: string,
+    extensions: Record<string, unknown> = {},
+  ) {
     super(detail);
     this.name = new.target.name;
     this.status = status;
     this.title = title;
+    this.extensions = extensions;
   }
 }
 
@@ -23,8 +30,8 @@ export class ForbiddenError extends AppError {
 }
 
 export class ConflictError extends AppError {
-  constructor(detail: string) {
-    super(409, "Conflict", detail);
+  constructor(detail: string, extensions: Record<string, unknown> = {}) {
+    super(409, "Conflict", detail, extensions);
   }
 }
 

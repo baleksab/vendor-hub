@@ -17,12 +17,26 @@ export type ImageEnv = {
   maxPerProduct: number;
 };
 
+export type CartEnv = {
+  maxLines: number;
+};
+
+export type OrdersEnv = {
+  paymentTtlMinutes: number;
+  paymentMaxAttempts: number;
+  returnWindowDays: number;
+  schedulerIntervalSeconds: number;
+  schedulerBatchSize: number;
+};
+
 export type ServerEnv = {
   host: string;
   port: number;
   db: DbEnv;
   jwt: JwtEnv;
   images: ImageEnv;
+  cart: CartEnv;
+  orders: OrdersEnv;
 };
 
 export type SeedEnv = {
@@ -114,6 +128,14 @@ export function loadServerEnv(source: Source = process.env): ServerEnv {
       expiresInSeconds: parsePositiveInteger(source, "JWT_EXPIRES_IN_SECONDS"),
     },
     images: loadImageEnv(source),
+    cart: { maxLines: parsePositiveInteger(source, "CART_MAX_LINES") },
+    orders: {
+      paymentTtlMinutes: parsePositiveInteger(source, "ORDER_PAYMENT_TTL_MINUTES"),
+      paymentMaxAttempts: parsePositiveInteger(source, "ORDER_PAYMENT_MAX_ATTEMPTS"),
+      returnWindowDays: parsePositiveInteger(source, "ORDER_RETURN_WINDOW_DAYS"),
+      schedulerIntervalSeconds: parsePositiveInteger(source, "ORDER_SCHEDULER_INTERVAL_SECONDS"),
+      schedulerBatchSize: parsePositiveInteger(source, "ORDER_SCHEDULER_BATCH_SIZE"),
+    },
   };
 }
 

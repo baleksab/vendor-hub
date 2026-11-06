@@ -8,11 +8,16 @@ import {
   validatorCompiler,
 } from "fastify-type-provider-zod";
 
-import type { ImageEnv, JwtEnv } from "../env.ts";
+import type { CartEnv, ImageEnv, JwtEnv, OrdersEnv } from "../env.ts";
 import { AuthService } from "./auth/auth.service.ts";
 import { Argon2PasswordService } from "./auth/password.service.ts";
+import { CartService } from "./cart/cart.service.ts";
 import { TokenService } from "./auth/token.service.ts";
 import { healthController, type DatabaseCheck } from "./health/health.controller.ts";
+import { registerOrderScheduler } from "./orders/order-scheduler.ts";
+import type { OrdersRepository } from "./orders/orders.repository.ts";
+import { OrdersService, type Clock } from "./orders/orders.service.ts";
+import type { PaymentGateway } from "./payments/payment-gateway.ts";
 import type { ImageStorage } from "./products/image-storage.ts";
 import type { ProductsRepository } from "./products/products.repository.ts";
 import { ProductsService } from "./products/products.service.ts";
@@ -35,6 +40,12 @@ export type AppOptions = {
   reviewsRepository: ReviewsRepository;
   imageStorage: ImageStorage;
   images: Pick<ImageEnv, "maxBytes" | "maxPerProduct">;
+  ordersRepository: OrdersRepository;
+  paymentGateway: PaymentGateway;
+  cart: CartEnv;
+  orders: OrdersEnv;
+  clock: Clock;
+  runOrderScheduler: boolean;
   checkDatabase: DatabaseCheck;
 };
 
@@ -43,7 +54,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     logger: options.logger
       ? {
           redact: {
-            paths: ["req.headers.authorization", "req.body.password"],
+            paths: ["req.headers.authorization", "req.body.password", "req.body.cardNumber"],
             censor: "[redacted]",
           },
         }
@@ -86,14 +97,34 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     options.vendorsRepository,
   );
   const authService = new AuthService(options.usersRepository, passwords, tokens);
+  const cartService = new CartService(options.productsRepository, options.cart);
+  const ordersService = new OrdersService(
+    options.ordersRepository,
+    options.vendorsRepository,
+    cartService,
+    options.paymentGateway,
+    options.orders,
+    options.clock,
+  );
+
+  if (options.runOrderScheduler) {
+    registerOrderScheduler(app, ordersService, options.orders.schedulerIntervalSeconds);
+  }
 
   await app.register(swaggerController);
   await app.register(healthController(options.checkDatabase));
   await app.register(
-    v1({ usersService, authService, vendorsService, productsService, reviewsService, tokens }),
-    {
-      prefix: "/api/v1",
-    },
+    v1({
+      usersService,
+      authService,
+      vendorsService,
+      productsService,
+      reviewsService,
+      cartService,
+      ordersService,
+      tokens,
+    }),
+    { prefix: "/api/v1" },
   );
 
   return app;
