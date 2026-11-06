@@ -5,10 +5,9 @@ import type { FastifyInstance } from "fastify";
 import { buildApp } from "../app.ts";
 import type { DatabaseHandle } from "../db/client.ts";
 import { users } from "../db/schema.ts";
-import { TEST_JWT, validUser } from "../testing/build-test-app.ts";
+import { validUser } from "../testing/build-test-app.ts";
+import { drizzleAppOptions } from "../testing/drizzle-app-options.ts";
 import { createTestDatabase, truncateAll } from "../testing/test-database.ts";
-import { DrizzleVendorsRepository } from "../vendors/vendors.repository.ts";
-import { DrizzleUsersRepository } from "./users.repository.ts";
 
 describe("users and auth against Postgres", () => {
   let handle: DatabaseHandle;
@@ -16,15 +15,7 @@ describe("users and auth against Postgres", () => {
 
   beforeAll(async () => {
     handle = await createTestDatabase();
-    app = await buildApp({
-      logger: false,
-      jwt: TEST_JWT,
-      usersRepository: new DrizzleUsersRepository(handle.db),
-      vendorsRepository: new DrizzleVendorsRepository(handle.db),
-      checkDatabase: async () => {
-        await handle.pool.query("select 1");
-      },
-    });
+    app = await buildApp(drizzleAppOptions(handle));
     await app.ready();
   });
 
@@ -204,15 +195,7 @@ describe("users and auth against Postgres", () => {
 
   it("returns 503 on /health when the pool is closed", async () => {
     const closed = await createTestDatabase();
-    const closedApp = await buildApp({
-      logger: false,
-      jwt: TEST_JWT,
-      usersRepository: new DrizzleUsersRepository(closed.db),
-      vendorsRepository: new DrizzleVendorsRepository(closed.db),
-      checkDatabase: async () => {
-        await closed.pool.query("select 1");
-      },
-    });
+    const closedApp = await buildApp(drizzleAppOptions(closed));
 
     expect((await closedApp.inject({ method: "GET", url: "/health" })).statusCode).toBe(200);
     await closed.pool.end();

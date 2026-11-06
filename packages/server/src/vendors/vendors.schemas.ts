@@ -77,6 +77,9 @@ export const PublicVendorMemberResponse = z
 
 export const PublicVendorResponse = z
   .object({
+    id: z.uuid(),
+    ratingAvg: z.number(),
+    ratingCount: z.number().int(),
     slug: z.string(),
     name: z.string(),
     description: z.string(),

@@ -13,6 +13,8 @@ export type Vendor = {
   name: string;
   description: string;
   members: VendorMember[];
+  ratingAvg: number;
+  ratingCount: number;
   createdAt: Date;
 };
 

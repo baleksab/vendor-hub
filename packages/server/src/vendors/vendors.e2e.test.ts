@@ -5,10 +5,10 @@ import type { FastifyInstance } from "fastify";
 import { buildApp } from "../app.ts";
 import type { DatabaseHandle } from "../db/client.ts";
 import { vendorMembers, vendors } from "../db/schema.ts";
-import { TEST_JWT, validUser } from "../testing/build-test-app.ts";
-import { createTestDatabase, truncateAll } from "../testing/test-database.ts";
-import { DrizzleUsersRepository } from "../users/users.repository.ts";
+import { validUser } from "../testing/build-test-app.ts";
 import { DrizzleVendorsRepository } from "./vendors.repository.ts";
+import { drizzleAppOptions } from "../testing/drizzle-app-options.ts";
+import { createTestDatabase, truncateAll } from "../testing/test-database.ts";
 
 const acme = { slug: "acme", name: "Acme Inc", description: "We sell everything you need." };
 const operatorUser = { ...validUser, email: "op@example.com" };
@@ -19,15 +19,7 @@ describe("vendors against Postgres", () => {
 
   beforeAll(async () => {
     handle = await createTestDatabase();
-    app = await buildApp({
-      logger: false,
-      jwt: TEST_JWT,
-      usersRepository: new DrizzleUsersRepository(handle.db),
-      vendorsRepository: new DrizzleVendorsRepository(handle.db),
-      checkDatabase: async () => {
-        await handle.pool.query("select 1");
-      },
-    });
+    app = await buildApp(drizzleAppOptions(handle));
     await app.ready();
   });
 

@@ -1,5 +1,17 @@
 import { sql } from "drizzle-orm";
-import { char, check, pgEnum, pgTable, text, uniqueIndex, uuid } from "drizzle-orm/pg-core";
+import {
+  char,
+  check,
+  index,
+  integer,
+  numeric,
+  pgEnum,
+  pgTable,
+  text,
+  uniqueIndex,
+  uuid,
+  type AnyPgColumn,
+} from "drizzle-orm/pg-core";
 
 import { USER_ROLES } from "../users/user-role.ts";
 import { VENDOR_MEMBER_ROLES } from "../vendors/vendor-member-role.ts";
@@ -38,6 +50,10 @@ export const vendors = pgTable(
     slug: text("slug").notNull(),
     name: text("name").notNull(),
     description: text("description").notNull(),
+    ratingAvg: numeric("rating_avg", { precision: 3, scale: 2, mode: "number" })
+      .notNull()
+      .default(0),
+    ratingCount: integer("rating_count").notNull().default(0),
   },
   (table) => [
     uniqueIndex("vendors_slug_unique")
@@ -72,3 +88,79 @@ export const vendorMembers = pgTable(
     baseEntityChecks("vendor_members", table),
   ],
 );
+
+export const products = pgTable(
+  "products",
+  {
+    ...baseEntity,
+    vendorId: uuid("vendor_id")
+      .notNull()
+      .references(() => vendors.id),
+    category: text("category").notNull(),
+    name: text("name").notNull(),
+    description: text("description").notNull(),
+    priceMinor: integer("price_minor").notNull(),
+    currency: char("currency", { length: 3 }).notNull(),
+    stock: integer("stock").notNull(),
+    ratingAvg: numeric("rating_avg", { precision: 3, scale: 2, mode: "number" })
+      .notNull()
+      .default(0),
+    ratingCount: integer("rating_count").notNull().default(0),
+  },
+  (table) => [
+    index("products_vendor_category_idx").on(table.vendorId, table.category),
+    index("products_vendor_created_idx").on(table.vendorId, sql`${table.createdAt} desc`),
+    index("products_rating_idx").on(table.ratingAvg),
+    index("products_name_trgm_idx").using("gin", sql`lower(${table.name}) gin_trgm_ops`),
+    check("products_price_non_negative", sql`${table.priceMinor} >= 0`),
+    check("products_stock_non_negative", sql`${table.stock} >= 0`),
+    check("products_currency_format", sql`${table.currency} ~ '^[A-Z]{3}$'`),
+    baseEntityChecks("products", table),
+  ],
+);
+
+export const productImages = pgTable(
+  "product_images",
+  {
+    ...baseEntity,
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id),
+    position: integer("position").notNull(),
+    contentType: text("content_type").notNull(),
+    byteSize: integer("byte_size").notNull(),
+  },
+  (table) => [
+    uniqueIndex("product_images_position_unique")
+      .on(table.productId, table.position)
+      .where(sql`${table.isDeleted} = false`),
+    baseEntityChecks("product_images", table),
+  ],
+);
+
+function reviewTable(name: string, targetColumn: string, target: () => AnyPgColumn) {
+  return pgTable(
+    name,
+    {
+      ...baseEntity,
+      targetId: uuid(targetColumn).notNull().references(target),
+      userId: uuid("user_id")
+        .notNull()
+        .references(() => users.id),
+      rating: integer("rating").notNull(),
+      comment: text("comment"),
+    },
+    (table) => [
+      uniqueIndex(`${name}_user_unique`)
+        .on(table.targetId, table.userId)
+        .where(sql`${table.isDeleted} = false`),
+      index(`${name}_target_created_idx`).on(table.targetId, sql`${table.createdAt} desc`),
+      check(`${name}_rating_range`, sql`${table.rating} between 1 and 5`),
+      baseEntityChecks(name, table),
+    ],
+  );
+}
+
+export const productReviews = reviewTable("product_reviews", "product_id", () => products.id);
+
+export const vendorReviews = reviewTable("vendor_reviews", "vendor_id", () => vendors.id);
