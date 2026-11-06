@@ -1,0 +1,41 @@
+import { describe, expect, it } from "vitest";
+
+import { isProxied } from "./proxyAllowlist";
+
+const ID = "0b4fd4a1-8e8f-4f4a-9a52-6f1c4a5d2c11";
+const OTHER_ID = "7c9e6679-7425-40de-944b-e07fc1f90ae7";
+
+describe("isProxied", () => {
+  it.each([
+    ["GET", "/api/v1/countries"],
+    ["GET", "/api/v1/users"],
+    ["GET", "/api/v1/users/abc-123"],
+    ["PATCH", "/api/v1/users/abc-123"],
+    ["GET", "/api/v1/vendors/managed"],
+    ["GET", `/api/v1/vendors/${ID}`],
+    ["PATCH", `/api/v1/vendors/${ID}`],
+    ["DELETE", `/api/v1/vendors/${ID}`],
+    ["POST", `/api/v1/vendors/${ID}/operators`],
+    ["DELETE", `/api/v1/vendors/${ID}/operators/${OTHER_ID}`],
+  ])("allows %s %s", (method, path) => {
+    expect(isProxied(method, path)).toBe(true);
+  });
+
+  it.each([
+    ["GET", "/api/v1/vendors"],
+    ["GET", "/api/v1/vendors/me"],
+    ["POST", "/api/v1/vendors"],
+    ["POST", "/api/v1/vendors/me/operators"],
+    ["DELETE", "/api/v1/vendors/me/operators/" + OTHER_ID],
+    ["DELETE", "/api/v1/vendors/managed"],
+    ["PATCH", "/api/v1/vendors/managed"],
+    ["GET", `/api/v1/vendors/${ID}/operators`],
+    ["PATCH", `/api/v1/vendors/${ID}/operators/${OTHER_ID}`],
+    ["GET", "/api/v1/vendors/not-a-uuid"],
+    ["DELETE", "/api/v1/users/abc-123"],
+    ["POST", "/api/v1/users"],
+    ["PUT", `/api/v1/vendors/${ID}`],
+  ])("rejects %s %s", (method, path) => {
+    expect(isProxied(method, path)).toBe(false);
+  });
+});

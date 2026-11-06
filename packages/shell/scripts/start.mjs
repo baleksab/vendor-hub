@@ -18,6 +18,7 @@ const port = required("SHELL_PORT");
 required("SHELL_ORIGIN");
 required("DEFAULT_LOCALE");
 required("USER_ADMINISTRATOR_MANIFEST_URL");
+required("VENDOR_ADMINISTRATOR_MANIFEST_URL");
 required("API_URL");
 required("SESSION_COOKIE_NAME");
 required("SESSION_COOKIE_SECURE");

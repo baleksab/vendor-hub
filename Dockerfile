@@ -48,3 +48,16 @@ USER node
 WORKDIR /app/packages/user-administrator
 
 CMD ["vite", "preview"]
+
+FROM build AS vendor-administrator
+
+ENV PATH="/app/packages/vendor-administrator/node_modules/.bin:${PATH}"
+
+RUN mkdir -p /app/packages/vendor-administrator/node_modules/.vite-temp \
+    && chown node /app/packages/vendor-administrator/node_modules/.vite-temp
+
+USER node
+
+WORKDIR /app/packages/vendor-administrator
+
+CMD ["vite", "preview"]

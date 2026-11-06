@@ -382,6 +382,9 @@ importers:
       '@react-router/serve':
         specifier: 8.5.1
         version: 8.5.1(react-router@8.5.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(supports-color@10.2.2)(typescript@7.0.2)
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.105.1(@types/react@19.3.0)(react@19.3.1)
       '@vendor-hub/api-client':
         specifier: workspace:*
         version: link:../api-client
@@ -466,6 +469,64 @@ importers:
         version: 19.3.1(react@19.3.1)
 
   packages/user-administrator:
+    dependencies:
+      '@mantine/core':
+        specifier: 'catalog:'
+        version: 9.7.4(@mantine/hooks@9.7.4(react@19.3.1))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@mantine/form':
+        specifier: 'catalog:'
+        version: 9.7.4(react@19.3.1)
+      '@mantine/hooks':
+        specifier: 'catalog:'
+        version: 9.7.4(react@19.3.1)
+      '@tanstack/react-query':
+        specifier: 'catalog:'
+        version: 5.105.1(@types/react@19.3.0)(react@19.3.1)
+      '@vendor-hub/api-client':
+        specifier: workspace:*
+        version: link:../api-client
+      '@vendor-hub/ui':
+        specifier: workspace:*
+        version: link:../ui
+      react:
+        specifier: 'catalog:'
+        version: 19.3.1
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.3.1(react@19.3.1)
+      react-router:
+        specifier: 8.5.1
+        version: 8.5.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+    devDependencies:
+      '@module-federation/vite':
+        specifier: 'catalog:'
+        version: 1.23.7(typescript@7.0.2)(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+      '@tailwindcss/vite':
+        specifier: 'catalog:'
+        version: 4.3.3(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.19.2
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.3.0(@types/react@19.3.0)
+      '@vendor-hub/types':
+        specifier: workspace:*
+        version: link:../types
+      '@vitejs/plugin-react':
+        specifier: 'catalog:'
+        version: 6.1.2(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+      tailwindcss:
+        specifier: 'catalog:'
+        version: 4.3.3
+      vite:
+        specifier: 'catalog:'
+        version: 8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
+
+  packages/vendor-administrator:
     dependencies:
       '@mantine/core':
         specifier: 'catalog:'

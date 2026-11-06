@@ -1,8 +1,10 @@
-import { Stack, Title } from "@mantine/core";
-import { redirect } from "react-router";
+import { Button, Group, Stack, Title } from "@mantine/core";
+import { Link, redirect } from "react-router";
 
+import { useSession } from "../../hooks/useSession/useSession";
 import { useT } from "../../i18n/LocaleProvider";
 import { pageMeta } from "../../seo/pageMeta";
+import { MANAGE_VENDORS_PATH, manageVendorsLabelKey } from "../../vendor/manageVendorsLink";
 import { VENDORS_PATH } from "../../vendor/vendorPaths";
 import { loadVendorPage, readPage } from "../../vendor/vendorList.server";
 import type { Route } from "./+types/Vendors";
@@ -42,10 +44,19 @@ export function meta({ matches }: Route.MetaArgs) {
 
 export default function Vendors({ loaderData }: Route.ComponentProps) {
   const t = useT();
+  const { user, vendors } = useSession();
+  const manageLabelKey = manageVendorsLabelKey(user, vendors);
 
   return (
     <Stack gap="lg">
-      <Title order={1}>{t("vendors.title")}</Title>
+      <Group justify="space-between" align="center" wrap="wrap">
+        <Title order={1}>{t("vendors.title")}</Title>
+        {manageLabelKey === null ? null : (
+          <Button component={Link} to={MANAGE_VENDORS_PATH} mih={44}>
+            {t(manageLabelKey)}
+          </Button>
+        )}
+      </Group>
       <VendorList vendors={loaderData.vendors} />
     </Stack>
   );

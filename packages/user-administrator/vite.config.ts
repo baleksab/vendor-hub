@@ -33,6 +33,7 @@ export default defineConfig(({ mode }) => {
           react: { singleton: true },
           "react-dom": { singleton: true },
           "react-router": { singleton: true },
+          "@tanstack/react-query": { singleton: true },
           "@mantine/core": { singleton: true },
           "@mantine/hooks": { singleton: true },
         },
