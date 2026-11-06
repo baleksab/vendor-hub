@@ -11,11 +11,10 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
-import { EmptyState, ErrorAlert, PageHeader } from "@vendor-hub/ui";
+import { BackLink, EmptyState, ErrorAlert, PageHeader } from "@vendor-hub/ui";
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router";
 
-import { BackLink } from "../../components/BackLink";
 import { useT } from "../../context/MessagesContext";
 import { useManagedVendors } from "../../hooks/useManagedVendors";
 import { BECOME_VENDOR_PATH, PUBLIC_VENDORS_PATH } from "../../paths";
@@ -85,7 +84,9 @@ export default function VendorList() {
 
   const header = (
     <>
-      <BackLink to={PUBLIC_VENDORS_PATH}>{t("vendors.back")}</BackLink>
+      <BackLink to={PUBLIC_VENDORS_PATH} linkComponent={Link}>
+        {t("vendors.back")}
+      </BackLink>
       {title}
     </>
   );

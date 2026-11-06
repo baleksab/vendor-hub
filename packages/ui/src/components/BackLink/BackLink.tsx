@@ -1,14 +1,19 @@
 import { Anchor, Group } from "@mantine/core";
-import type { ReactNode } from "react";
-import { Link } from "react-router";
+import type { ElementType, ReactNode } from "react";
 
 const CHEVRON_SIZE = 16;
 
-type Props = { to: string; children: ReactNode };
+const LinkAnchor: ElementType = Anchor;
 
-export function BackLink({ to, children }: Props) {
+type Props = {
+  to: string;
+  linkComponent: ElementType;
+  children: ReactNode;
+};
+
+export function BackLink({ to, linkComponent, children }: Props) {
   return (
-    <Anchor component={Link} to={to} size="sm" w="fit-content">
+    <LinkAnchor component={linkComponent} to={to} size="sm" w="fit-content">
       <Group gap={4} wrap="nowrap">
         <svg
           width={CHEVRON_SIZE}
@@ -25,6 +30,6 @@ export function BackLink({ to, children }: Props) {
         </svg>
         {children}
       </Group>
-    </Anchor>
+    </LinkAnchor>
   );
 }

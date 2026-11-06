@@ -1,3 +1,4 @@
+export { BackLink } from "./components/BackLink/BackLink";
 export { EmptyState } from "./components/EmptyState/EmptyState";
 export { ErrorAlert } from "./components/ErrorAlert/ErrorAlert";
 export { FormAlert } from "./components/FormAlert/FormAlert";

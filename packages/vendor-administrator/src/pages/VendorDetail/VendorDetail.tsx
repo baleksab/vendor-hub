@@ -1,9 +1,8 @@
 import { Anchor, Group, Skeleton, Stack, Title } from "@mantine/core";
 import { ApiError } from "@vendor-hub/api-client";
-import { EmptyState, ErrorAlert } from "@vendor-hub/ui";
-import { useParams } from "react-router";
+import { BackLink, EmptyState, ErrorAlert } from "@vendor-hub/ui";
+import { Link, useParams } from "react-router";
 
-import { BackLink } from "../../components/BackLink";
 import { RoleBadge } from "../../components/RoleBadge";
 import { useT } from "../../context/MessagesContext";
 import { useVendor } from "../../hooks/useVendor";
@@ -21,7 +20,11 @@ export default function VendorDetail() {
   const { id = "" } = useParams();
   const { data: vendor, error, isPending, refetch } = useVendor(id);
 
-  const back = <BackLink to={VENDORS_PATH}>{t("vendor.back")}</BackLink>;
+  const back = (
+    <BackLink to={VENDORS_PATH} linkComponent={Link}>
+      {t("vendor.back")}
+    </BackLink>
+  );
 
   if (isPending) {
     return <Skeleton height={FORM_SKELETON_HEIGHT} />;
