@@ -15,9 +15,10 @@ import { EmptyState, ErrorAlert, PageHeader } from "@vendor-hub/ui";
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router";
 
+import { BackLink } from "../../components/BackLink";
 import { useT } from "../../context/MessagesContext";
 import { useManagedVendors } from "../../hooks/useManagedVendors";
-import { BECOME_VENDOR_PATH } from "../../paths";
+import { BECOME_VENDOR_PATH, PUBLIC_VENDORS_PATH } from "../../paths";
 import {
   PAGE_SIZES,
   hasActiveFilters,
@@ -72,7 +73,7 @@ export default function VendorList() {
   const filtered = hasActiveFilters(filters);
   const selected = data?.data.find((vendor) => vendor.id === selectedId) ?? null;
 
-  const header =
+  const title =
     data === undefined ? (
       <Skeleton width={TITLE_SKELETON_WIDTH} height={TITLE_SKELETON_HEIGHT} mb="lg" />
     ) : (
@@ -81,6 +82,13 @@ export default function VendorList() {
         description={t("vendors.total", { total: data.meta.total })}
       />
     );
+
+  const header = (
+    <>
+      <BackLink to={PUBLIC_VENDORS_PATH}>{t("vendors.back")}</BackLink>
+      {title}
+    </>
+  );
 
   const filterBar = (
     <Paper withBorder radius="md" p="md">
