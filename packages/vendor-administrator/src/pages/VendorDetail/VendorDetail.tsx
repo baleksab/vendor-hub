@@ -1,4 +1,4 @@
-import { Anchor, Group, Skeleton, Stack, Title } from "@mantine/core";
+import { Anchor, Button, Group, Paper, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { ApiError } from "@vendor-hub/api-client";
 import { EmptyState, ErrorAlert } from "@vendor-hub/ui";
 import { Link, useParams } from "react-router";
@@ -6,7 +6,7 @@ import { Link, useParams } from "react-router";
 import { RoleBadge } from "../../components/RoleBadge";
 import { useT } from "../../context/MessagesContext";
 import { useVendor } from "../../hooks/useVendor";
-import { VENDORS_PATH, vendorSitePath } from "../../paths";
+import { VENDORS_PATH, productsPath, vendorSitePath } from "../../paths";
 import { AddOperatorForm } from "./AddOperatorForm";
 import { DeleteVendor } from "./DeleteVendor";
 import { MembersTable } from "./MembersTable";
@@ -82,6 +82,21 @@ export default function VendorDetail() {
           </Anchor>
         </Group>
       </Stack>
+      <Paper withBorder radius="md" p="lg">
+        <Group justify="space-between" align="center">
+          <div>
+            <Title order={2} size="h4">
+              {t("products.manage")}
+            </Title>
+            <Text size="sm" c="dimmed">
+              {t("products.manageDescription")}
+            </Text>
+          </div>
+          <Button component={Link} to={productsPath(vendor.id)} variant="light" mih={44}>
+            {t("products.manage")}
+          </Button>
+        </Group>
+      </Paper>
       <VendorForm vendor={vendor} />
       <MembersTable vendor={vendor} />
       <AddOperatorForm vendorId={vendor.id} />

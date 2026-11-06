@@ -1,15 +1,15 @@
 import type { MetaDescriptor } from "react-router";
 
 import { createT } from "../i18n";
-import type { MessageKey } from "../i18n";
+import type { PlainMessageKey } from "../i18n";
 import { isLocale } from "../i18n/locales";
 import { createPageMeta } from "./createMeta";
 
 type RootMatch = { id: string; loaderData: unknown } | undefined;
 
 type PageMetaOptions = {
-  titleKey: MessageKey;
-  descriptionKey: MessageKey;
+  titleKey: PlainMessageKey;
+  descriptionKey: PlainMessageKey;
   path: string;
   noindex?: boolean;
 };

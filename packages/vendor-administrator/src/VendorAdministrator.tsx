@@ -13,6 +13,8 @@ import { VENDORS_PATH } from "./paths";
 
 const VendorList = lazy(() => import("./pages/VendorList/VendorList"));
 const VendorDetail = lazy(() => import("./pages/VendorDetail/VendorDetail"));
+const ProductList = lazy(() => import("./pages/ProductList/ProductList"));
+const ProductForm = lazy(() => import("./pages/ProductForm/ProductForm"));
 
 export default function VendorAdministrator({
   locale,
@@ -32,6 +34,9 @@ export default function VendorAdministrator({
             <Routes>
               <Route path="vendors" element={<VendorList />} />
               <Route path="vendors/:id" element={<VendorDetail />} />
+              <Route path="vendors/:id/products" element={<ProductList />} />
+              <Route path="vendors/:id/products/new" element={<ProductForm />} />
+              <Route path="vendors/:id/products/:productId" element={<ProductForm />} />
               <Route path="*" element={<Navigate to={VENDORS_PATH} replace />} />
             </Routes>
           </Suspense>

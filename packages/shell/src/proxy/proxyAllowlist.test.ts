@@ -17,8 +17,29 @@ describe("isProxied", () => {
     ["DELETE", `/api/v1/vendors/${ID}`],
     ["POST", `/api/v1/vendors/${ID}/operators`],
     ["DELETE", `/api/v1/vendors/${ID}/operators/${OTHER_ID}`],
+    ["POST", `/api/v1/vendors/${ID}/products`],
+    ["PATCH", `/api/v1/products/${ID}`],
+    ["DELETE", `/api/v1/products/${ID}`],
+    ["POST", `/api/v1/products/${ID}/images`],
+    ["PUT", `/api/v1/products/${ID}/images/order`],
+    ["DELETE", `/api/v1/products/${ID}/images/${OTHER_ID}`],
+    ["DELETE", `/api/v1/products/${ID}/reviews/${OTHER_ID}`],
+    ["GET", "/api/v1/categories"],
+    ["GET", `/api/v1/products/${ID}`],
+    ["GET", `/api/v1/products/${ID}/reviews`],
+    ["GET", "/api/v1/vendors/by-slug/acme/products"],
+    ["GET", `/api/v1/product-images/${ID}`],
   ])("allows %s %s", (method, path) => {
     expect(isProxied(method, path)).toBe(true);
+  });
+
+  it.each([
+    ["PUT", `/api/v1/products/${ID}/reviews/me`],
+    ["POST", `/api/v1/products/${ID}`],
+    ["GET", "/api/v1/product-images/nope"],
+    ["DELETE", `/api/v1/product-images/${ID}`],
+  ])("rejects %s %s", (method, path) => {
+    expect(isProxied(method, path)).toBe(false);
   });
 
   it.each([

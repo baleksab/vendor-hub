@@ -24,6 +24,7 @@ services:
     environment:
       NGINX_PORT: ${NGINX_PORT:?}
       SITE_DOMAIN: ${SITE_DOMAIN:?}
+      NGINX_MAX_BODY_SIZE: ${NGINX_MAX_BODY_SIZE:?}
       SHELL_UPSTREAM: ${SHELL_UPSTREAM:?}
     ports:
       - "${NGINX_PORT:?}:${NGINX_PORT:?}"

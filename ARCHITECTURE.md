@@ -49,7 +49,7 @@ The `user-administrator` remote is mounted at `admin/*`. It calls the shell's ow
 browser --> nginx (vendorhub.localhost) --> shell SSR (/vendors/:slug) --> GET /api/v1/vendors/by-slug/:slug
 ```
 
-nginx (`infra/nginx/vendorhub.conf.template`, rendered with `envsubst` from `infra/nginx/.env.local`) is the only public entry and proxies everything on one domain to the shell. The shell port is not published in production. Every vendor lives under a path of the same domain (`/vendors/:slug`), so adding a vendor never touches the nginx config. The shell renders the public vendor page, see the shell's `ARCHITECTURE.md`.
+nginx (`infra/nginx/vendorhub.conf.template`, rendered with `envsubst` from `infra/nginx/.env.local`) is the only public entry and proxies everything on one domain to the shell. nginx accepts request bodies up to `NGINX_MAX_BODY_SIZE` (product image uploads), keep it above the server's `PRODUCT_IMAGE_MAX_BYTES`. The shell port is not published in production. Every vendor lives under a path of the same domain (`/vendors/:slug`), so adding a vendor never touches the nginx config. The shell renders the public vendor page, see the shell's `ARCHITECTURE.md`.
 
 ## Boundaries
 
@@ -104,3 +104,7 @@ No hosts, ports or URLs in code. Each package has `.env` (keys with empty values
 | `pnpm typecheck`               | typecheck in every package                |
 | `pnpm check`                   | lint + typecheck + build                  |
 | `pnpm format` / `format:check` | oxfmt                                     |
+
+## Product images
+
+Vendor members upload product images from the `vendor-administrator` remote as multipart requests through the shell proxy to the server, which checks the type by the file's first bytes and stores the file through its `ImageStorage` (a directory, `PRODUCT_IMAGE_DIR`). Browsers load images from the public `GET /api/v1/product-images/:id`, also through the proxy, with immutable caching. In the Docker deploy the directory is the `product-images` volume.

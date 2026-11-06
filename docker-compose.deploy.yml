@@ -11,6 +11,7 @@ x-server-env: &server-env
     SERVER_HOST: 0.0.0.0
     DB_HOST: postgres
     DB_PORT: "5432"
+    PRODUCT_IMAGE_DIR: /var/lib/vendor-hub/product-images
 
 services:
   postgres:
@@ -33,6 +34,8 @@ services:
     restart: unless-stopped
     ports:
       - "${SERVER_PORT:?}:${SERVER_PORT:?}"
+    volumes:
+      - product-images:/var/lib/vendor-hub/product-images
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -130,3 +133,6 @@ services:
         condition: service_healthy
       vendor-administrator:
         condition: service_healthy
+
+volumes:
+  product-images:

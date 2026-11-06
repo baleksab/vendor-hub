@@ -1,6 +1,6 @@
 import { ApiError } from "@vendor-hub/api-client";
 
-export type ErrorContext = "login" | "register" | "vendor" | "generic";
+export type ErrorContext = "login" | "register" | "vendor" | "review" | "generic";
 
 export type ErrorDescription = {
   form: string | null;
@@ -21,6 +21,10 @@ function describeConflict(error: ApiError, context: ErrorContext): ErrorDescript
 export function describeError(error: unknown, context: ErrorContext): ErrorDescription {
   if (!(error instanceof ApiError)) {
     return { form: "auth.error.generic", fields: {} };
+  }
+
+  if (context === "review" && error.status === 403) {
+    return { form: "review.error.ownVendor", fields: {} };
   }
 
   switch (error.kind) {

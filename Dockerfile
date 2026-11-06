@@ -20,6 +20,8 @@ RUN pnpm build
 
 FROM build AS server
 
+RUN mkdir -p /var/lib/vendor-hub/product-images && chown -R node:node /var/lib/vendor-hub
+
 USER node
 
 WORKDIR /app/packages/server
