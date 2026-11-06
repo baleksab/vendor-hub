@@ -110,6 +110,12 @@ export const sr = {
   "admin.error.message": "Nije moguće učitati administraciju.",
   "seo.admin.title": "Administracija",
   "seo.admin.description": "Upravljanje korisnicima platforme Vendor Hub.",
+  "manage.error.title": "Greška",
+  "manage.error.message": "Nije moguće učitati upravljanje prodavcima.",
+  "seo.manageVendors.title": "Upravljanje prodavcima",
+  "seo.manageVendors.description": "Upravljaj svojim prodavcima na Vendor Hub-u.",
+  "vendors.manage.admin": "Upravljaj prodavcima",
+  "vendors.manage.mine": "Upravljaj svojim prodavcima",
   "validation.tooShort": "Vrednost je prekratka.",
   "validation.slug":
     "Koristi 3 do 40 malih slova, cifara ili pojedinačnih crtica, ne na početku ni na kraju.",

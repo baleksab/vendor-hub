@@ -16,6 +16,7 @@ env_files=(
   "$secret_file"
   packages/shell/.env.local
   packages/user-administrator/.env.local
+  packages/vendor-administrator/.env.local
 )
 
 compose=(docker compose -f docker-compose.yml -f docker-compose.deploy.yml)

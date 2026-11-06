@@ -21,6 +21,7 @@ Closes #
 - [ ] `api-client`
 - [ ] `ui`
 - [ ] `user-administrator`
+- [ ] `vendor-administrator`
 - [ ] `infra` (nginx, docker compose)
 - [ ] root / tooling
 

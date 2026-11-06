@@ -33,8 +33,16 @@ export default defineConfig(({ mode }) => {
     define: {
       MANTINE_VERSION: JSON.stringify(installedVersion("@mantine/core")),
       REACT_ROUTER_VERSION: JSON.stringify(installedVersion("react-router")),
+      REACT_QUERY_VERSION: JSON.stringify(installedVersion("@tanstack/react-query")),
     },
-    optimizeDeps: { include: ["@mantine/core", "@mantine/hooks", "@module-federation/runtime"] },
+    optimizeDeps: {
+      include: [
+        "@mantine/core",
+        "@mantine/hooks",
+        "@module-federation/runtime",
+        "@tanstack/react-query",
+      ],
+    },
     plugins: [tailwindcss(), reactRouter()],
     server: {
       host: env.host,

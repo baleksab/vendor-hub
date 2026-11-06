@@ -16,6 +16,7 @@
     "@module-federation/runtime": "catalog:",
     "@react-router/node": "8.5.1",
     "@react-router/serve": "8.5.1",
+    "@tanstack/react-query": "catalog:",
     "@vendor-hub/api-client": "workspace:*",
     "@vendor-hub/ui": "workspace:*",
     "isbot": "5.2.2",
