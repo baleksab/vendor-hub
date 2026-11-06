@@ -35,7 +35,7 @@ The shared modules are the same as in `user-administrator`: `react`, `react-dom`
 - All calls use `createApiClient` and `unwrap` with `apiBaseUrl` as base URL. In the shell that is the shell origin, where the `/api/v1/*` proxy adds the token.
 - `queryKeys.ts` is the only place that builds query keys. Mutations write the vendor response into the detail cache and invalidate the lists. Deleting removes the detail query and invalidates the lists.
 - The list state (`q`, `relation`, `sort`, `order`, `size`, `page`) lives in the URL (`pages/VendorList/filters.ts`), search is debounced, and any filter change goes back to page 1. Filtering, sorting and paging happen on the API (`GET /vendors/managed`). The response `scope` (`all` or `mine`) picks the page title.
-- `viewerRole` and `canDelete` come from the API. The delete section renders only when `canDelete` is true, and the owner row has no remove button.
+- `viewerRole`, `memberRole` and `canDelete` come from the API. The role badge shows `memberRole`, and an administrator who is not a member of the vendor sees a gray "Not affiliated". The delete section renders only when `canDelete` is true, and the owner row has no remove button.
 - The list is a table from the `sm` breakpoint up and a stack of cards below it. A row opens the quick view drawer through a real button in the name cell, and the drawer links to the detail page.
 - Delete asks the user to type the slug before the button enables. `404` on the detail shows the not-found state.
 

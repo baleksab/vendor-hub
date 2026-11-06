@@ -1213,6 +1213,7 @@ export interface components {
             members: components["schemas"]["VendorMemberResponseInput"][];
             /** @enum {string} */
             viewerRole: "administrator" | "owner" | "operator";
+            memberRole: ("owner" | "operator") | null;
             canDelete: boolean;
             /** Format: date-time */
             createdAt: string;
@@ -1266,6 +1267,7 @@ export interface components {
             memberCount: number;
             /** @enum {string} */
             viewerRole: "administrator" | "owner" | "operator";
+            memberRole: ("owner" | "operator") | null;
             canDelete: boolean;
             /** Format: date-time */
             createdAt: string;
@@ -1380,6 +1382,7 @@ export interface components {
             members: components["schemas"]["VendorMemberResponse"][];
             /** @enum {string} */
             viewerRole: "administrator" | "owner" | "operator";
+            memberRole: ("owner" | "operator") | null;
             canDelete: boolean;
             /** Format: date-time */
             createdAt: string;
@@ -1433,6 +1436,7 @@ export interface components {
             memberCount: number;
             /** @enum {string} */
             viewerRole: "administrator" | "owner" | "operator";
+            memberRole: ("owner" | "operator") | null;
             canDelete: boolean;
             /** Format: date-time */
             createdAt: string;

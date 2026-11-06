@@ -9,6 +9,7 @@ const owned = {
   description: "d",
   members: [],
   viewerRole: "owner" as const,
+  memberRole: "owner" as const,
   canDelete: true,
   createdAt: "2026-01-01T00:00:00.000Z",
 };

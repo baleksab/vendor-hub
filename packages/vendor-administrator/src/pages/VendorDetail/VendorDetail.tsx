@@ -80,7 +80,7 @@ export default function VendorDetail() {
             <Anchor href={vendorSitePath(vendor.slug)} size="sm">
               {vendor.slug}
             </Anchor>
-            <RoleBadge role={vendor.viewerRole} />
+            <RoleBadge role={vendor.memberRole} />
           </Group>
         }
       />

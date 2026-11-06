@@ -11,24 +11,29 @@ export type ViewerRole = "administrator" | VendorMemberRole;
 
 export type VendorAccess = {
   viewerRole: ViewerRole;
+  memberRole: VendorMemberRole | null;
   canDelete: boolean;
 };
 
-export const OWNER_ACCESS: VendorAccess = { viewerRole: "owner", canDelete: true };
+export const OWNER_ACCESS: VendorAccess = {
+  viewerRole: "owner",
+  memberRole: "owner",
+  canDelete: true,
+};
 
 export function accessFor(
   actor: Actor,
   memberRole: VendorMemberRole | undefined,
 ): VendorAccess | undefined {
   if (actor.role === "administrator") {
-    return { viewerRole: "administrator", canDelete: true };
+    return { viewerRole: "administrator", memberRole: memberRole ?? null, canDelete: true };
   }
 
   if (memberRole === undefined) {
     return undefined;
   }
 
-  return { viewerRole: memberRole, canDelete: memberRole === "owner" };
+  return { viewerRole: memberRole, memberRole, canDelete: memberRole === "owner" };
 }
 
 export function resolveAccess(

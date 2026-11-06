@@ -41,7 +41,7 @@ export function VendorQuickView({ vendor, onClose }: Props) {
             <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
               {t("quick.role")}
             </Text>
-            <RoleBadge role={vendor.viewerRole} />
+            <RoleBadge role={vendor.memberRole} />
           </div>
           <Button component={Link} to={vendorPath(vendor.id)} size="md">
             {t("quick.manage")}

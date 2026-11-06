@@ -18,6 +18,7 @@ export function toVendorResponse(
     description: vendor.description,
     members: vendor.members.map((member) => ({ ...member })),
     viewerRole: access.viewerRole,
+    memberRole: access.memberRole,
     canDelete: access.canDelete,
     createdAt: vendor.createdAt.toISOString(),
   };
@@ -61,6 +62,7 @@ export function toManagedVendorListResponse(
       owner: item.owner,
       memberCount: item.memberCount,
       viewerRole: item.viewerRole,
+      memberRole: item.memberRole,
       canDelete: item.canDelete,
       createdAt: item.createdAt.toISOString(),
     })),
