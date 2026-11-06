@@ -112,7 +112,7 @@ A new remote means: a new entry in `remotes` and `RemoteName` in `remote.ts`, a 
 
 `Admin` (`/admin/*`) has a loader that calls `requireUser` and throws `403` when the user is not an administrator (`shouldRevalidate` is `false`, so navigating inside the remote does not call the API again). The component renders `user-administrator/UserAdministrator` with `locale`, `apiBaseUrl` (the shell origin) and `onUnauthorized`, which sends the user to `/login?redirectTo=...`. The "Administration" link in the sidebar is shown to administrators only. The authorization itself is enforced by the API.
 
-`ManageVendors` (`/manage/*`) has a loader that only calls `requireUser`, so any logged-in user can open it, and the API decides which vendors they see. It renders `vendor-administrator/VendorAdministrator` with the same props. The `/vendors` page shows a button to `/manage/vendors` ("Manage vendors" for administrators, "Manage your vendors" for owners and operators, nothing for everybody else), decided by `vendor/manageVendorsLink.ts` from the root loader data.
+`ManageVendors` (`/manage/*`) has a loader that only calls `requireUser`, so any logged-in user can open it, and the API decides which vendors they see. It renders `vendor-administrator/VendorAdministrator` with the same props. The sidebar shows a "Vendor Administration" link to `/manage/vendors` under the same condition. The `/vendors` page shows a button to `/manage/vendors` ("Manage vendors" for administrators, "Manage your vendors" for owners and operators, nothing for everybody else), decided by `vendor/manageVendorsLink.ts` from the root loader data.
 
 ## Tests
 

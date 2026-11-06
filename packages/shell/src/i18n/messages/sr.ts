@@ -105,6 +105,7 @@ export const sr = {
   "vendors.pagination": "Stranice prodavaca",
   "nav.becomeVendor": "Postani prodavac",
   "nav.administration": "Administracija korisnika",
+  "nav.vendorAdministration": "Administracija prodavaca",
   "remote.loading": "Modul se učitava...",
   "admin.error.title": "Greška",
   "admin.error.message": "Nije moguće učitati administraciju.",

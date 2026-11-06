@@ -104,6 +104,7 @@ export const en = {
   "vendors.pagination": "Vendor pages",
   "nav.becomeVendor": "Become a vendor",
   "nav.administration": "User Administration",
+  "nav.vendorAdministration": "Vendor Administration",
   "remote.loading": "Module is loading...",
   "admin.error.title": "Error",
   "admin.error.message": "Could not load the administration.",
