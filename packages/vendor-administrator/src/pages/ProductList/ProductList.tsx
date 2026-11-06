@@ -18,7 +18,7 @@ import {
 } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
 import type { ProductListItemResponse } from "@vendor-hub/types";
-import { EmptyState, ErrorAlert, PageHeader, PriceTag, StarRating } from "@vendor-hub/ui";
+import { BackLink, EmptyState, ErrorAlert, PageHeader, PriceTag, StarRating } from "@vendor-hub/ui";
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router";
 
@@ -141,9 +141,7 @@ export default function ProductList() {
 
   return (
     <Stack gap="md">
-      <Anchor component={Link} to={vendorPath(id)} size="sm" w="fit-content">
-        {t("products.back")}
-      </Anchor>
+      <BackLink to={vendorPath(id)} label={t("products.back")} linkComponent={Link} />
 
       <PageHeader
         title={t("products.title")}

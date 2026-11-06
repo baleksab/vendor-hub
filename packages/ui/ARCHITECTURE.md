@@ -9,7 +9,7 @@ packages/ui/
 ├── src/
 │   ├── theme.ts        Mantine theme (Primer-like) and cssVariablesResolver
 │   ├── tokens.css      Tailwind `@theme` tokens (fonts)
-│   ├── components/     PageHeader, PageSpinner, EmptyState, ErrorAlert, FormField, FormAlert (text props such as `errorText`, `messageText`), and the catalogue set: StarRating, StarRatingInput, ReviewSummary, ReviewList, PriceTag, StockBadge, ProductCard (link component as a prop), ImageGallery
+│   ├── components/     PageHeader, PageSpinner, EmptyState, ErrorAlert, FormField, FormAlert (text props such as `errorText`, `messageText`), and BackLink (chevron link back, link component as a prop), and the catalogue set: StarRating, StarRatingInput, ReviewSummary, ReviewList, PriceTag, StockBadge, ProductCard (link component as a prop), ImageGallery
 │   └── index.ts
 └── tsconfig.json, .oxlintrc.json
 ```
