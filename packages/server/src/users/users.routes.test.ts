@@ -161,6 +161,26 @@ describe("users and auth routes", () => {
     expect(byCountry.json().meta.total).toBe(0);
   });
 
+  it("sorts the list by name in both directions and rejects an unknown field", async () => {
+    const headers = await adminBearer();
+
+    await register({ ...validUser, email: "zed@example.com", firstName: "Zed", lastName: "Zulu" });
+    await register({ ...validUser, email: "abe@example.com", firstName: "Abe", lastName: "Alpha" });
+
+    const names = async (query: string) =>
+      (await app.inject({ method: "GET", url: `/api/v1/users?${query}`, headers }))
+        .json()
+        .data.map((user: { lastName: string }) => user.lastName);
+
+    expect((await names("sort=name&order=asc"))[0]).toBe("Alpha");
+    expect((await names("sort=name&order=desc"))[0]).toBe("Zulu");
+    expect((await names("sort=name"))[0]).toBe("Alpha");
+
+    const invalid = await app.inject({ method: "GET", url: "/api/v1/users?sort=email", headers });
+
+    expect(invalid.statusCode).toBe(400);
+  });
+
   it("patches one field and leaves the others unchanged", async () => {
     const headers = await adminBearer();
     const target = (await register({ ...validUser, email: "other@example.com" })).json();
