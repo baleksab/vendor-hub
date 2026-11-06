@@ -9,7 +9,7 @@ packages/ui/
 ├── src/
 │   ├── theme.ts        Mantine theme (Primer-like) and cssVariablesResolver
 │   ├── tokens.css      Tailwind `@theme` tokens (fonts)
-│   ├── components/     PageHeader, PageSpinner, EmptyState, ErrorAlert, FormField, FormAlert (text props such as `errorText`, `messageText`), and BackLink (chevron link back, link component as a prop), and the catalogue set: StarRating, StarRatingInput, ReviewSummary, ReviewList, PriceTag, StockBadge, ProductCard (link component as a prop), ImageGallery
+│   ├── components/     PageHeader, PageSpinner, EmptyState, ErrorAlert, FormField, FormAlert (text props such as `errorText`, `messageText`), and BackLink (chevron link back, link component as a prop), and the catalogue set: StarRating, StarRatingInput, ReviewSummary, ReviewList, PriceTag, StockBadge, ProductCard (link component and an optional `action` slot below the link, e.g. an add to cart form), ImageGallery, and the cart and order set: QuantityStepper (a real named number input with 44px − and + buttons, so a plain form still submits it), AddToCartButton (disabled when stock is 0, same rule as StockBadge), CartLine (quantity and remove controls as slots), CartSummary (totals per currency), OrderStatusBadge and `orderNumber`, OrderItemsTable (table from `sm`, a list below), OrderTimeline and `orderEventKind`, ShippingDetails, PaymentAttemptList
 │   └── index.ts
 └── tsconfig.json, .oxlintrc.json
 ```

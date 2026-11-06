@@ -1,4 +1,4 @@
-import { AspectRatio, Card, Group, Image, Stack, Text } from "@mantine/core";
+import { AspectRatio, Box, Card, Group, Image, Stack, Text } from "@mantine/core";
 import type { ComponentType, CSSProperties, ReactNode } from "react";
 
 import { PriceTag } from "../PriceTag/PriceTag";
@@ -23,14 +23,15 @@ type Props = {
   outOfStockLabel: string;
   inStockLabel: string;
   lowStockLabel: (stock: number) => string;
+  action?: ReactNode;
 };
 
 export function ProductCard(props: Props) {
   const Link = props.linkComponent;
 
   return (
-    <Link to={props.href} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
-      <Card withBorder padding="sm" radius="md" h="100%">
+    <Card withBorder padding="sm" radius="md" h="100%">
+      <Link to={props.href} style={{ textDecoration: "none", color: "inherit", display: "block" }}>
         <Card.Section>
           <AspectRatio ratio={4 / 3}>
             {props.imageUrl === null ? (
@@ -68,7 +69,13 @@ export function ProductCard(props: Props) {
             />
           </Group>
         </Stack>
-      </Card>
-    </Link>
+      </Link>
+
+      {props.action === undefined ? null : (
+        <Box mt="auto" pt="sm">
+          {props.action}
+        </Box>
+      )}
+    </Card>
   );
 }
