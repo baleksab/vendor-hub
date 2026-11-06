@@ -6,32 +6,41 @@ import { useT } from "../../i18n/LocaleProvider";
 import { pageMeta } from "../../seo/pageMeta";
 import { MANAGE_VENDORS_PATH, manageVendorsLabelKey } from "../../vendor/manageVendorsLink";
 import { VENDORS_PATH } from "../../vendor/vendorPaths";
-import { loadVendorPage, readPage } from "../../vendor/vendorList.server";
+import { listCategories } from "../../api/endpoints/products.server";
+import { categorySlugs } from "../../vendor/products/categoryNames";
+import { parseVendorFilters, toVendorSearchParams } from "../../vendor/vendorFilters";
+import { loadVendorPage } from "../../vendor/vendorList.server";
 import type { Route } from "./+types/Vendors";
+import { VendorFilterBar } from "./components/VendorFilterBar";
 import { VendorList } from "./components/VendorList";
 
-async function loadVendors(page: number) {
+export async function loader({ request }: Route.LoaderArgs) {
   try {
-    const vendors = await loadVendorPage(page);
+    const { data: categories } = await listCategories();
+    const filters = parseVendorFilters(
+      new URL(request.url).searchParams,
+      categorySlugs(categories),
+    );
+    const vendors = await loadVendorPage(filters);
 
-    if (page > vendors.pageCount) {
-      throw redirect(
-        vendors.pageCount === 1 ? VENDORS_PATH : `${VENDORS_PATH}?page=${vendors.pageCount}`,
-      );
+    if (filters.page > vendors.pageCount) {
+      const last = toVendorSearchParams({ ...filters, page: vendors.pageCount }).toString();
+
+      throw redirect(last === "" ? VENDORS_PATH : `${VENDORS_PATH}?${last}`);
     }
 
-    return vendors;
+    return { vendors, categories, filters };
   } catch (error) {
     if (error instanceof Response) {
       throw error;
     }
 
-    return null;
+    return {
+      vendors: null,
+      categories: [],
+      filters: parseVendorFilters(new URL(request.url).searchParams, new Set<string>()),
+    };
   }
-}
-
-export async function loader({ request }: Route.LoaderArgs) {
-  return { vendors: await loadVendors(readPage(request)) };
 }
 
 export function meta({ matches }: Route.MetaArgs) {
@@ -46,6 +55,8 @@ export default function Vendors({ loaderData }: Route.ComponentProps) {
   const t = useT();
   const { user, vendors } = useSession();
   const manageLabelKey = manageVendorsLabelKey(user, vendors);
+  const { filters } = loaderData;
+  const filtered = filters.q !== null || filters.category !== null || filters.minRating !== null;
 
   return (
     <Stack gap="lg">
@@ -57,7 +68,13 @@ export default function Vendors({ loaderData }: Route.ComponentProps) {
           </Button>
         )}
       </Group>
-      <VendorList vendors={loaderData.vendors} />
+      <VendorFilterBar filters={loaderData.filters} categories={loaderData.categories} />
+      <VendorList
+        vendors={loaderData.vendors}
+        categories={loaderData.categories}
+        filters={loaderData.filters}
+        filtered={filtered}
+      />
     </Stack>
   );
 }

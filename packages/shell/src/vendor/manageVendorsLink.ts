@@ -2,6 +2,11 @@ import type { MyVendorsResponse } from "@vendor-hub/types";
 
 export const MANAGE_VENDORS_PATH = "/manage/vendors";
 
+export const manageVendorPath = (id: string) => `${MANAGE_VENDORS_PATH}/${id}`;
+
+export const manageProductPath = (vendorId: string, productId: string) =>
+  `${manageVendorPath(vendorId)}/products/${productId}`;
+
 type Viewer = { role: string } | null;
 
 export function manageVendorsLabelKey(

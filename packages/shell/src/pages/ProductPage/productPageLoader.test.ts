@@ -24,17 +24,16 @@ function route() {
       {
         "/api/v1/products/{id}": product,
         "/api/v1/products/{id}/reviews": { data: [], meta: {}, summary: {} },
-        "/api/v1/categories": { data: [] },
       }[path],
     ),
   );
 }
 
 describe("ProductPage loader", () => {
-  it("loads the product, its reviews and the categories", async () => {
+  it("loads the product and its reviews", async () => {
     route();
 
-    expect(await run("acme")).toMatchObject({ product, categories: [] });
+    expect(await run("acme")).toMatchObject({ product });
   });
 
   it("answers 404 when the product belongs to another vendor", async () => {
