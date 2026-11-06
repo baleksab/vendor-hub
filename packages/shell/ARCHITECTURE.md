@@ -11,9 +11,9 @@ packages/shell/
 │   ├── routes.ts           route config
 │   ├── pages/              src/pages/{Name}/{Name}.tsx, one folder per page
 │   │   ├── Home/           landing page: components/ (Hero, Features, Steps, Architecture, CallToAction, inline SVG illustration and icons)
-│   │   ├── Vendors/        `/vendors`, the paginated vendor list (components/VendorList)
-│   │   ├── VendorSite/     `/vendors/:slug`, the public vendor page with Products, Reviews and About sections (components/VendorSiteContent, ProductsTab, ProductFilterForm)
-│   │   ├── ProductPage/    `/vendors/:slug/products/:productId`, the product page with gallery, rating and reviews
+│   │   ├── Vendors/        `/vendors`, the vendor list with search, filters and sort (components/VendorFilterBar, VendorList, VendorCard)
+│   │   ├── VendorSite/     `/vendors/:slug`, the public vendor page with a back link and Mantine `Tabs` for the Products, About and Reviews sections (components/VendorSiteContent, ProductsTab, ProductFilterForm)
+│   │   ├── ProductPage/    `/vendors/:slug/products/:productId`, the product page with a back link labelled with the vendor name (history back when the user came from inside the app, else the vendor page; product cards pass the active filters as query params and the link keeps them), a "Manage product" button to `/manage/vendors/:vendorId/products/:productId` for administrators, owners and operators of the vendor, gallery, rating and reviews
 │   │   ├── BecomeVendor/   vendor registration form, becomeVendorAction.server.ts, noindex
 │   │   ├── Login/          login form, loginAction.server.ts, noindex
 │   │   ├── Register/       registration form, registerAction.server.ts, countries from the API, noindex
@@ -27,7 +27,7 @@ packages/shell/
 │   ├── forms/              shared form helpers: readValues, invalid, failed, FormErrors, describeError, common Zod fields
 │   ├── auth/               session cookie, getSession/requireUser, signIn, same-origin check, safeRedirect
 │   ├── testing/            shared helpers for action tests
-│   ├── vendor/             vendorPaths.ts (`/vendors` and `vendorPath(slug)`), myVendors.server.ts (per-request cache), vendorList.server.ts (vendor list page)
+│   ├── vendor/             vendorPaths.ts (`/vendors` and `vendorPath(slug)`), myVendors.server.ts (per-request cache), vendorFilters.ts (`parseVendorFilters` and the vendor list URL and API query), vendorList.server.ts (vendor list page)
 │   ├── env.server.ts       cached env for server-only code
 │   ├── seo/                createPageMeta, pageMeta, buildRobots, buildSitemap, indexablePages
 │   ├── proxy/              forwardApiRequest.server.ts, proxyAllowlist.ts
@@ -93,7 +93,7 @@ Every page exports `meta`. `pageMeta(matches, { titleKey, descriptionKey, path, 
 
 ## Localization
 
-`src/i18n` is a small own layer with no dependency. `messages/en.ts` is the source of truth (`as const`); `sr.ts` uses `satisfies Messages`, so a missing or extra key fails `tsc`, and `t("key", params)` is typed from the English strings. `resolveLocale` picks the locale on the server: `locale` cookie, then `Accept-Language`, then `DEFAULT_LOCALE` from env. The root loader returns it, `Layout` sets `<html lang>` and `LocaleProvider`, so server and client render the same text. `POST /locale` (`routes/locale.ts`) sets the cookie and redirects back, which also works without JS. `createT` does not depend on React, so remotes can reuse it later.
+`src/i18n` is a small own layer with no dependency. `messages/en.ts` is the source of truth (`as const`); `sr.ts` uses `satisfies Messages`, so a missing or extra key fails `tsc`, and `t("key", params)` is typed from the English strings. `resolveLocale` picks the locale on the server: `locale` cookie, then `Accept-Language`, then `DEFAULT_LOCALE` from env. The root loader returns it, `Layout` sets `<html lang>` and `LocaleProvider`, so server and client render the same text. `POST /locale` (`routes/locale.ts`) sets the cookie and redirects back, which also works without JS. A message with a `count` param can have `.one` and `.few` variants (`vendors.count.one`), picked by `Intl.PluralRules` of the locale; both catalogs need the same keys, so English repeats the base text for `.few`. `createT` does not depend on React, so remotes can reuse it later.
 
 New language: add `messages/<code>.ts`, register it in `catalogs` in `i18n/index.ts` and in `LOCALES`.
 
@@ -132,8 +132,8 @@ CI (`.github/workflows/checks.yml`) runs format, lint, typecheck, build and unit
 
 - `BecomeVendor` (`/become-vendor`) needs a logged-in user. An anonymous visitor is sent to `/login?redirectTo=/become-vendor` by `requireUser` and comes back after logging in. A user who already owns a vendor is redirected to its page, a slug conflict lands on the slug field (`describeError` context `vendor`), and after a successful registration the user is redirected to the new vendor page.
 - `AppLayout` always shows "Become a vendor", except to a user who already owns a vendor. The root loader provides the vendors (`GET /vendors/me`), so the first paint is right.
-- **Vendor list:** the `Vendors` loader (`/vendors`) reads `?page=` (page size `VENDORS_PAGE_SIZE`), loads `GET /api/v1/vendors` with `limit` and `offset` and renders the vendors as cards that link to `/vendors/:slug` (`VendorList`), with Mantine `Pagination` built from links, so it works without JavaScript. A page past the end redirects to the last page, and if the list cannot be loaded the rest of the page still renders with an error notice.
-- **Vendor page:** `/vendors/:slug` is an ordinary route in the normal layout. Its loader calls the public `GET /vendors/by-slug/:slug` and answers `404` if the vendor does not exist. The page is public: no login is needed to see it. `meta` uses the vendor name and a cut of the description, with the canonical link on `/vendors/:slug`.
+- **Vendor list:** the `Vendors` loader (`/vendors`) reads `?q=`, `category`, `minRating`, `sort` and `page` through `parseVendorFilters` (invalid values fall back to the default, page size `VENDORS_PAGE_SIZE`) and loads `GET /api/v1/vendors` together with `GET /categories`. `VendorFilterBar` is a plain GET form in a bordered `Paper` with labelled fields (search, category, rating, sort) and Apply and Reset buttons, styled like the filters of the user administration, and `VendorList` renders `VendorCard`s (rating, product count and the categories the vendor sells, named by the active locale) that link to `/vendors/:slug`, with Mantine `Pagination` built from links that keep the filters, so it all works without JavaScript. A page past the end redirects to the last page, and if the list cannot be loaded the rest of the page still renders with an error notice.
+- **Vendor page:** `/vendors/:slug` is an ordinary route in the normal layout. Its loader calls the public `GET /vendors/by-slug/:slug` and answers `404` if the vendor does not exist. The page is public: no login is needed to see it. It starts with a `BackLink` to `/vendors`, the title row has a "Manage vendor" button to `/manage/vendors/:id` for administrators, owners and operators of that vendor, and the sections are Mantine `Tabs` (the active tab comes from `?tab=`, changing it navigates, only the active panel is rendered). `meta` uses the vendor name and a cut of the description, with the canonical link on `/vendors/:slug`.
 - Links to a vendor page are built with `vendorPath(slug)`.
 
 ## Products and reviews

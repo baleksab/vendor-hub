@@ -1,11 +1,11 @@
 import type { UserCredentialsLookup } from "../users/user.ts";
 import { BadRequestError, ConflictError, ForbiddenError, NotFoundError } from "../shared/errors.ts";
-import type { Page } from "../shared/pagination.ts";
 import { accessFor, resolveAccess, type Actor, type VendorAccess } from "./vendor-access.ts";
 import type { ManagedVendorRow, Vendor, VendorListItem, VendorSummary } from "./vendor.ts";
 import type {
   AddOperatorRequest,
   ListManagedVendorsQuery,
+  ListVendorsQuery,
   RegisterVendorRequest,
   UpdateVendorRequest,
 } from "./vendors.schemas.ts";
@@ -32,8 +32,8 @@ export class VendorsService {
     return this.repository.create({ ...request, ownerId });
   }
 
-  async list(page: Page): Promise<{ items: VendorListItem[]; total: number }> {
-    return this.repository.list(page);
+  async list(query: ListVendorsQuery): Promise<{ items: VendorListItem[]; total: number }> {
+    return this.repository.list(query);
   }
 
   async getMine(

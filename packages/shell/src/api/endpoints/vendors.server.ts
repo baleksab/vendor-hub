@@ -1,6 +1,7 @@
 import type {
   VendorListResponse,
   MyVendorsResponse,
+  paths,
   PublicVendorResponse,
   RegisterVendorRequest,
   VendorResponse,
@@ -19,7 +20,14 @@ export function getMyVendors(token: string): Promise<MyVendorsResponse> {
   return unwrap(createServerApi(token).GET("/api/v1/vendors/me"));
 }
 
-export function listVendors(query: { limit: number; offset: number }): Promise<VendorListResponse> {
+type ListQuery = NonNullable<paths["/api/v1/vendors"]["get"]["parameters"]["query"]>;
+
+export type VendorListQuery = Omit<ListQuery, "limit" | "offset"> & {
+  limit: number;
+  offset: number;
+};
+
+export function listVendors(query: VendorListQuery): Promise<VendorListResponse> {
   return unwrap(createServerApi().GET("/api/v1/vendors", { params: { query } }));
 }
 

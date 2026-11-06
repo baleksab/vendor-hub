@@ -1,35 +1,22 @@
+import type { VendorListItemResponse } from "@vendor-hub/types";
+
 import { listVendors } from "../api/endpoints/vendors.server";
-
-export const VENDORS_PAGE_SIZE = 12;
-
-export type VendorCard = {
-  slug: string;
-  name: string;
-  description: string;
-};
+import { toVendorApiQuery, VENDORS_PAGE_SIZE, type VendorFilters } from "./vendorFilters";
 
 export type VendorPage = {
-  items: VendorCard[];
+  items: VendorListItemResponse[];
+  total: number;
   page: number;
   pageCount: number;
 };
 
-export function readPage(request: Request): number {
-  const raw = new URL(request.url).searchParams.get("page") ?? "";
-  const page = /^\d+$/.test(raw) ? Number(raw) : 1;
-
-  return page >= 1 ? page : 1;
-}
-
-export async function loadVendorPage(page: number): Promise<VendorPage> {
-  const { data, meta } = await listVendors({
-    limit: VENDORS_PAGE_SIZE,
-    offset: (page - 1) * VENDORS_PAGE_SIZE,
-  });
+export async function loadVendorPage(filters: VendorFilters): Promise<VendorPage> {
+  const { data, meta } = await listVendors(toVendorApiQuery(filters));
 
   return {
     items: data,
-    page,
+    total: meta.total,
+    page: filters.page,
     pageCount: Math.max(1, Math.ceil(meta.total / VENDORS_PAGE_SIZE)),
   };
 }

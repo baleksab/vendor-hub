@@ -6,7 +6,6 @@ import {
   NativeSelect,
   Pagination,
   SimpleGrid,
-  Skeleton,
   Stack,
   Text,
   TextInput,
@@ -18,7 +17,7 @@ import type {
   ProductCategoryCountListResponse,
   ProductListResponse,
 } from "@vendor-hub/types";
-import { Form, Link, useNavigate, useNavigation } from "react-router";
+import { Form, Link, useNavigate } from "react-router";
 
 import { useLocale, useT } from "../../../i18n/LocaleProvider";
 import {
@@ -39,8 +38,6 @@ type Props = {
   products: ProductListResponse;
 };
 
-const SKELETON_COUNT = 6;
-
 function hrefFor(filters: ProductFilters): string {
   const query = toSearchParams(filters).toString();
 
@@ -51,11 +48,15 @@ export function ProductsTab({ slug, filters, categories, counts, products }: Pro
   const t = useT();
   const locale = useLocale();
   const navigate = useNavigate();
-  const navigation = useNavigation();
   const [drawerOpened, drawer] = useDisclosure(false);
-  const loading = navigation.state === "loading";
   const pages = Math.max(1, Math.ceil(products.meta.total / PRODUCT_PAGE_SIZE));
   const clearHref = "?";
+  const filterQuery = toSearchParams(filters).toString();
+
+  const productHref = (productId: string) =>
+    filterQuery === ""
+      ? productPath(slug, productId)
+      : `${productPath(slug, productId)}?${filterQuery}`;
 
   const chips: { key: string; label: string; href: string }[] = [];
   const without = (patch: Partial<ProductFilters>) => hrefFor({ ...filters, ...patch, page: 1 });
@@ -206,13 +207,7 @@ export function ProductsTab({ slug, filters, categories, counts, products }: Pro
           {t("products.count", { count: products.meta.total })}
         </Text>
 
-        {loading ? (
-          <SimpleGrid cols={{ base: 1, xs: 2, lg: 3 }} spacing="md">
-            {Array.from({ length: SKELETON_COUNT }, (_, index) => (
-              <Skeleton key={index} h={260} radius="md" />
-            ))}
-          </SimpleGrid>
-        ) : products.data.length === 0 ? (
+        {products.data.length === 0 ? (
           <EmptyState
             title={chips.length === 0 ? t("products.empty") : t("products.emptyFiltered")}
             action={
@@ -229,7 +224,7 @@ export function ProductsTab({ slug, filters, categories, counts, products }: Pro
               <ProductCard
                 key={product.id}
                 name={product.name}
-                href={productPath(slug, product.id)}
+                href={productHref(product.id)}
                 linkComponent={Link}
                 imageUrl={
                   product.coverImageId === null ? null : productImagePath(product.coverImageId)

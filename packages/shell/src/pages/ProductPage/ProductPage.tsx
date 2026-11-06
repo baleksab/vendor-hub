@@ -1,20 +1,21 @@
-import { Anchor, Breadcrumbs, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
-import { ImageGallery, PriceTag, StarRating, StockBadge } from "@vendor-hub/ui";
-import { data, Link } from "react-router";
+import { Button, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
+import { BackLink, ImageGallery, PriceTag, StarRating, StockBadge } from "@vendor-hub/ui";
+import type { MouseEvent } from "react";
+import { data, Link, useLocation, useNavigate } from "react-router";
 
 import { ApiError } from "@vendor-hub/api-client";
-import { listCategories, getProduct } from "../../api/endpoints/products.server";
+import { getProduct } from "../../api/endpoints/products.server";
 import { listProductReviews } from "../../api/endpoints/reviews.server";
 import { loginPath } from "../../auth/safeRedirect";
 import { ReviewSection } from "../../components/ReviewSection/ReviewSection";
+import { manageProductPath } from "../../vendor/manageVendorsLink";
 import { useSession } from "../../hooks/useSession/useSession";
 import { useLocale, useT } from "../../i18n/LocaleProvider";
 import { reviewAction } from "../../reviews/reviewAction.server";
 import { createPageMeta } from "../../seo/createMeta";
 import { pageMeta, readRootData } from "../../seo/pageMeta";
 import { createT } from "../../i18n";
-import { categoryName } from "../../vendor/products/categoryNames";
-import { productImagePath, productPath, VENDORS_PATH, vendorPath } from "../../vendor/vendorPaths";
+import { productImagePath, productPath, vendorPath } from "../../vendor/vendorPaths";
 import type { Route } from "./+types/ProductPage";
 
 const REVIEWS_LIMIT = 50;
@@ -28,12 +29,9 @@ export async function loader({ params }: Route.LoaderArgs) {
       throw data(null, { status: 404 });
     }
 
-    const [reviews, categories] = await Promise.all([
-      listProductReviews(product.id, { limit: REVIEWS_LIMIT, offset: 0 }),
-      listCategories(),
-    ]);
+    const reviews = await listProductReviews(product.id, { limit: REVIEWS_LIMIT, offset: 0 });
 
-    return { product, reviews, categories: categories.data };
+    return { product, reviews };
   } catch (error) {
     if (error instanceof ApiError && (error.status === 404 || error.status === 400)) {
       throw data(null, { status: 404 });
@@ -76,44 +74,34 @@ export function meta({ matches, loaderData, params }: Route.MetaArgs) {
 }
 
 export default function ProductPage({ loaderData, params }: Route.ComponentProps) {
-  const { product, reviews, categories } = loaderData;
+  const { product, reviews } = loaderData;
   const t = useT();
   const locale = useLocale();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { user, vendors } = useSession();
   const base = vendorPath(params.slug);
   const isMember =
     vendors?.owned?.slug === product.vendorSlug ||
     vendors?.operating.some((candidate) => candidate.slug === product.vendorSlug) === true;
 
-  const trail = [
-    { label: t("nav.vendors"), to: VENDORS_PATH },
-    { label: product.vendorName, to: base },
-    ...(product.parentCategory === null
-      ? []
-      : [
-          {
-            label: categoryName(categories, product.parentCategory, locale),
-            to: `${base}?category=${product.parentCategory}`,
-          },
-        ]),
-    {
-      label: categoryName(categories, product.category, locale),
-      to: `${base}?category=${product.category}`,
-    },
-  ];
+  const canManage = user?.role === "administrator" || isMember;
+
+  const goBack = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (location.key !== "default") {
+      event.preventDefault();
+      void navigate(-1);
+    }
+  };
 
   return (
     <Stack component="article" gap="xl">
-      <Breadcrumbs aria-label={t("product.breadcrumbs")}>
-        {trail.map((item) => (
-          <Anchor key={item.to} component={Link} to={item.to} size="sm">
-            {item.label}
-          </Anchor>
-        ))}
-        <Text size="sm" c="dimmed">
-          {product.name}
-        </Text>
-      </Breadcrumbs>
+      <BackLink
+        to={`${base}${location.search}`}
+        label={product.vendorName}
+        linkComponent={Link}
+        onClick={goBack}
+      />
 
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
         <ImageGallery
@@ -126,9 +114,21 @@ export default function ProductPage({ loaderData, params }: Route.ComponentProps
         />
 
         <Stack gap="md">
-          <Title order={1} fz={{ base: 28, sm: 36 }}>
-            {product.name}
-          </Title>
+          <Group justify="space-between" align="center" wrap="nowrap" gap="md">
+            <Title order={1} fz={{ base: 28, sm: 36 }}>
+              {product.name}
+            </Title>
+            {canManage ? (
+              <Button
+                component={Link}
+                to={manageProductPath(product.vendorId, product.id)}
+                variant="default"
+                mih={44}
+              >
+                {t("product.manage")}
+              </Button>
+            ) : null}
+          </Group>
           <StarRating
             value={product.ratingAvg}
             count={product.ratingCount}
@@ -166,7 +166,7 @@ export default function ProductPage({ loaderData, params }: Route.ComponentProps
         targetId={product.id}
         reviews={reviews}
         currentUserId={user?.id ?? null}
-        canModerate={user?.role === "administrator" || isMember}
+        canModerate={canManage}
         loginPath={loginPath(productPath(params.slug, product.id))}
       />
     </Stack>

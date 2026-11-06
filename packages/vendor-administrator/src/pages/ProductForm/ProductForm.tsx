@@ -1,6 +1,5 @@
 import {
   Alert,
-  Anchor,
   Button,
   Group,
   NumberInput,
@@ -20,7 +19,7 @@ import type {
   ProductResponse,
   UpdateProductRequest,
 } from "@vendor-hub/types";
-import { EmptyState, ErrorAlert } from "@vendor-hub/ui";
+import { BackLink, EmptyState, ErrorAlert } from "@vendor-hub/ui";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
@@ -294,11 +293,7 @@ export default function ProductForm() {
   const product = useProduct(productId);
   const sample = useProducts(vendor.data?.slug, { limit: CURRENCY_SAMPLE_SIZE, offset: 0 });
 
-  const back = (
-    <Anchor component={Link} to={productsPath(id)} size="sm" w="fit-content">
-      {t("products.title")}
-    </Anchor>
-  );
+  const back = <BackLink to={productsPath(id)} label={t("products.title")} linkComponent={Link} />;
 
   const loading =
     vendor.isPending || (productId !== undefined && product.isPending) || sample.isPending;

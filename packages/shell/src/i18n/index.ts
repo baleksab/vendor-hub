@@ -26,11 +26,18 @@ const catalogs: Record<Locale, Messages> = { en, sr };
 
 export function createT(locale: Locale): T {
   const messages = catalogs[locale];
+  const plurals = new Intl.PluralRules(locale);
 
   return (key, ...[params]) => {
     const values: Record<string, string | number> = params ?? {};
+    const count = values["count"];
+    const pluralKey = typeof count === "number" ? `${key}.${plurals.select(count)}` : null;
+    const message =
+      pluralKey !== null && Object.hasOwn(messages, pluralKey)
+        ? messages[pluralKey as MessageKey]
+        : messages[key];
 
-    return messages[key].replace(/\{(\w+)\}/g, (_match, name: string) => String(values[name]));
+    return message.replace(/\{(\w+)\}/g, (_match, name: string) => String(values[name]));
   };
 }
 
