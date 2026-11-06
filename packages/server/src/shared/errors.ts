@@ -45,3 +45,15 @@ export class ServiceUnavailableError extends AppError {
     super(503, "Service Unavailable", detail);
   }
 }
+
+export class PayloadTooLargeError extends AppError {
+  constructor(detail: string) {
+    super(413, "Payload Too Large", detail);
+  }
+}
+
+export class UnsupportedMediaTypeError extends AppError {
+  constructor(detail: string) {
+    super(415, "Unsupported Media Type", detail);
+  }
+}

@@ -50,6 +50,8 @@ export class InMemoryVendorsRepository implements VendorsRepository {
       slug: input.slug,
       name: input.name,
       description: input.description,
+      ratingAvg: 0,
+      ratingCount: 0,
       createdAt: new Date(),
     };
 

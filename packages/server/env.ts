@@ -11,11 +11,18 @@ export type JwtEnv = {
   expiresInSeconds: number;
 };
 
+export type ImageEnv = {
+  directory: string;
+  maxBytes: number;
+  maxPerProduct: number;
+};
+
 export type ServerEnv = {
   host: string;
   port: number;
   db: DbEnv;
   jwt: JwtEnv;
+  images: ImageEnv;
 };
 
 export type SeedEnv = {
@@ -89,6 +96,14 @@ export function loadDbEnv(source: Source = process.env): DbEnv {
   };
 }
 
+export function loadImageEnv(source: Source = process.env): ImageEnv {
+  return {
+    directory: required(source, "PRODUCT_IMAGE_DIR"),
+    maxBytes: parsePositiveInteger(source, "PRODUCT_IMAGE_MAX_BYTES"),
+    maxPerProduct: parsePositiveInteger(source, "PRODUCT_IMAGE_MAX_PER_PRODUCT"),
+  };
+}
+
 export function loadServerEnv(source: Source = process.env): ServerEnv {
   return {
     host: required(source, "SERVER_HOST"),
@@ -98,6 +113,7 @@ export function loadServerEnv(source: Source = process.env): ServerEnv {
       secret: parseJwtSecret(source, "JWT_SECRET"),
       expiresInSeconds: parsePositiveInteger(source, "JWT_EXPIRES_IN_SECONDS"),
     },
+    images: loadImageEnv(source),
   };
 }
 

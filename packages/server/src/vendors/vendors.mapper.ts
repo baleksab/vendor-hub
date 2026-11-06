@@ -26,6 +26,9 @@ export function toVendorResponse(
 
 export function toPublicVendorResponse(vendor: Vendor): PublicVendorResponse {
   return {
+    id: vendor.id,
+    ratingAvg: vendor.ratingAvg,
+    ratingCount: vendor.ratingCount,
     slug: vendor.slug,
     name: vendor.name,
     description: vendor.description,

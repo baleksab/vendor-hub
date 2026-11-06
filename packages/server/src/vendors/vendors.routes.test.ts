@@ -217,6 +217,9 @@ describe("vendors routes", () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.json()).toEqual({
+      id: expect.any(String),
+      ratingAvg: 0,
+      ratingCount: 0,
       slug: "acme",
       name: "Acme Inc",
       description: "We sell everything you need.",

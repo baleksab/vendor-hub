@@ -3,7 +3,7 @@ import { alias } from "drizzle-orm/pg-core";
 
 import { notDeleted } from "../db/base-entity.ts";
 import type { Database } from "../db/client.ts";
-import { users, vendorMembers, vendors } from "../db/schema.ts";
+import { products, users, vendorMembers, vendors } from "../db/schema.ts";
 import { findUniqueViolation } from "../db/unique-violation.ts";
 import { ConflictError } from "../shared/errors.ts";
 import { escapeLike } from "../shared/like.ts";
@@ -241,6 +241,11 @@ export class DrizzleVendorsRepository implements VendorsRepository {
         .set({ isDeleted: true, deletedAt: sql`now()` })
         .where(and(eq(vendorMembers.vendorId, id), notDeleted(vendorMembers)));
 
+      await tx
+        .update(products)
+        .set({ isDeleted: true, deletedAt: sql`now()` })
+        .where(and(eq(products.vendorId, id), notDeleted(products)));
+
       return true;
     });
   }
@@ -312,6 +317,8 @@ export class DrizzleVendorsRepository implements VendorsRepository {
         slug: vendors.slug,
         name: vendors.name,
         description: vendors.description,
+        ratingAvg: vendors.ratingAvg,
+        ratingCount: vendors.ratingCount,
         createdAt: vendors.createdAt,
       })
       .from(vendors)

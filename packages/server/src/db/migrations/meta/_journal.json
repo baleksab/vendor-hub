@@ -15,6 +15,13 @@
       "when": 1793885250310,
       "tag": "0001_gigantic_violations",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793965033829,
+      "tag": "0002_unique_ricochet",
+      "breakpoints": true
     }
   ]
 }
