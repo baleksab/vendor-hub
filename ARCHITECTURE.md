@@ -28,7 +28,7 @@ projekat/
 
 1. The browser requests a page from the shell. The shell renders HTML on the server (SSR). Routes that need a remote render a loading spinner on the server.
 2. After hydration the shell loads the remote's `mf-manifest.json` through `@module-federation/runtime`, then the exposed module, and renders it in place of the spinner.
-3. `react`, `react-dom`, `react-router`, `@mantine/core` and `@mantine/hooks` are `singleton` shared modules: the shell provides its copy, the remote uses it. There is exactly one React and one Mantine at runtime, so remote components see the shell's `MantineProvider` (theme and color scheme).
+3. `react`, `react-dom`, `react-router`, `@tanstack/react-query`, `@mantine/core` and `@mantine/hooks` are `singleton` shared modules: the shell provides its copy, the remote uses it. There is exactly one React and one Mantine at runtime, so remote components see the shell's `MantineProvider` (theme and color scheme). Likewise the shell owns the one `QueryClient` (`QueryClientProvider` in `App`), so remotes share a cache and a mutation in one remote can invalidate queries of another. Query keys start with a per-remote prefix (`users`, `vendors`, `countries`).
 
 The remotes' manifest URLs are not hardcoded in the shell. The root loader reads them from env and passes them to the client.
 

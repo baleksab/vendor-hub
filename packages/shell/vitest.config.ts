@@ -4,6 +4,7 @@ export default defineConfig({
   define: {
     MANTINE_VERSION: JSON.stringify("test"),
     REACT_ROUTER_VERSION: JSON.stringify("test"),
+    REACT_QUERY_VERSION: JSON.stringify("test"),
   },
   test: {
     include: ["src/**/*.test.ts"],

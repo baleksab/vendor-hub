@@ -1,12 +1,10 @@
-import { QueryClientProvider } from "@tanstack/react-query";
-import { ApiError } from "@vendor-hub/api-client";
 import type { VendorAdministratorProps } from "@vendor-hub/types";
 import { PageSpinner } from "@vendor-hub/ui";
-import { lazy, Suspense, useEffect, useMemo } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import { Navigate, Route, Routes } from "react-router";
 
 import { createVendorsClient } from "./api/client";
-import { queryClient } from "./api/queryClient";
+import { useUnauthorizedHandler } from "./hooks/useUnauthorizedHandler";
 import { ApiContext } from "./context/ApiContext";
 import { LocaleContext } from "./context/LocaleContext";
 import { MessagesContext } from "./context/MessagesContext";
@@ -24,32 +22,21 @@ export default function VendorAdministrator({
   const client = useMemo(() => createVendorsClient(apiBaseUrl), [apiBaseUrl]);
   const t = useMemo(() => createT(locale), [locale]);
 
-  useEffect(() => {
-    const handleError = (error: unknown) => {
-      if (error instanceof ApiError && error.kind === "unauthorized") {
-        onUnauthorized();
-      }
-    };
-
-    queryClient.getQueryCache().config.onError = handleError;
-    queryClient.getMutationCache().config.onError = handleError;
-  }, [onUnauthorized]);
+  useUnauthorizedHandler(onUnauthorized);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ApiContext value={client}>
-        <LocaleContext value={locale}>
-          <MessagesContext value={t}>
-            <Suspense fallback={<PageSpinner label={t("common.loading")} />}>
-              <Routes>
-                <Route path="vendors" element={<VendorList />} />
-                <Route path="vendors/:id" element={<VendorDetail />} />
-                <Route path="*" element={<Navigate to={VENDORS_PATH} replace />} />
-              </Routes>
-            </Suspense>
-          </MessagesContext>
-        </LocaleContext>
-      </ApiContext>
-    </QueryClientProvider>
+    <ApiContext value={client}>
+      <LocaleContext value={locale}>
+        <MessagesContext value={t}>
+          <Suspense fallback={<PageSpinner label={t("common.loading")} />}>
+            <Routes>
+              <Route path="vendors" element={<VendorList />} />
+              <Route path="vendors/:id" element={<VendorDetail />} />
+              <Route path="*" element={<Navigate to={VENDORS_PATH} replace />} />
+            </Routes>
+          </Suspense>
+        </MessagesContext>
+      </LocaleContext>
+    </ApiContext>
   );
 }

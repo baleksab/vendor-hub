@@ -1,12 +1,14 @@
 import { createInstance, type ModuleFederation } from "@module-federation/runtime";
 import * as MantineCore from "@mantine/core";
 import * as MantineHooks from "@mantine/hooks";
+import * as ReactQuery from "@tanstack/react-query";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as ReactRouter from "react-router";
 
 const mantineVersion = MANTINE_VERSION;
 const reactRouterVersion = REACT_ROUTER_VERSION;
+const reactQueryVersion = REACT_QUERY_VERSION;
 
 export type RemoteName = "user-administrator" | "vendor-administrator";
 
@@ -38,6 +40,11 @@ export function getFederation(manifestUrls: RemoteManifestUrls): ModuleFederatio
         version: reactRouterVersion,
         lib: () => ReactRouter,
         shareConfig: { singleton: true, requiredVersion: reactRouterVersion },
+      },
+      "@tanstack/react-query": {
+        version: reactQueryVersion,
+        lib: () => ReactQuery,
+        shareConfig: { singleton: true, requiredVersion: `^${reactQueryVersion}` },
       },
       "@mantine/core": {
         version: mantineVersion,

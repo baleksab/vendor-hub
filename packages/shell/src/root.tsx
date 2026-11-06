@@ -26,6 +26,7 @@ import "./app.css";
 import { AppLayout } from "./components/AppLayout/AppLayout";
 import { LOCALES } from "./i18n/locales";
 import { LocaleProvider, useT } from "./i18n/LocaleProvider";
+import { AppQueryProvider } from "./query/AppQueryProvider";
 import { resolveLocale } from "./i18n/server";
 import { loadMyVendors } from "./vendor/myVendors.server";
 
@@ -83,9 +84,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <AppLayout>
-      <Outlet />
-    </AppLayout>
+    <AppQueryProvider>
+      <AppLayout>
+        <Outlet />
+      </AppLayout>
+    </AppQueryProvider>
   );
 }
 

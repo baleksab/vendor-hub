@@ -66,6 +66,10 @@ browser --(HttpOnly cookie, same origin)--> shell server --(Authorization: Beare
 - `getSession(request)` (`auth/session.server.ts`) calls `GET /api/v1/users/me` once per request and clears the cookie if the API answers `401`. The root loader returns the `user`, so the first paint already has the right header, and `useSession` just reads it. `requireUser` redirects to `/login?redirectTo=...`, `redirectIfAuthenticated` is used by the login and register loaders. `redirectTo` is accepted only as a same-origin relative path (`auth/safeRedirect.ts`). The target is built with `requestTarget`, which strips the `.data` suffix and `_routes` param that single fetch adds to client-side navigation requests.
 - Pages of the shell have no client-side API client: everything they need runs in loaders and actions on the server. Remotes that must call the API from the browser use the API proxy below.
 
+### Query client
+
+`query/AppQueryProvider.tsx` wraps the app in `App` and creates the `QueryClient` once per browser session with `useState` (never at module level, so SSR requests do not share a cache). `createQueryClient` sets the defaults (`staleTime` 30 s, no refetch on window focus, no retry on 401, 403 and 404). The status is read by duck typing because the shell and each remote bundle their own copy of `ApiError`. Remotes call `useQueryClient` and the query hooks from the shared module, and report a `401` through `onUnauthorized` by subscribing to the shared caches.
+
 ### API proxy
 
 `routes/apiProxy.ts` is registered as `api/v1/*` and handles every method through `proxy/forwardApiRequest.server.ts`. It answers `404` for anything outside the allowlist (`proxy/proxyAllowlist.ts`, a table of `{ method, pattern }` entries: `GET` and `PATCH` on `/api/v1/users` and `/api/v1/users/:id`, `GET /api/v1/countries`, and for vendors `GET /vendors/managed`, `GET`, `PATCH` and `DELETE /vendors/:id`, `POST /vendors/:id/operators` and `DELETE /vendors/:id/operators/:userId`, with the ids matched as uuids), checks the `Origin` on non-GET requests (`assertSameOrigin`), answers `401` without a session cookie, and forwards method, path, query and body to `API_URL` with `Authorization: Bearer <token>` from the cookie. The `Cookie` header and other request headers are not forwarded, the response keeps only the status and `Content-Type`, and a failed upstream call becomes `502`. Adding a path to the allowlist is a deliberate change.
@@ -94,7 +98,7 @@ New language: add `messages/<code>.ts`, register it in `catalogs` in `i18n/index
 
 ## Loading a remote
 
-`src/remote.ts` creates one `@module-federation/runtime` instance (`createInstance`) with the list of remotes and the `shared` config. It does not use the `@module-federation/vite` plugin. `react`, `react-dom`, `react-router`, `@mantine/core` and `@mantine/hooks` are provided as `singleton` with the shell's own copy. `react-router` is shared so that the `<Routes>` of a remote follow the shell's router. The Mantine and React Router versions come from the `MANTINE_VERSION` and `REACT_ROUTER_VERSION` globals, which `vite.config.ts` fills from the installed packages.
+`src/remote.ts` creates one `@module-federation/runtime` instance (`createInstance`) with the list of remotes and the `shared` config. It does not use the `@module-federation/vite` plugin. `react`, `react-dom`, `react-router`, `@tanstack/react-query`, `@mantine/core` and `@mantine/hooks` are provided as `singleton` with the shell's own copy. `react-router` is shared so that the `<Routes>` of a remote follow the shell's router. The Mantine, React Router and TanStack Query versions come from the `MANTINE_VERSION`, `REACT_ROUTER_VERSION` and `REACT_QUERY_VERSION` globals, which `vite.config.ts` fills from the installed packages.
 
 `Admin` does the loading with `loadRemoteModule` (`remote.ts`, caches the promise per module) inside `components/RemoteSlot` (error boundary + `Suspense`):
 
@@ -119,7 +123,7 @@ CI (`.github/workflows/checks.yml`) runs format, lint, typecheck, build and unit
 ## Rules specific to this package
 
 - React Router packages are pinned here and must all match.
-- `react`, `react-dom` and `react-router` stay `singleton` in the `shared` config in `remote.ts`.
+- `react`, `react-dom`, `react-router` and `@tanstack/react-query` stay `singleton` in the `shared` config in `remote.ts`.
 - Nothing in the shell may assume a remote runs on the server.
 - API types come from `@vendor-hub/types`, a devDependency used with `import type` only, so nothing from it ends up in the bundle.
 

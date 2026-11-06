@@ -7,7 +7,7 @@ Remote for vendor management. Vite + React, Module Federation 2 (`@module-federa
 ```
 packages/vendor-administrator/
 ├── src/
-│   ├── VendorAdministrator.tsx   exposed component: QueryClient, contexts, lazy <Routes>
+│   ├── VendorAdministrator.tsx   exposed component: contexts, lazy <Routes>, 401 handler
 │   ├── main.tsx                  standalone entry: BrowserRouter, ui theme, MantineProvider
 │   ├── paths.ts                  VENDORS_PATH, vendorPath (the remote is mounted at /manage)
 │   ├── api/                      client.ts, queryKeys.ts (vendorKeys), vendors.ts
@@ -28,7 +28,7 @@ packages/vendor-administrator/
 
 `./VendorAdministrator` with the props `{ locale, apiBaseUrl, onUnauthorized }` (type `VendorAdministratorProps` in `@vendor-hub/types`). It renders `<Routes>` with `vendors`, `vendors/:id` and a catch-all redirect to `vendors`. Both pages are `React.lazy` chunks.
 
-The shared modules and the `QueryClient` setup are the same as in `user-administrator`: `react`, `react-dom`, `react-router`, `@mantine/core` and `@mantine/hooks` are `singleton`, and the remote owns its `QueryClient`.
+The shared modules are the same as in `user-administrator`: `react`, `react-dom`, `react-router`, `@tanstack/react-query`, `@mantine/core` and `@mantine/hooks` are `singleton`. The `QueryClient` comes from the shell, so the cache is shared with the other remotes. `useUnauthorizedHandler` subscribes to the caches and calls `onUnauthorized` on a `401`. Only standalone mode (`main.tsx`) creates its own client.
 
 ## Data
 
