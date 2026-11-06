@@ -170,6 +170,38 @@ describe("users and auth against Postgres", () => {
     expect((await register()).statusCode).toBe(201);
   });
 
+  it("sorts the list in SQL by name, role, country and creation time", async () => {
+    const headers = await bearer();
+
+    await register({
+      ...validUser,
+      email: "zed@example.com",
+      firstName: "zed",
+      lastName: "Zulu",
+      country: "DE",
+    });
+    await register({
+      ...validUser,
+      email: "abe@example.com",
+      firstName: "Abe",
+      lastName: "alpha",
+      country: "AT",
+    });
+
+    const list = async (query: string) =>
+      (await app.inject({ method: "GET", url: `/api/v1/users?${query}`, headers }))
+        .json()
+        .data.map(
+          (user: { lastName: string; country: string }) => `${user.lastName}/${user.country}`,
+        );
+
+    expect(await list("sort=name&order=asc")).toEqual(["alpha/AT", "Doe/RS", "Zulu/DE"]);
+    expect(await list("sort=name&order=desc")).toEqual(["Zulu/DE", "Doe/RS", "alpha/AT"]);
+    expect(await list("sort=country")).toEqual(["alpha/AT", "Zulu/DE", "Doe/RS"]);
+    expect((await list("sort=createdAt"))[0]).toBe("alpha/AT");
+    expect((await list("sort=createdAt&order=asc"))[0]).toBe("Doe/RS");
+  });
+
   it("returns 503 on /health when the pool is closed", async () => {
     const closed = await createTestDatabase();
     const closedApp = await buildApp({

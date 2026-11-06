@@ -31,7 +31,7 @@ packages/user-administrator/
 - All calls use `createApiClient` and `unwrap` from `@vendor-hub/api-client`, with `apiBaseUrl` as base URL. In the shell that is the shell origin, where the `/api/v1/*` proxy adds the token. The browser never holds the JWT.
 - `queryKeys.ts` is the only place that builds query keys. Hooks never write an array literal.
 - `useUnauthorizedHandler` subscribes to the query and mutation caches and calls `onUnauthorized` on `ApiError.kind === "unauthorized"`. Queries are not retried on 401, 403 and 404 (set in the shell's client).
-- The list state (`q`, `role`, `country`, `size`, `page`) lives in the URL search params (`pages/UserList/filters.ts`), search is debounced, and any filter change goes back to page 1. Filtering and paging happen on the API (`search`, `role`, `country`, `limit`, `offset`). The country list comes from `GET /api/v1/countries` (cached forever) and is labelled with `Intl.DisplayNames` in the `locale`.
+- The list state (`q`, `role`, `country`, `sort`, `order`, `size`, `page`) lives in the URL search params (`pages/UserList/filters.ts`), search is debounced, and any filter change goes back to page 1. Filtering, sorting and paging happen on the API (`search`, `role`, `country`, `sort`, `order`, `limit`, `offset`). The country list comes from `GET /api/v1/countries` (cached forever) and is labelled with `Intl.DisplayNames` in the `locale`.
 - `useUpdateUser` writes the response into the detail cache and invalidates the lists.
 - The edit form sends only changed fields (PATCH semantics), the password only when filled. A `validation` error maps `fieldErrors` onto the fields, `conflict` lands on the email.
 

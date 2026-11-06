@@ -13,6 +13,7 @@ import {
   Table,
   Text,
   TextInput,
+  UnstyledButton,
 } from "@mantine/core";
 import { useDebouncedCallback } from "@mantine/hooks";
 import type { UserListQuery } from "@vendor-hub/types";
@@ -25,7 +26,15 @@ import { useT } from "../../context/MessagesContext";
 import { useCountries } from "../../hooks/useCountries";
 import { useUsers } from "../../hooks/useUsers";
 import { userPath } from "../../paths";
-import { PAGE_SIZES, hasActiveFilters, readFilters, writeFilters, type Filters } from "./filters";
+import {
+  PAGE_SIZES,
+  hasActiveFilters,
+  nextSort,
+  readFilters,
+  writeFilters,
+  type Filters,
+  type SortField,
+} from "./filters";
 
 type CountryCode = NonNullable<UserListQuery["country"]>;
 
@@ -52,6 +61,8 @@ export default function UserList() {
     search: filters.search === "" ? undefined : filters.search,
     role: filters.role ?? undefined,
     country: knownCountry,
+    sort: filters.sort,
+    order: filters.order,
   });
 
   const dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
@@ -73,6 +84,28 @@ export default function UserList() {
     commitSearch.cancel();
     setSearchInput("");
     applyFilters({ search: "", role: null, country: null });
+  };
+
+  const sortHeader = (field: SortField, label: string) => {
+    const active = filters.sort === field;
+
+    return (
+      <Table.Th
+        aria-sort={active ? (filters.order === "asc" ? "ascending" : "descending") : "none"}
+      >
+        <UnstyledButton
+          mih={24}
+          onClick={() => applyFilters({ ...nextSort(filters, field), page: 1 })}
+          aria-label={t("users.sort", { column: label })}
+          style={{ display: "inline-flex", alignItems: "center", gap: 4 }}
+        >
+          <Text size="sm" fw={600} component="span">
+            {label}
+          </Text>
+          <span aria-hidden="true">{active ? (filters.order === "asc" ? "↑" : "↓") : "↕"}</span>
+        </UnstyledButton>
+      </Table.Th>
+    );
   };
 
   const roleOptions = [
@@ -189,10 +222,10 @@ export default function UserList() {
             <Table highlightOnHover verticalSpacing="sm" horizontalSpacing="md">
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>{t("users.col.user")}</Table.Th>
-                  <Table.Th>{t("users.col.role")}</Table.Th>
-                  <Table.Th>{t("users.col.country")}</Table.Th>
-                  <Table.Th>{t("users.col.created")}</Table.Th>
+                  {sortHeader("name", t("users.col.user"))}
+                  {sortHeader("role", t("users.col.role"))}
+                  {sortHeader("country", t("users.col.country"))}
+                  {sortHeader("createdAt", t("users.col.created"))}
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>

@@ -49,7 +49,9 @@ describe("UsersService", () => {
     const user = await service.create(request);
 
     await expect(service.get(user.id)).resolves.toMatchObject({ email: "jane@example.com" });
-    await expect(service.list({ limit: 20, offset: 0 })).resolves.toMatchObject({ total: 1 });
+    await expect(service.list({ limit: 20, offset: 0, sort: "createdAt" })).resolves.toMatchObject({
+      total: 1,
+    });
     await expect(service.update(user.id, { firstName: "Janet" })).resolves.toMatchObject({
       firstName: "Janet",
     });
