@@ -18,7 +18,9 @@ packages/vendor-administrator/
 │   ├── i18n/messages.ts          en and sr texts, createT(locale)
 │   └── pages/
 │       ├── VendorList/           VendorList, VendorTable, VendorQuickView, filters.ts
-│       └── VendorDetail/         VendorDetail, VendorForm, MembersTable, AddOperatorForm, DeleteVendor
+│       ├── VendorDetail/         VendorDetail, VendorForm, MembersTable, AddOperatorForm, DeleteVendor
+│       ├── ProductList/          ProductList (table, inline stock edit, delete modal), filters.ts
+│       └── ProductForm/         ProductForm (create and edit), ImagesEditor, ReviewsModeration
 ├── env.ts, vite.config.ts, index.html
 ├── .env / .env.local / .env.secret.example
 └── tsconfig.json, .oxlintrc.json
@@ -38,6 +40,10 @@ The shared modules are the same as in `user-administrator`: `react`, `react-dom`
 - `viewerRole`, `memberRole` and `canDelete` come from the API. The role badge shows `memberRole`, and an administrator who is not a member of the vendor sees a gray "Not affiliated". The delete section renders only when `canDelete` is true, and the owner row has no remove button.
 - The list is a table from the `sm` breakpoint up and a stack of cards below it. A row opens the quick view drawer through a real button in the name cell, and the drawer links to the detail page.
 - Delete asks the user to type the slug before the button enables. `404` on the detail shows the not-found state.
+
+### Products
+
+Reached from the vendor detail page: `/manage/vendors/:id/products`, `.../products/new` and `.../products/:productId`. The list reads the public search (`GET /vendors/by-slug/:slug/products`, the slug comes from the vendor), its state (`q`, `category`, `inStock`, `sort`, `order`, `page`) lives in the URL (`pages/ProductList/filters.ts`) and the stock cell saves on blur. The form sends only changed fields, and after a create it navigates to the edit page where images can be added. `ImagesEditor` uploads one file per request as multipart through the shell proxy and shows a readable message per file for `413`, `415` and `409`, images are reordered with buttons and the first one is the cover. `ReviewsModeration` lists the product reviews with a delete button. Query keys come from `productKeys` and `categoryKeys`, mutations update the detail with `setQueryData` and invalidate `productKeys.lists()`.
 
 ## Two ways to run
 

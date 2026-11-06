@@ -51,7 +51,7 @@ cp packages/server/.env.secret.example packages/server/.env.secret
 pnpm stack:deploy
 ```
 
-The script (`scripts/deploy.sh`) checks Docker and the secrets file, builds the images, starts Postgres, applies the migrations, seeds the administrator, then starts the server, the shell, the remote and nginx, and waits until all of them are healthy. Then open `http://vendorhub.localhost`. `pnpm stack:down` stops everything. It runs as its own compose project (`vendor-hub-stack`), separate from the containers of `pnpm db:up` and `pnpm nginx:up`, so stop `pnpm nginx:up` first (nginx needs port 80). The deploy does not publish Postgres on the host.
+The script (`scripts/deploy.sh`) checks Docker and the secrets file, builds the images, starts Postgres, applies the migrations, seeds the administrator, then starts the server, the shell, the remote and nginx, and waits until all of them are healthy. Then open `http://vendorhub.localhost`. `pnpm stack:down` stops everything. It runs as its own compose project (`vendor-hub-stack`), separate from the containers of `pnpm db:up` and `pnpm nginx:up`, so stop `pnpm nginx:up` first (nginx needs port 80). The deploy does not publish Postgres on the host. Uploaded product images live in the `product-images` volume.
 
 ### Development
 
