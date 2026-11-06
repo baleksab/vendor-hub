@@ -1,6 +1,6 @@
-import { Anchor, Group, Skeleton, Stack } from "@mantine/core";
+import { Anchor, Group, Skeleton, Stack, Title } from "@mantine/core";
 import { ApiError } from "@vendor-hub/api-client";
-import { EmptyState, ErrorAlert, PageHeader } from "@vendor-hub/ui";
+import { EmptyState, ErrorAlert } from "@vendor-hub/ui";
 import { Link, useParams } from "react-router";
 
 import { RoleBadge } from "../../components/RoleBadge";
@@ -73,17 +73,15 @@ export default function VendorDetail() {
   return (
     <Stack gap="md">
       {back}
-      <PageHeader
-        title={vendor.name}
-        actions={
-          <Group gap="sm">
-            <Anchor href={vendorSitePath(vendor.slug)} size="sm">
-              {vendor.slug}
-            </Anchor>
-            <RoleBadge role={vendor.memberRole} />
-          </Group>
-        }
-      />
+      <Stack gap={4} mb="sm">
+        <Title order={1}>{vendor.name}</Title>
+        <Group gap="sm">
+          <RoleBadge role={vendor.memberRole} />
+          <Anchor href={vendorSitePath(vendor.slug)} size="sm">
+            {vendor.slug}
+          </Anchor>
+        </Group>
+      </Stack>
       <VendorForm vendor={vendor} />
       <MembersTable vendor={vendor} />
       <AddOperatorForm vendorId={vendor.id} />
