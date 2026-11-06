@@ -1,17 +1,35 @@
-import { and, asc, count, desc, eq, sql, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, isNotNull, or, sql, type SQL } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 
 import { notDeleted } from "../db/base-entity.ts";
 import type { Database } from "../db/client.ts";
 import { users, vendorMembers, vendors } from "../db/schema.ts";
 import { findUniqueViolation } from "../db/unique-violation.ts";
 import { ConflictError } from "../shared/errors.ts";
+import { escapeLike } from "../shared/like.ts";
 import type { Page } from "../shared/pagination.ts";
-import type { NewVendor, Vendor, VendorListItem, VendorSummary } from "./vendor.ts";
+import type { Actor } from "./vendor-access.ts";
+import type {
+  ManagedVendorRow,
+  NewVendor,
+  Vendor,
+  VendorListItem,
+  VendorPatch,
+  VendorSummary,
+} from "./vendor.ts";
+import { resolveOrder, type ListManagedVendorsQuery } from "./vendors.schemas.ts";
 
 export type VendorsRepository = {
   create(input: NewVendor): Promise<Vendor>;
   list(page: Page): Promise<{ items: VendorListItem[]; total: number }>;
+  listManaged(
+    actor: Actor,
+    query: ListManagedVendorsQuery,
+  ): Promise<{ items: ManagedVendorRow[]; total: number }>;
+  findById(id: string): Promise<Vendor | undefined>;
   findBySlug(slug: string): Promise<Vendor | undefined>;
+  update(id: string, patch: VendorPatch): Promise<Vendor | undefined>;
+  softDelete(id: string): Promise<boolean>;
   findOwnedBy(userId: string): Promise<Vendor | undefined>;
   listOperatedBy(userId: string): Promise<VendorSummary[]>;
   addOperator(vendorId: string, userId: string): Promise<void>;
@@ -97,6 +115,134 @@ export class DrizzleVendorsRepository implements VendorsRepository {
       .where(notDeleted(vendors));
 
     return { items, total: totalRow?.total ?? 0 };
+  }
+
+  async listManaged(
+    actor: Actor,
+    query: ListManagedVendorsQuery,
+  ): Promise<{ items: ManagedVendorRow[]; total: number }> {
+    const mine = alias(vendorMembers, "mine");
+    const ownerMember = alias(vendorMembers, "owner_member");
+    const memberCounts = this.db
+      .select({ vendorId: vendorMembers.vendorId, total: count().as("total") })
+      .from(vendorMembers)
+      .where(notDeleted(vendorMembers))
+      .groupBy(vendorMembers.vendorId)
+      .as("member_counts");
+
+    const conditions: (SQL | undefined)[] = [notDeleted(vendors)];
+
+    if (actor.role !== "administrator") {
+      conditions.push(isNotNull(mine.id));
+    }
+
+    if (query.relation !== undefined) {
+      conditions.push(eq(mine.role, query.relation === "owned" ? "owner" : "operator"));
+    }
+
+    if (query.search !== undefined) {
+      const pattern = `%${escapeLike(query.search)}%`;
+
+      conditions.push(or(ilike(vendors.name, pattern), ilike(vendors.slug, pattern)));
+    }
+
+    const where = and(...conditions);
+    const mineJoin = and(
+      eq(mine.vendorId, vendors.id),
+      eq(mine.userId, actor.userId),
+      notDeleted(mine),
+    );
+    const sortColumn = {
+      name: vendors.name,
+      createdAt: vendors.createdAt,
+      memberCount: memberCounts.total,
+    }[query.sort];
+    const direction = resolveOrder(query) === "asc" ? asc : desc;
+
+    const items = await this.db
+      .select({
+        id: vendors.id,
+        slug: vendors.slug,
+        name: vendors.name,
+        description: vendors.description,
+        ownerId: users.id,
+        ownerFirstName: users.firstName,
+        ownerLastName: users.lastName,
+        memberCount: memberCounts.total,
+        callerRole: mine.role,
+        createdAt: vendors.createdAt,
+      })
+      .from(vendors)
+      .innerJoin(memberCounts, eq(memberCounts.vendorId, vendors.id))
+      .innerJoin(
+        ownerMember,
+        and(
+          eq(ownerMember.vendorId, vendors.id),
+          eq(ownerMember.role, "owner"),
+          notDeleted(ownerMember),
+        ),
+      )
+      .innerJoin(users, eq(users.id, ownerMember.userId))
+      .leftJoin(mine, mineJoin)
+      .where(where)
+      .orderBy(direction(sortColumn), asc(vendors.id))
+      .limit(query.limit)
+      .offset(query.offset);
+
+    const [totalRow] = await this.db
+      .select({ total: count() })
+      .from(vendors)
+      .leftJoin(mine, mineJoin)
+      .where(where);
+
+    return {
+      items: items.map((row) => ({
+        id: row.id,
+        slug: row.slug,
+        name: row.name,
+        description: row.description,
+        owner: { userId: row.ownerId, firstName: row.ownerFirstName, lastName: row.ownerLastName },
+        memberCount: row.memberCount,
+        callerRole: row.callerRole ?? undefined,
+        createdAt: row.createdAt,
+      })),
+      total: totalRow?.total ?? 0,
+    };
+  }
+
+  async findById(id: string): Promise<Vendor | undefined> {
+    return this.load(eq(vendors.id, id));
+  }
+
+  async update(id: string, patch: VendorPatch): Promise<Vendor | undefined> {
+    const rows = await this.db
+      .update(vendors)
+      .set(patch)
+      .where(and(eq(vendors.id, id), notDeleted(vendors)))
+      .returning({ id: vendors.id });
+
+    return rows.length === 0 ? undefined : this.load(eq(vendors.id, id));
+  }
+
+  async softDelete(id: string): Promise<boolean> {
+    return this.db.transaction(async (tx) => {
+      const deleted = await tx
+        .update(vendors)
+        .set({ isDeleted: true, deletedAt: sql`now()` })
+        .where(and(eq(vendors.id, id), notDeleted(vendors)))
+        .returning({ id: vendors.id });
+
+      if (deleted.length === 0) {
+        return false;
+      }
+
+      await tx
+        .update(vendorMembers)
+        .set({ isDeleted: true, deletedAt: sql`now()` })
+        .where(and(eq(vendorMembers.vendorId, id), notDeleted(vendorMembers)));
+
+      return true;
+    });
   }
 
   async findBySlug(slug: string): Promise<Vendor | undefined> {

@@ -5,6 +5,7 @@ import type { Database } from "../db/client.ts";
 import { users } from "../db/schema.ts";
 import { findUniqueViolation } from "../db/unique-violation.ts";
 import { ConflictError } from "../shared/errors.ts";
+import { escapeLike } from "../shared/like.ts";
 import type { ListUsersQuery } from "./users.schemas.ts";
 import type { NewUser, User, UserCredentials, UserCredentialsLookup, UserPatch } from "./user.ts";
 
@@ -27,10 +28,6 @@ const publicColumns = {
   createdAt: users.createdAt,
   updatedAt: users.updatedAt,
 };
-
-function escapeLike(value: string): string {
-  return value.replace(/[\\%_]/g, "\\$&");
-}
 
 function listFilter(query: ListUsersQuery): SQL | undefined {
   const conditions: (SQL | undefined)[] = [notDeleted(users)];

@@ -788,6 +788,377 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/vendors/managed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    limit?: number;
+                    offset?: number;
+                    search?: string;
+                    relation?: "owned" | "operated";
+                    sort?: "name" | "createdAt" | "memberCount";
+                    order?: "asc" | "desc";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ManagedVendorListResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vendors/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VendorResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateVendorRequestInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VendorResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
+    "/api/v1/vendors/{id}/operators": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AddOperatorRequestInput"];
+                };
+            };
+            responses: {
+                /** @description Default Response */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VendorResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vendors/{id}/operators/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: string;
+                    userId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -812,6 +1183,102 @@ export interface components {
                 path: string;
                 message: string;
             }[];
+        };
+        RegisterVendorRequestInput: {
+            slug: string;
+            name: string;
+            description: string;
+        };
+        AddOperatorRequestInput: {
+            email: string;
+        };
+        VendorMemberResponseInput: {
+            /** Format: uuid */
+            userId: string;
+            firstName: string;
+            lastName: string;
+            /** @enum {string} */
+            role: "owner" | "operator";
+        };
+        UpdateVendorRequestInput: {
+            name?: string;
+            description?: string;
+        };
+        VendorResponseInput: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            name: string;
+            description: string;
+            members: components["schemas"]["VendorMemberResponseInput"][];
+            /** @enum {string} */
+            viewerRole: "administrator" | "owner" | "operator";
+            canDelete: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        VendorSummaryResponseInput: {
+            slug: string;
+            name: string;
+        };
+        MyVendorsResponseInput: {
+            owned: components["schemas"]["VendorResponseInput"] | null;
+            operating: components["schemas"]["VendorSummaryResponseInput"][];
+        };
+        PublicVendorMemberResponseInput: {
+            firstName: string;
+            lastName: string;
+            /** @enum {string} */
+            role: "owner" | "operator";
+        };
+        PublicVendorResponseInput: {
+            slug: string;
+            name: string;
+            description: string;
+            members: components["schemas"]["PublicVendorMemberResponseInput"][];
+        };
+        VendorListItemResponseInput: {
+            slug: string;
+            name: string;
+            description: string;
+        };
+        VendorListResponseInput: {
+            data: components["schemas"]["VendorListItemResponseInput"][];
+            meta: {
+                total: number;
+                limit: number;
+                offset: number;
+            };
+        };
+        ManagedVendorOwnerResponseInput: {
+            /** Format: uuid */
+            userId: string;
+            firstName: string;
+            lastName: string;
+        };
+        ManagedVendorListItemResponseInput: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            name: string;
+            description: string;
+            owner: components["schemas"]["ManagedVendorOwnerResponseInput"];
+            memberCount: number;
+            /** @enum {string} */
+            viewerRole: "administrator" | "owner" | "operator";
+            canDelete: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        ManagedVendorListResponseInput: {
+            data: components["schemas"]["ManagedVendorListItemResponseInput"][];
+            meta: {
+                total: number;
+                limit: number;
+                offset: number;
+            };
+            /** @enum {string} */
+            scope: "all" | "mine";
         };
         CountryListResponseInput: {
             data: string[];
@@ -862,65 +1329,6 @@ export interface components {
                 offset: number;
             };
         };
-        RegisterVendorRequestInput: {
-            slug: string;
-            name: string;
-            description: string;
-        };
-        AddOperatorRequestInput: {
-            email: string;
-        };
-        VendorMemberResponseInput: {
-            /** Format: uuid */
-            userId: string;
-            firstName: string;
-            lastName: string;
-            /** @enum {string} */
-            role: "owner" | "operator";
-        };
-        VendorResponseInput: {
-            /** Format: uuid */
-            id: string;
-            slug: string;
-            name: string;
-            description: string;
-            members: components["schemas"]["VendorMemberResponseInput"][];
-            /** Format: date-time */
-            createdAt: string;
-        };
-        VendorSummaryResponseInput: {
-            slug: string;
-            name: string;
-        };
-        MyVendorsResponseInput: {
-            owned: components["schemas"]["VendorResponseInput"] | null;
-            operating: components["schemas"]["VendorSummaryResponseInput"][];
-        };
-        PublicVendorMemberResponseInput: {
-            firstName: string;
-            lastName: string;
-            /** @enum {string} */
-            role: "owner" | "operator";
-        };
-        PublicVendorResponseInput: {
-            slug: string;
-            name: string;
-            description: string;
-            members: components["schemas"]["PublicVendorMemberResponseInput"][];
-        };
-        VendorListItemResponseInput: {
-            slug: string;
-            name: string;
-            description: string;
-        };
-        VendorListResponseInput: {
-            data: components["schemas"]["VendorListItemResponseInput"][];
-            meta: {
-                total: number;
-                limit: number;
-                offset: number;
-            };
-        };
         LoginRequest: {
             email: string;
             password: string;
@@ -941,6 +1349,103 @@ export interface components {
                 path: string;
                 message: string;
             }[];
+        };
+        RegisterVendorRequest: {
+            slug: string;
+            name: string;
+            description: string;
+        };
+        AddOperatorRequest: {
+            /** Format: email */
+            email: string;
+        };
+        VendorMemberResponse: {
+            /** Format: uuid */
+            userId: string;
+            firstName: string;
+            lastName: string;
+            /** @enum {string} */
+            role: "owner" | "operator";
+        };
+        UpdateVendorRequest: {
+            name?: string;
+            description?: string;
+        };
+        VendorResponse: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            name: string;
+            description: string;
+            members: components["schemas"]["VendorMemberResponse"][];
+            /** @enum {string} */
+            viewerRole: "administrator" | "owner" | "operator";
+            canDelete: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        VendorSummaryResponse: {
+            slug: string;
+            name: string;
+        };
+        MyVendorsResponse: {
+            owned: components["schemas"]["VendorResponse"] | null;
+            operating: components["schemas"]["VendorSummaryResponse"][];
+        };
+        PublicVendorMemberResponse: {
+            firstName: string;
+            lastName: string;
+            /** @enum {string} */
+            role: "owner" | "operator";
+        };
+        PublicVendorResponse: {
+            slug: string;
+            name: string;
+            description: string;
+            members: components["schemas"]["PublicVendorMemberResponse"][];
+        };
+        VendorListItemResponse: {
+            slug: string;
+            name: string;
+            description: string;
+        };
+        VendorListResponse: {
+            data: components["schemas"]["VendorListItemResponse"][];
+            meta: {
+                total: number;
+                limit: number;
+                offset: number;
+            };
+        };
+        ManagedVendorOwnerResponse: {
+            /** Format: uuid */
+            userId: string;
+            firstName: string;
+            lastName: string;
+        };
+        ManagedVendorListItemResponse: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            name: string;
+            description: string;
+            owner: components["schemas"]["ManagedVendorOwnerResponse"];
+            memberCount: number;
+            /** @enum {string} */
+            viewerRole: "administrator" | "owner" | "operator";
+            canDelete: boolean;
+            /** Format: date-time */
+            createdAt: string;
+        };
+        ManagedVendorListResponse: {
+            data: components["schemas"]["ManagedVendorListItemResponse"][];
+            meta: {
+                total: number;
+                limit: number;
+                offset: number;
+            };
+            /** @enum {string} */
+            scope: "all" | "mine";
         };
         CountryListResponse: {
             data: string[];
@@ -987,66 +1492,6 @@ export interface components {
         };
         UserListResponse: {
             data: components["schemas"]["UserResponse"][];
-            meta: {
-                total: number;
-                limit: number;
-                offset: number;
-            };
-        };
-        RegisterVendorRequest: {
-            slug: string;
-            name: string;
-            description: string;
-        };
-        AddOperatorRequest: {
-            /** Format: email */
-            email: string;
-        };
-        VendorMemberResponse: {
-            /** Format: uuid */
-            userId: string;
-            firstName: string;
-            lastName: string;
-            /** @enum {string} */
-            role: "owner" | "operator";
-        };
-        VendorResponse: {
-            /** Format: uuid */
-            id: string;
-            slug: string;
-            name: string;
-            description: string;
-            members: components["schemas"]["VendorMemberResponse"][];
-            /** Format: date-time */
-            createdAt: string;
-        };
-        VendorSummaryResponse: {
-            slug: string;
-            name: string;
-        };
-        MyVendorsResponse: {
-            owned: components["schemas"]["VendorResponse"] | null;
-            operating: components["schemas"]["VendorSummaryResponse"][];
-        };
-        PublicVendorMemberResponse: {
-            firstName: string;
-            lastName: string;
-            /** @enum {string} */
-            role: "owner" | "operator";
-        };
-        PublicVendorResponse: {
-            slug: string;
-            name: string;
-            description: string;
-            members: components["schemas"]["PublicVendorMemberResponse"][];
-        };
-        VendorListItemResponse: {
-            slug: string;
-            name: string;
-            description: string;
-        };
-        VendorListResponse: {
-            data: components["schemas"]["VendorListItemResponse"][];
             meta: {
                 total: number;
                 limit: number;

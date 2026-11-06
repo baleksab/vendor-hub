@@ -1,7 +1,16 @@
 import { ConflictError } from "../shared/errors.ts";
 import type { VendorMemberRole } from "../vendors/vendor-member-role.ts";
 import type { Page } from "../shared/pagination.ts";
-import type { NewVendor, Vendor, VendorListItem, VendorSummary } from "../vendors/vendor.ts";
+import type { Actor } from "../vendors/vendor-access.ts";
+import type {
+  ManagedVendorRow,
+  NewVendor,
+  Vendor,
+  VendorListItem,
+  VendorPatch,
+  VendorSummary,
+} from "../vendors/vendor.ts";
+import { resolveOrder, type ListManagedVendorsQuery } from "../vendors/vendors.schemas.ts";
 import {
   ALREADY_MEMBER_MESSAGE,
   ALREADY_OWNER_MESSAGE,
@@ -59,6 +68,98 @@ export class InMemoryVendorsRepository implements VendorsRepository {
         .map(({ slug, name, description }) => ({ slug, name, description })),
       total: newestFirst.length,
     };
+  }
+
+  async listManaged(
+    actor: Actor,
+    query: ListManagedVendorsQuery,
+  ): Promise<{ items: ManagedVendorRow[]; total: number }> {
+    const search = query.search?.toLowerCase();
+    const relationRole = query.relation === "owned" ? "owner" : "operator";
+
+    const rows = this.vendors.flatMap((vendor): ManagedVendorRow[] => {
+      const members = this.members.filter((member) => member.vendorId === vendor.id);
+      const callerRole = members.find((member) => member.userId === actor.userId)?.role;
+      const ownerMember = members.find((member) => member.role === "owner");
+      const owner = this.users.rows.find((user) => user.id === ownerMember?.userId);
+
+      const visible = actor.role === "administrator" || callerRole !== undefined;
+      const relationMatches = query.relation === undefined || callerRole === relationRole;
+      const searchMatches =
+        search === undefined ||
+        vendor.name.toLowerCase().includes(search) ||
+        vendor.slug.toLowerCase().includes(search);
+
+      if (!visible || !relationMatches || !searchMatches || owner === undefined) {
+        return [];
+      }
+
+      return [
+        {
+          id: vendor.id,
+          slug: vendor.slug,
+          name: vendor.name,
+          description: vendor.description,
+          owner: { userId: owner.id, firstName: owner.firstName, lastName: owner.lastName },
+          memberCount: members.length,
+          callerRole,
+          createdAt: vendor.createdAt,
+        },
+      ];
+    });
+
+    const direction = resolveOrder(query) === "asc" ? 1 : -1;
+    const sorted = rows.sort((left, right) => {
+      const difference =
+        query.sort === "name"
+          ? left.name.localeCompare(right.name)
+          : query.sort === "memberCount"
+            ? left.memberCount - right.memberCount
+            : left.createdAt.getTime() - right.createdAt.getTime();
+
+      return difference !== 0 ? difference * direction : left.id.localeCompare(right.id);
+    });
+
+    return {
+      items: sorted.slice(query.offset, query.offset + query.limit),
+      total: sorted.length,
+    };
+  }
+
+  async findById(id: string): Promise<Vendor | undefined> {
+    const vendor = this.vendors.find((row) => row.id === id);
+
+    return vendor && this.toVendor(vendor);
+  }
+
+  async update(id: string, patch: VendorPatch): Promise<Vendor | undefined> {
+    const vendor = this.vendors.find((row) => row.id === id);
+
+    if (vendor === undefined) {
+      return undefined;
+    }
+
+    Object.assign(vendor, patch);
+
+    return this.toVendor(vendor);
+  }
+
+  async softDelete(id: string): Promise<boolean> {
+    const index = this.vendors.findIndex((row) => row.id === id);
+
+    if (index === -1) {
+      return false;
+    }
+
+    this.vendors.splice(index, 1);
+
+    for (let position = this.members.length - 1; position >= 0; position -= 1) {
+      if (this.members[position]?.vendorId === id) {
+        this.members.splice(position, 1);
+      }
+    }
+
+    return true;
   }
 
   async findBySlug(slug: string): Promise<Vendor | undefined> {

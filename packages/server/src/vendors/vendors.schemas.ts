@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { PageMeta, PaginationQuery } from "../shared/pagination.ts";
 import { RESERVED_SLUGS } from "./reserved-slugs.ts";
-import { VendorMemberRoleSchema } from "./vendor-member-role.ts";
+import { VENDOR_MEMBER_ROLES, VendorMemberRoleSchema } from "./vendor-member-role.ts";
 
 const slug = z
   .string()
@@ -33,6 +33,15 @@ export const VendorMemberResponse = z
   })
   .meta({ id: "VendorMemberResponse" });
 
+export const ViewerRoleSchema = z.enum(["administrator", ...VENDOR_MEMBER_ROLES]);
+
+export const UpdateVendorRequest = z
+  .object({ name: name.optional(), description: description.optional() })
+  .refine((body) => Object.values(body).some((value) => value !== undefined), {
+    message: "At least one field must be present",
+  })
+  .meta({ id: "UpdateVendorRequest" });
+
 export const VendorResponse = z
   .object({
     id: z.uuid(),
@@ -40,6 +49,8 @@ export const VendorResponse = z
     name: z.string(),
     description: z.string(),
     members: z.array(VendorMemberResponse),
+    viewerRole: ViewerRoleSchema,
+    canDelete: z.boolean(),
     createdAt: z.iso.datetime(),
   })
   .meta({ id: "VendorResponse" });
@@ -82,13 +93,61 @@ export const VendorListResponse = z
 
 export const ListVendorsQuery = PaginationQuery;
 
+const SEARCH_MAX_LENGTH = 100;
+
+export const VENDOR_SORT_FIELDS = ["name", "createdAt", "memberCount"] as const;
+
+export const ManagedVendorOwnerResponse = z
+  .object({ userId: z.uuid(), firstName: z.string(), lastName: z.string() })
+  .meta({ id: "ManagedVendorOwnerResponse" });
+
+export const ManagedVendorListItemResponse = z
+  .object({
+    id: z.uuid(),
+    slug: z.string(),
+    name: z.string(),
+    description: z.string(),
+    owner: ManagedVendorOwnerResponse,
+    memberCount: z.number().int().min(1),
+    viewerRole: ViewerRoleSchema,
+    canDelete: z.boolean(),
+    createdAt: z.iso.datetime(),
+  })
+  .meta({ id: "ManagedVendorListItemResponse" });
+
+export const ManagedVendorListResponse = z
+  .object({
+    data: z.array(ManagedVendorListItemResponse),
+    meta: PageMeta,
+    scope: z.enum(["all", "mine"]),
+  })
+  .meta({ id: "ManagedVendorListResponse" });
+
+export const ListManagedVendorsQuery = PaginationQuery.extend({
+  search: z.string().trim().min(1).max(SEARCH_MAX_LENGTH).optional(),
+  relation: z.enum(["owned", "operated"]).optional(),
+  sort: z.enum(VENDOR_SORT_FIELDS).default("name"),
+  order: z.enum(["asc", "desc"]).optional(),
+});
+
+export const VendorIdParams = z.object({ id: z.uuid() });
+
+export const VendorOperatorParams = z.object({ id: z.uuid(), userId: z.uuid() });
+
 export const VendorSlugParams = z.object({ slug: z.string().min(1).max(63) });
 
 export const OperatorParams = z.object({ userId: z.uuid() });
 
 export type RegisterVendorRequest = z.infer<typeof RegisterVendorRequest>;
 export type AddOperatorRequest = z.infer<typeof AddOperatorRequest>;
+export type UpdateVendorRequest = z.infer<typeof UpdateVendorRequest>;
+export type ListManagedVendorsQuery = z.infer<typeof ListManagedVendorsQuery>;
+export type ManagedVendorListResponse = z.infer<typeof ManagedVendorListResponse>;
 export type VendorResponse = z.infer<typeof VendorResponse>;
 export type MyVendorsResponse = z.infer<typeof MyVendorsResponse>;
 export type VendorListResponse = z.infer<typeof VendorListResponse>;
 export type PublicVendorResponse = z.infer<typeof PublicVendorResponse>;
+
+export function resolveOrder(query: ListManagedVendorsQuery): "asc" | "desc" {
+  return query.order ?? (query.sort === "name" ? "asc" : "desc");
+}

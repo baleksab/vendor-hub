@@ -21,9 +21,22 @@ export type UpdateUserRequest = Schemas["UpdateUserRequest"];
 export type UserListResponse = Schemas["UserListResponse"];
 export type UserListQuery = NonNullable<paths["/api/v1/users"]["get"]["parameters"]["query"]>;
 
+export type UpdateVendorRequest = Schemas["UpdateVendorRequest"];
+export type ManagedVendorListResponse = Schemas["ManagedVendorListResponse"];
+export type ManagedVendorListItemResponse = Schemas["ManagedVendorListItemResponse"];
+export type ManagedVendorListQuery = NonNullable<
+  paths["/api/v1/vendors/managed"]["get"]["parameters"]["query"]
+>;
+
 export type Locale = "en" | "sr";
 
 export type UserAdministratorProps = {
+  locale: Locale;
+  apiBaseUrl: string;
+  onUnauthorized: () => void;
+};
+
+export type VendorAdministratorProps = {
   locale: Locale;
   apiBaseUrl: string;
   onUnauthorized: () => void;
