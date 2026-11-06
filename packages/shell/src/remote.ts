@@ -8,7 +8,7 @@ import * as ReactRouter from "react-router";
 const mantineVersion = MANTINE_VERSION;
 const reactRouterVersion = REACT_ROUTER_VERSION;
 
-export type RemoteName = "user-administrator";
+export type RemoteName = "user-administrator" | "vendor-administrator";
 
 export type RemoteManifestUrls = Record<RemoteName, string>;
 
@@ -19,7 +19,10 @@ const modules = new Map<string, Promise<unknown>>();
 export function getFederation(manifestUrls: RemoteManifestUrls): ModuleFederation {
   instance ??= createInstance({
     name: "shell",
-    remotes: [{ name: "user-administrator", entry: manifestUrls["user-administrator"] }],
+    remotes: [
+      { name: "user-administrator", entry: manifestUrls["user-administrator"] },
+      { name: "vendor-administrator", entry: manifestUrls["vendor-administrator"] },
+    ],
     shared: {
       react: {
         version: React.version,

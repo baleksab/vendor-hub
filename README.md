@@ -22,16 +22,17 @@ SSR serves the public side (fast first paint, SEO for storefronts and products).
                                     └──► server (REST API) ──► PostgreSQL
 ```
 
-| Part    | Package                       | Role                                                          |
-| ------- | ----------------------------- | ------------------------------------------------------------- |
-| Shell   | `packages/shell`              | SSR host: landing page, storefronts, checkout, loads remotes  |
-| Remotes | `packages/remote-*`           | Vendor admin panel and statistics (Module Federation, client) |
-| API     | `packages/server`             | REST API and business rules (Fastify, Zod, Postgres)          |
-| Types   | `packages/types`              | API types generated from the server's OpenAPI document        |
-| Client  | `packages/api-client`         | Shared typed fetch client (`openapi-fetch`) and `ApiError`    |
-| UI      | `packages/ui`                 | Shared Mantine theme, design tokens and common components     |
-| Admin   | `packages/user-administrator` | Remote with the user administration pages                     |
-| Proxy   | nginx                         | Reverse proxy in front of the shell                           |
+| Part    | Package                         | Role                                                          |
+| ------- | ------------------------------- | ------------------------------------------------------------- |
+| Shell   | `packages/shell`                | SSR host: landing page, storefronts, checkout, loads remotes  |
+| Remotes | `packages/remote-*`             | Vendor admin panel and statistics (Module Federation, client) |
+| API     | `packages/server`               | REST API and business rules (Fastify, Zod, Postgres)          |
+| Types   | `packages/types`                | API types generated from the server's OpenAPI document        |
+| Client  | `packages/api-client`           | Shared typed fetch client (`openapi-fetch`) and `ApiError`    |
+| UI      | `packages/ui`                   | Shared Mantine theme, design tokens and common components     |
+| Admin   | `packages/user-administrator`   | Remote with the user administration pages                     |
+| Manage  | `packages/vendor-administrator` | Remote with the vendor management pages                       |
+| Proxy   | nginx                           | Reverse proxy in front of the shell                           |
 
 Each vendor owns a path (`/vendors/<slug>`), and `/vendors` lists them all. Everything is served from one domain, so adding a vendor never changes the nginx config. The domain is configuration, like every other host and port.
 
@@ -71,14 +72,16 @@ pnpm nginx:up       # nginx on port 80, open http://vendorhub.localhost
 
 `*.localhost` resolves to `127.0.0.1` in Chrome, Firefox and Safari, so no hosts file or DNS setup is needed.
 
-nginx (`infra/nginx`) sends `vendorhub.localhost` to the shell. `pnpm nginx:down` stops it. Its settings are in `infra/nginx/.env.local`; changing the domain or port also means changing `SHELL_ORIGIN` (shell) and `REMOTE_TEST_ALLOWED_ORIGINS` and `USER_ADMINISTRATOR_ALLOWED_ORIGINS` (remotes). nginx is optional: without it the shell is also reachable on `localhost:4100`.
+nginx (`infra/nginx`) sends `vendorhub.localhost` to the shell. `pnpm nginx:down` stops it. Its settings are in `infra/nginx/.env.local`; changing the domain or port also means changing `SHELL_ORIGIN` (shell) and `REMOTE_TEST_ALLOWED_ORIGINS` and `USER_ADMINISTRATOR_ALLOWED_ORIGINS` and `VENDOR_ADMINISTRATOR_ALLOWED_ORIGINS` (remotes). nginx is optional: without it the shell is also reachable on `localhost:4100`.
 
 | Service             | URL                                                             |
 | ------------------- | --------------------------------------------------------------- |
 | Shell               | `http://vendorhub.localhost` (nginx), upstream `localhost:4100` |
 | Vendor site         | `http://vendorhub.localhost/vendors/<slug>` (nginx)             |
 | Remote (user admin) | `http://localhost:4102`                                         |
+| Remote (vendors)    | `http://localhost:4103`                                         |
 | Admin pages         | `http://vendorhub.localhost/admin/users` (administrators only)  |
+| Vendor management   | `http://vendorhub.localhost/manage/vendors` (logged in)         |
 | API                 | `http://localhost:4200` (docs `/docs`)                          |
 | Postgres            | `localhost:5433`                                                |
 

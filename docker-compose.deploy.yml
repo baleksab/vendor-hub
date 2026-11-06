@@ -93,6 +93,33 @@ services:
       timeout: 3s
       retries: 10
 
+  vendor-administrator:
+    build:
+      context: .
+      target: vendor-administrator
+    image: vendor-hub-vendor-administrator
+    restart: unless-stopped
+    env_file:
+      - packages/vendor-administrator/.env
+      - packages/vendor-administrator/.env.local
+    environment:
+      VENDOR_ADMINISTRATOR_HOST: 0.0.0.0
+    ports:
+      - "${VENDOR_ADMINISTRATOR_PORT:?}:${VENDOR_ADMINISTRATOR_PORT:?}"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "/app/scripts/healthcheck.mjs",
+          "VENDOR_ADMINISTRATOR_HOST",
+          "VENDOR_ADMINISTRATOR_PORT",
+          "/mf-manifest.json",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   nginx:
     environment:
       SHELL_UPSTREAM: shell:${SHELL_PORT:?}
@@ -100,4 +127,6 @@ services:
       shell:
         condition: service_healthy
       user-administrator:
+        condition: service_healthy
+      vendor-administrator:
         condition: service_healthy

@@ -4,6 +4,7 @@ Object.assign(process.env, {
   SHELL_PORT: "4100",
   SHELL_ORIGIN: "http://shell.test",
   USER_ADMINISTRATOR_MANIFEST_URL: "http://admin.test/mf-manifest.json",
+  VENDOR_ADMINISTRATOR_MANIFEST_URL: "http://manage.test/mf-manifest.json",
   API_URL: "http://api.test",
   SESSION_COOKIE_NAME: "session",
   SESSION_COOKIE_SECURE: "true",

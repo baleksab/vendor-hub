@@ -17,6 +17,7 @@ packages/shell/
 │   │   ├── Login/          login form, loginAction.server.ts, noindex
 │   │   ├── Register/       registration form, registerAction.server.ts, countries from the API, noindex
 │   │   ├── Admin/          `/admin/*`, loader allows administrators only, mounts the user-administrator remote, noindex
+│   │   ├── ManageVendors/  `/manage/*`, loader needs a session only, mounts the vendor-administrator remote, noindex
 │   │   └── NotFound/       splat route, 404 + noindex
 │   ├── components/         shared: AppLayout, NavLink, LanguageSwitcher, UserMenu, FormField, FormAlert, RemoteSlot, RemoteErrorBoundary, RemoteFallback
 │   ├── hooks/              shared: useIsClient, useSession
@@ -45,7 +46,7 @@ packages/shell/
 
 ## Server side
 
-- `root.tsx` has the `loader` that reads env with `getEnv()` (cached `readShellEnv(process.env)`) and returns the locale, the public origin, the remote manifest URL, the current user and the vendors of that user (`GET /vendors/me`, cached per request, `null` if the call fails). Env is read on the server only; the client gets the URL as loader data.
+- `root.tsx` has the `loader` that reads env with `getEnv()` (cached `readShellEnv(process.env)`) and returns the locale, the public origin, the remote manifest URLs, the current user and the vendors of that user (`GET /vendors/me`, cached per request, `null` if the call fails). Env is read on the server only; the client gets the URL as loader data.
 - `Layout` renders the HTML document with `mantineHtmlProps`, `ColorSchemeScript` in `<head>` and `MantineProvider` (theme from `@vendor-hub/ui`) around the children. Mantine is server-rendered; its CSS is static, so SSR needs no style extraction.
 - `Layout` renders the HTML document. SSR output includes the route markup and, for remote routes, a loading spinner.
 - `pnpm build` produces `build/`; `pnpm start` runs `scripts/start.mjs`, which checks the env keys and maps `SHELL_HOST`/`SHELL_PORT` to the `HOST`/`PORT` that `react-router-serve` expects.
@@ -67,7 +68,7 @@ browser --(HttpOnly cookie, same origin)--> shell server --(Authorization: Beare
 
 ### API proxy
 
-`routes/apiProxy.ts` is registered as `api/v1/*` and handles every method through `proxy/forwardApiRequest.server.ts`. It answers `404` for anything outside the allowlist (`proxy/proxyAllowlist.ts`: `GET` and `PATCH` on `/api/v1/users` and `/api/v1/users/:id`, and `GET /api/v1/countries`), checks the `Origin` on non-GET requests (`assertSameOrigin`), answers `401` without a session cookie, and forwards method, path, query and body to `API_URL` with `Authorization: Bearer <token>` from the cookie. The `Cookie` header and other request headers are not forwarded, the response keeps only the status and `Content-Type`, and a failed upstream call becomes `502`. Adding a path to the allowlist is a deliberate change.
+`routes/apiProxy.ts` is registered as `api/v1/*` and handles every method through `proxy/forwardApiRequest.server.ts`. It answers `404` for anything outside the allowlist (`proxy/proxyAllowlist.ts`, a table of `{ method, pattern }` entries: `GET` and `PATCH` on `/api/v1/users` and `/api/v1/users/:id`, `GET /api/v1/countries`, and for vendors `GET /vendors/managed`, `GET`, `PATCH` and `DELETE /vendors/:id`, `POST /vendors/:id/operators` and `DELETE /vendors/:id/operators/:userId`, with the ids matched as uuids), checks the `Origin` on non-GET requests (`assertSameOrigin`), answers `401` without a session cookie, and forwards method, path, query and body to `API_URL` with `Authorization: Bearer <token>` from the cookie. The `Cookie` header and other request headers are not forwarded, the response keeps only the status and `Content-Type`, and a failed upstream call becomes `502`. Adding a path to the allowlist is a deliberate change.
 
 API calls use `openapi-fetch` with the `paths` type generated into `@vendor-hub/types`, so paths, methods, bodies and responses are checked by `tsc`. `createServerApi(token?)` builds the client, and every call is wrapped in `unwrap` (`@vendor-hub/api-client`). Calls are defined once per resource in `api/endpoints/*.server.ts`, and actions and loaders use those functions instead of building requests themselves.
 
@@ -106,6 +107,8 @@ A new remote means: a new entry in `remotes` and `RemoteName` in `remote.ts`, a 
 ### Administration
 
 `Admin` (`/admin/*`) has a loader that calls `requireUser` and throws `403` when the user is not an administrator (`shouldRevalidate` is `false`, so navigating inside the remote does not call the API again). The component renders `user-administrator/UserAdministrator` with `locale`, `apiBaseUrl` (the shell origin) and `onUnauthorized`, which sends the user to `/login?redirectTo=...`. The "Administration" link in the sidebar is shown to administrators only. The authorization itself is enforced by the API.
+
+`ManageVendors` (`/manage/*`) has a loader that only calls `requireUser`, so any logged-in user can open it, and the API decides which vendors they see. It renders `vendor-administrator/VendorAdministrator` with the same props. The `/vendors` page shows a button to `/manage/vendors` ("Manage vendors" for administrators, "Manage your vendors" for owners and operators, nothing for everybody else), decided by `vendor/manageVendorsLink.ts` from the root loader data.
 
 ## Tests
 

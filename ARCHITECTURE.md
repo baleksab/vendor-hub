@@ -7,15 +7,16 @@ projekat/
 ├── packages/
 │   ├── shell/          host app, React Router 8 framework mode, SSR
 │   ├── user-administrator/ remote with the admin user pages (TanStack Query, React Router routes)
+│   ├── vendor-administrator/ remote with the vendor management pages (list, quick view, detail)
 │   ├── server/         REST API, Fastify + Zod (not part of the microfrontend runtime)
 │   └── types/          API types generated from the server's OpenAPI document (@vendor-hub/types)
 │   ├── api-client/     shared typed fetch client, unwrap, ApiError (@vendor-hub/api-client)
 │   └── ui/             Mantine theme, design tokens, common components (@vendor-hub/ui)
 ├── infra/nginx/        nginx template for the site (docker compose service)
 ├── scripts/            deploy.sh (one-command deploy), healthcheck.mjs (container health probe)
-├── Dockerfile          one build stage, one target per app (server, shell, user-administrator)
+├── Dockerfile          one build stage, one target per app (server, shell, user-administrator, vendor-administrator)
 ├── docker-compose.yml  Postgres and nginx (also used for local development)
-├── docker-compose.deploy.yml  overlay for the full stack: migrate, server, shell, user-administrator
+├── docker-compose.deploy.yml  overlay for the full stack: migrate, server, shell, user-administrator, vendor-administrator
 ├── pnpm-workspace.yaml workspace + dependency catalog
 ├── tsconfig.base.json  shared compiler options
 ├── .oxlintrc.json      shared lint rules
@@ -37,6 +38,8 @@ The remotes' manifest URLs are not hardcoded in the shell. The root loader reads
 browser --> nginx --> shell /admin/users   (loader: administrators only) --> user-administrator remote (client)
 browser --> nginx --> shell /api/v1/users  (proxy: adds Bearer from the HttpOnly cookie) --> API
 ```
+
+The `vendor-administrator` remote is mounted at `manage/*` (`/manage/vendors` and `/manage/vendors/:id`). Its shell route only requires a logged-in user, because the API decides what each user can see: administrators every vendor, everybody else the vendors they own or operate. The proxy allowlist is a table of method and path pattern entries, with `vendors/managed` and the vendor ids (matched as uuids, so `/vendors/me` never matches) added next to `/users` and `GET /countries`.
 
 The `user-administrator` remote is mounted at `admin/*`. It calls the shell's own origin, and a resource route `api/v1/*` forwards an allowlisted set of paths (`/users` and the public `GET /countries`) to the API with the token from the cookie, so the JWT never reaches client JS and no CORS is needed. Authorization stays in the API.
 

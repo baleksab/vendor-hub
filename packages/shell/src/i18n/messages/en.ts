@@ -109,6 +109,12 @@ export const en = {
   "admin.error.message": "Could not load the administration.",
   "seo.admin.title": "Administration",
   "seo.admin.description": "Manage the users of Vendor Hub.",
+  "manage.error.title": "Error",
+  "manage.error.message": "Could not load the vendor management.",
+  "seo.manageVendors.title": "Manage vendors",
+  "seo.manageVendors.description": "Create and manage your vendors on Vendor Hub.",
+  "vendors.manage.admin": "Manage vendors",
+  "vendors.manage.mine": "Manage your vendors",
   "validation.tooShort": "This value is too short.",
   "validation.slug":
     "Use 3 to 40 lowercase letters, digits or single hyphens, not at the start or end.",
