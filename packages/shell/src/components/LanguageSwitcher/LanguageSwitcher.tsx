@@ -3,6 +3,7 @@ import { Form } from "react-router";
 
 import { useLocale, useT } from "../../i18n/LocaleProvider";
 import { LOCALES } from "../../i18n/locales";
+import classes from "./LanguageSwitcher.module.scss";
 
 export function LanguageSwitcher({ fullWidth = false }: { fullWidth?: boolean }) {
   const t = useT();
@@ -18,7 +19,7 @@ export function LanguageSwitcher({ fullWidth = false }: { fullWidth?: boolean })
             name="locale"
             value={locale}
             size="compact-sm"
-            h={fullWidth ? 44 : { base: 44, md: 32 }}
+            className={fullWidth ? classes.fullWidth : classes.button}
             px="sm"
             flex={fullWidth ? 1 : undefined}
             variant={locale === current ? "light" : "default"}
