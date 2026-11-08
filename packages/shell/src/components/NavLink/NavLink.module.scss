@@ -1,0 +1,22 @@
+.bar {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+
+  :global(.mantine-Button-inner) {
+    height: auto;
+    min-width: 0;
+    justify-content: center;
+  }
+
+  :global(.mantine-Button-label) {
+    display: block;
+    min-width: 0;
+    overflow: hidden;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

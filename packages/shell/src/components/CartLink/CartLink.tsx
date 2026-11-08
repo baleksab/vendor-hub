@@ -17,7 +17,7 @@ export function CartLink() {
       variant="subtle"
       color="gray"
       mih={44}
-      px="xs"
+      px="sm"
       leftSection={<NavIcon name="cart" />}
       rightSection={
         cartCount > 0 ? (

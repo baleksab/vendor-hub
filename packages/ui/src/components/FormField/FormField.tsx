@@ -3,6 +3,13 @@ import type { ChangeEvent, FocusEventHandler } from "react";
 
 type Option = { value: string; label: string };
 
+const INPUT_WRAPPER_ORDER: ("label" | "input" | "description" | "error")[] = [
+  "label",
+  "input",
+  "description",
+  "error",
+];
+
 type Props = {
   name: string;
   label: string;
@@ -53,6 +60,7 @@ export function FormField({
     onFocus,
     onBlur,
     size: "md",
+    inputWrapperOrder: INPUT_WRAPPER_ORDER,
   } as const;
 
   if (kind === "select") {

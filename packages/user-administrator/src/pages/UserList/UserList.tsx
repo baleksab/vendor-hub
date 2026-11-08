@@ -3,6 +3,7 @@ import {
   Avatar,
   Badge,
   Button,
+  Card,
   Group,
   Pagination,
   Paper,
@@ -213,60 +214,95 @@ export default function UserList() {
           />
         </Paper>
       ) : (
-        <Paper
-          withBorder
-          radius="md"
-          style={{ overflow: "hidden", opacity: isPlaceholderData ? PLACEHOLDER_OPACITY : 1 }}
-        >
-          <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH}>
-            <Table highlightOnHover verticalSpacing="sm" horizontalSpacing="md">
-              <Table.Thead>
-                <Table.Tr>
-                  {sortHeader("name", t("users.col.user"))}
-                  {sortHeader("role", t("users.col.role"))}
-                  {sortHeader("country", t("users.col.country"))}
-                  {sortHeader("createdAt", t("users.col.created"))}
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {data.data.map((user) => (
-                  <Table.Tr key={user.id}>
-                    <Table.Td>
-                      <Group gap="sm" wrap="nowrap">
-                        <Avatar size={AVATAR_SIZE} radius="xl" color="primer">
-                          {user.firstName.charAt(0)}
-                          {user.lastName.charAt(0)}
-                        </Avatar>
-                        <div>
-                          <Anchor component={Link} to={userPath(user.id)} fw={500} size="sm">
-                            {user.firstName} {user.lastName}
-                          </Anchor>
-                          <Text size="xs" c="dimmed">
-                            {user.email}
-                          </Text>
-                        </div>
-                      </Group>
-                    </Table.Td>
-                    <Table.Td>
-                      <Badge
-                        variant={user.role === "administrator" ? "filled" : "light"}
-                        color={user.role === "administrator" ? "primer" : "gray"}
-                      >
-                        {t(`role.${user.role}`)}
-                      </Badge>
-                    </Table.Td>
-                    <Table.Td>
-                      <Text size="sm">{countryName(user.country)}</Text>
-                    </Table.Td>
-                    <Table.Td>
-                      <Text size="sm">{dateFormat.format(new Date(user.createdAt))}</Text>
-                    </Table.Td>
+        <div style={{ opacity: isPlaceholderData ? PLACEHOLDER_OPACITY : 1 }}>
+          <Paper withBorder radius="md" visibleFrom="sm" style={{ overflow: "hidden" }}>
+            <Table.ScrollContainer minWidth={TABLE_MIN_WIDTH}>
+              <Table highlightOnHover verticalSpacing="sm" horizontalSpacing="md">
+                <Table.Thead>
+                  <Table.Tr>
+                    {sortHeader("name", t("users.col.user"))}
+                    {sortHeader("role", t("users.col.role"))}
+                    {sortHeader("country", t("users.col.country"))}
+                    {sortHeader("createdAt", t("users.col.created"))}
                   </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-          </Table.ScrollContainer>
-        </Paper>
+                </Table.Thead>
+                <Table.Tbody>
+                  {data.data.map((user) => (
+                    <Table.Tr key={user.id}>
+                      <Table.Td>
+                        <Group gap="sm" wrap="nowrap">
+                          <Avatar size={AVATAR_SIZE} radius="xl" color="brand">
+                            {user.firstName.charAt(0)}
+                            {user.lastName.charAt(0)}
+                          </Avatar>
+                          <div>
+                            <Anchor component={Link} to={userPath(user.id)} fw={500} size="sm">
+                              {user.firstName} {user.lastName}
+                            </Anchor>
+                            <Text size="xs" c="dimmed">
+                              {user.email}
+                            </Text>
+                          </div>
+                        </Group>
+                      </Table.Td>
+                      <Table.Td>
+                        <Badge
+                          variant={user.role === "administrator" ? "filled" : "light"}
+                          color={user.role === "administrator" ? "brand" : "gray"}
+                        >
+                          {t(`role.${user.role}`)}
+                        </Badge>
+                      </Table.Td>
+                      <Table.Td>
+                        <Text size="sm">{countryName(user.country)}</Text>
+                      </Table.Td>
+                      <Table.Td>
+                        <Text size="sm">{dateFormat.format(new Date(user.createdAt))}</Text>
+                      </Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            </Table.ScrollContainer>
+          </Paper>
+
+          <Stack gap="sm" hiddenFrom="sm">
+            {data.data.map((user) => (
+              <Card key={user.id} withBorder radius="md" p="md">
+                <Stack gap="xs">
+                  <Group gap="sm" wrap="nowrap">
+                    <Avatar size={AVATAR_SIZE} radius="xl" color="brand">
+                      {user.firstName.charAt(0)}
+                      {user.lastName.charAt(0)}
+                    </Avatar>
+                    <div style={{ minWidth: 0 }}>
+                      <Anchor component={Link} to={userPath(user.id)} fw={500} size="sm">
+                        {user.firstName} {user.lastName}
+                      </Anchor>
+                      <Text size="xs" c="dimmed" truncate>
+                        {user.email}
+                      </Text>
+                    </div>
+                  </Group>
+                  <Group justify="space-between">
+                    <Text size="sm" c="dimmed">
+                      {countryName(user.country)}
+                    </Text>
+                    <Badge
+                      variant={user.role === "administrator" ? "filled" : "light"}
+                      color={user.role === "administrator" ? "brand" : "gray"}
+                    >
+                      {t(`role.${user.role}`)}
+                    </Badge>
+                  </Group>
+                  <Text size="xs" c="dimmed">
+                    {dateFormat.format(new Date(user.createdAt))}
+                  </Text>
+                </Stack>
+              </Card>
+            ))}
+          </Stack>
+        </div>
       )}
 
       {total > 0 ? (

@@ -1,0 +1,26 @@
+.heading {
+  letter-spacing: -0.02em;
+}
+
+.card {
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--mantine-shadow-md);
+    border-color: var(--mantine-color-brand-3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}
