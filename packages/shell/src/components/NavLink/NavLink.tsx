@@ -2,6 +2,7 @@ import { Button } from "@mantine/core";
 import { Link, useMatch } from "react-router";
 
 import { NavIcon, type NavIconName } from "../NavIcon/NavIcon";
+import classes from "./NavLink.module.scss";
 
 type Props = {
   to: string;
@@ -28,6 +29,8 @@ export function NavLink({ to, label, icon, variant = "bar", onNavigate }: Props)
       aria-current={active ? "page" : undefined}
       onClick={onNavigate}
       h={drawer ? 48 : 36}
+      className={drawer ? undefined : classes.bar}
+      title={drawer ? undefined : label}
       px="sm"
       fw={active ? 600 : 500}
     >

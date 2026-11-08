@@ -76,7 +76,7 @@ export function UserMenu({ variant = "bar" }: { variant?: "bar" | "drawer" }) {
   }
 
   return (
-    <Menu position="bottom-end" width={200} withinPortal>
+    <Menu position="bottom-end" width={240} withinPortal>
       <Menu.Target>
         <UnstyledButton
           aria-label={t("nav.account")}
@@ -86,7 +86,7 @@ export function UserMenu({ variant = "bar" }: { variant?: "bar" | "drawer" }) {
         >
           <Group gap="xs" wrap="nowrap">
             <Avatar name={name} color="brand" size={34} radius="xl" />
-            <Text fw={500} size="sm" maw={140} truncate visibleFrom="lg">
+            <Text fw={500} size="sm" maw={140} truncate visibleFrom="xl">
               {name}
             </Text>
           </Group>
@@ -94,6 +94,11 @@ export function UserMenu({ variant = "bar" }: { variant?: "bar" | "drawer" }) {
       </Menu.Target>
       <Menu.Dropdown>
         <Menu.Label>{name}</Menu.Label>
+        {user.role === "administrator" ? (
+          <Menu.Item component={Link} to="/admin/users" mih={{ base: 44, sm: 34 }}>
+            {t("nav.administration")}
+          </Menu.Item>
+        ) : null}
         <Menu.Item mih={{ base: 44, sm: 34 }} onClick={handleLogout} disabled={loggingOut}>
           {t("nav.logout")}
         </Menu.Item>

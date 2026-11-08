@@ -14,6 +14,7 @@ import { UserMenu } from "../UserMenu/UserMenu";
 import classes from "./AppLayout.module.scss";
 
 const HEADER_HEIGHT = 64;
+const ADMIN_PATH = "/admin/users";
 const CONTAINER_SIZE = 1200;
 
 function Brand() {
@@ -56,8 +57,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
   }
 
   if (user?.role === "administrator") {
-    links.push({ to: "/admin/users", label: t("nav.administration"), icon: "administration" });
+    links.push({ to: ADMIN_PATH, label: t("nav.administration"), icon: "administration" });
   }
+
+  const barLinks = links.filter((link) => link.to !== ADMIN_PATH);
 
   return (
     <Box className={classes.root}>
@@ -66,24 +69,33 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <Group h="100%" wrap="nowrap" gap="md">
             <Brand />
 
-            <Group component="nav" aria-label={t("nav.label")} gap={4} ml="lg" visibleFrom="md">
-              {links.map((link) => (
+            <Group
+              component="nav"
+              aria-label={t("nav.label")}
+              gap={4}
+              ml="lg"
+              visibleFrom="lg"
+              wrap="nowrap"
+              miw={0}
+              flex="0 1 auto"
+            >
+              {barLinks.map((link) => (
                 <NavLink key={link.to} {...link} />
               ))}
             </Group>
 
             <Group ml="auto" gap="xs" wrap="nowrap">
               <CartLink />
-              <Box visibleFrom="md">
+              <Box visibleFrom="lg">
                 <LanguageSwitcher />
               </Box>
-              <Box visibleFrom="md">
+              <Box visibleFrom="lg">
                 <UserMenu />
               </Box>
               <Burger
                 opened={false}
                 onClick={openMobile}
-                hiddenFrom="md"
+                hiddenFrom="lg"
                 size={18}
                 aria-label={t("nav.menu")}
                 className={classes.burger}
@@ -96,7 +108,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <Drawer
         opened={mobileOpened}
         onClose={closeMobile}
-        hiddenFrom="md"
+        hiddenFrom="lg"
         size="100%"
         position="right"
         title={<Brand />}
