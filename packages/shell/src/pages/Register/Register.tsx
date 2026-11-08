@@ -1,4 +1,4 @@
-import { Alert, Anchor, Button, Stack, Text, Title } from "@mantine/core";
+import { Alert, Anchor, Button, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import {
   Form,
   Link,
@@ -56,7 +56,7 @@ export default function Register({ actionData }: Route.ComponentProps) {
   const fields = actionData?.fields;
 
   return (
-    <Stack component="section" gap="md" maw={560} mx="auto">
+    <Stack component="section" gap="md">
       <Title order={1}>{t("register.title")}</Title>
 
       {checkout === null ? null : (
@@ -84,27 +84,31 @@ export default function Register({ actionData }: Route.ComponentProps) {
       ) : (
         <Form method="post" noValidate>
           <Stack gap="md">
-            <ContactFields countries={countries} values={values} errors={fields} />
-            <FormField
-              name="password"
-              label={t("auth.password")}
-              kind="password"
-              autoComplete="new-password"
-              error={fields?.password}
-            />
-            <FormField
-              name="confirmPassword"
-              label={t("auth.confirmPassword")}
-              kind="password"
-              autoComplete="new-password"
-              error={fields?.confirmPassword}
-            />
+            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+              <ContactFields countries={countries} values={values} errors={fields} flat />
+              <FormField
+                name="password"
+                label={t("auth.password")}
+                kind="password"
+                autoComplete="new-password"
+                error={fields?.password}
+              />
+              <FormField
+                name="confirmPassword"
+                label={t("auth.confirmPassword")}
+                kind="password"
+                autoComplete="new-password"
+                error={fields?.confirmPassword}
+              />
+            </SimpleGrid>
 
             <FormAlert message={actionData?.form} />
 
-            <Button type="submit" size="md" mih={44} loading={navigation.state === "submitting"}>
-              {t("register.submit")}
-            </Button>
+            <Group>
+              <Button type="submit" size="md" mih={44} loading={navigation.state === "submitting"}>
+                {t("register.submit")}
+              </Button>
+            </Group>
           </Stack>
         </Form>
       )}

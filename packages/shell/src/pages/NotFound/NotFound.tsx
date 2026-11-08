@@ -22,7 +22,7 @@ export default function NotFound() {
   const t = useT();
 
   return (
-    <Stack component="section" gap="md" maw={640}>
+    <Stack component="section" gap="md">
       <Title order={1}>{t("notFound.title")}</Title>
       <Text c="dimmed">{t("notFound.message")}</Text>
       <Button component={Link} to="/" mih={44} style={{ alignSelf: "flex-start" }}>

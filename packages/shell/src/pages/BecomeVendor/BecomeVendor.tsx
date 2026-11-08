@@ -1,4 +1,4 @@
-import { Button, Stack, Title } from "@mantine/core";
+import { Button, Group, SimpleGrid, Stack, Title } from "@mantine/core";
 import { Form, redirect, useNavigation } from "react-router";
 
 import { requireUser } from "../../auth/session.server";
@@ -43,26 +43,28 @@ export default function BecomeVendor({ actionData }: Route.ComponentProps) {
   const fields = actionData?.fields;
 
   return (
-    <Stack component="section" gap="md" maw={560} mx="auto">
+    <Stack component="section" gap="md">
       <Title order={1}>{t("becomeVendor.title")}</Title>
 
       <Form method="post" noValidate>
         <Stack gap="md">
-          <FormField
-            name="slug"
-            label={t("vendor.slug")}
-            description={t("vendor.slugHint")}
-            autoComplete="off"
-            defaultValue={values?.slug}
-            error={fields?.slug}
-          />
-          <FormField
-            name="name"
-            label={t("vendor.name")}
-            autoComplete="organization"
-            defaultValue={values?.name}
-            error={fields?.name}
-          />
+          <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+            <FormField
+              name="slug"
+              label={t("vendor.slug")}
+              description={t("vendor.slugHint")}
+              autoComplete="off"
+              defaultValue={values?.slug}
+              error={fields?.slug}
+            />
+            <FormField
+              name="name"
+              label={t("vendor.name")}
+              autoComplete="organization"
+              defaultValue={values?.name}
+              error={fields?.name}
+            />
+          </SimpleGrid>
           <FormField
             name="description"
             label={t("vendor.description")}
@@ -73,9 +75,11 @@ export default function BecomeVendor({ actionData }: Route.ComponentProps) {
 
           <FormAlert message={actionData?.form} />
 
-          <Button type="submit" size="md" mih={44} loading={navigation.state === "submitting"}>
-            {t("becomeVendor.submit")}
-          </Button>
+          <Group>
+            <Button type="submit" size="md" mih={44} loading={navigation.state === "submitting"}>
+              {t("becomeVendor.submit")}
+            </Button>
+          </Group>
         </Stack>
       </Form>
     </Stack>

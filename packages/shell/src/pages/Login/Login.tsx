@@ -1,4 +1,4 @@
-import { Alert, Anchor, Button, Stack, Text, Title } from "@mantine/core";
+import { Alert, Anchor, Button, Group, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { Form, Link, useNavigation, useSearchParams } from "react-router";
 
 import { redirectIfAuthenticated } from "../../auth/session.server";
@@ -38,34 +38,38 @@ export default function Login({ actionData }: Route.ComponentProps) {
     : "/register";
 
   return (
-    <Stack component="section" gap="md" maw={420} mx="auto">
+    <Stack component="section" gap="md">
       <Title order={1}>{t("login.title")}</Title>
 
       {searchParams.has("registered") && <Alert color="green">{t("login.registered")}</Alert>}
 
       <Form method="post" noValidate>
         <Stack gap="md">
-          <FormField
-            name="email"
-            label={t("auth.email")}
-            type="email"
-            autoComplete="email"
-            defaultValue={actionData?.values.email}
-            error={actionData?.fields.email}
-          />
-          <FormField
-            name="password"
-            label={t("auth.password")}
-            kind="password"
-            autoComplete="current-password"
-            error={actionData?.fields.password}
-          />
+          <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+            <FormField
+              name="email"
+              label={t("auth.email")}
+              type="email"
+              autoComplete="email"
+              defaultValue={actionData?.values.email}
+              error={actionData?.fields.email}
+            />
+            <FormField
+              name="password"
+              label={t("auth.password")}
+              kind="password"
+              autoComplete="current-password"
+              error={actionData?.fields.password}
+            />
+          </SimpleGrid>
 
           <FormAlert message={actionData?.form} />
 
-          <Button type="submit" size="md" mih={44} loading={navigation.state === "submitting"}>
-            {t("login.submit")}
-          </Button>
+          <Group>
+            <Button type="submit" size="md" mih={44} loading={navigation.state === "submitting"}>
+              {t("login.submit")}
+            </Button>
+          </Group>
         </Stack>
       </Form>
 

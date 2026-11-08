@@ -116,6 +116,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <Box component="main" className={classes.main}>
         <Container
           size={CONTAINER_SIZE}
+          w="100%"
           px="md"
           py={{ base: "lg", sm: 48 }}
           display="flex"

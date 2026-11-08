@@ -17,7 +17,7 @@ export function RoleBadge({ role }: Props) {
   }
 
   return (
-    <Badge variant="light" color={role === "owner" ? "teal" : "primer"}>
+    <Badge variant="light" color={role === "owner" ? "teal" : "brand"}>
       {t(`role.${role}`)}
     </Badge>
   );
