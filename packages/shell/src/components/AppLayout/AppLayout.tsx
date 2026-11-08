@@ -64,14 +64,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
       <Box component="header" className={classes.header} h={HEADER_HEIGHT}>
         <Container size={CONTAINER_SIZE} px="md" h="100%">
           <Group h="100%" wrap="nowrap" gap="md">
-            <Burger
-              opened={false}
-              onClick={openMobile}
-              hiddenFrom="md"
-              size={18}
-              aria-label={t("nav.menu")}
-              className={classes.burger}
-            />
             <Brand />
 
             <Group component="nav" aria-label={t("nav.label")} gap={4} ml="lg" visibleFrom="md">
@@ -88,6 +80,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <Box visibleFrom="md">
                 <UserMenu />
               </Box>
+              <Burger
+                opened={false}
+                onClick={openMobile}
+                hiddenFrom="md"
+                size={18}
+                aria-label={t("nav.menu")}
+                className={classes.burger}
+              />
             </Group>
           </Group>
         </Container>
@@ -97,10 +97,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
         opened={mobileOpened}
         onClose={closeMobile}
         hiddenFrom="md"
-        size="min(320px, 88vw)"
+        size="100%"
+        position="right"
         title={<Brand />}
-        closeButtonProps={{ "aria-label": t("nav.close"), size: "lg" }}
-        classNames={{ body: classes.drawerBody }}
+        closeButtonProps={{
+          "aria-label": t("nav.close"),
+          className: classes.drawerClose,
+        }}
+        classNames={{ header: classes.drawerHeader, body: classes.drawerBody }}
       >
         <Stack h="100%" justify="space-between" gap="lg">
           <Stack component="nav" aria-label={t("nav.label")} gap={4}>
