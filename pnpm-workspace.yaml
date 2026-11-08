@@ -5,6 +5,7 @@ catalogMode: strict
 
 allowBuilds:
   esbuild: true
+  "@parcel/watcher": false
 
 catalog:
   react: 19.3.1
