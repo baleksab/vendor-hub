@@ -50,6 +50,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       remoteManifestUrls: {
         "user-administrator": env.userAdministratorManifestUrl,
         "vendor-administrator": env.vendorAdministratorManifestUrl,
+        insights: env.insightsManifestUrl,
       },
       user: session?.user ?? null,
       vendors,

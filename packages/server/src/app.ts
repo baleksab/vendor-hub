@@ -13,6 +13,8 @@ import { AuthService } from "./auth/auth.service.ts";
 import { Argon2PasswordService } from "./auth/password.service.ts";
 import { CartService } from "./cart/cart.service.ts";
 import { TokenService } from "./auth/token.service.ts";
+import type { InsightsRepository } from "./insights/insight.ts";
+import { InsightsService } from "./insights/insights.service.ts";
 import { healthController, type DatabaseCheck } from "./health/health.controller.ts";
 import { registerOrderScheduler } from "./orders/order-scheduler.ts";
 import type { OrdersRepository } from "./orders/orders.repository.ts";
@@ -41,6 +43,7 @@ export type AppOptions = {
   imageStorage: ImageStorage;
   images: Pick<ImageEnv, "maxBytes" | "maxPerProduct">;
   ordersRepository: OrdersRepository;
+  insightsRepository: InsightsRepository;
   paymentGateway: PaymentGateway;
   cart: CartEnv;
   orders: OrdersEnv;
@@ -107,6 +110,13 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
     options.clock,
   );
 
+  const insightsService = new InsightsService(
+    options.insightsRepository,
+    options.vendorsRepository,
+    options.productsRepository,
+    options.clock,
+  );
+
   if (options.runOrderScheduler) {
     registerOrderScheduler(app, ordersService, options.orders.schedulerIntervalSeconds);
   }
@@ -122,6 +132,7 @@ export async function buildApp(options: AppOptions): Promise<FastifyInstance> {
       reviewsService,
       cartService,
       ordersService,
+      insightsService,
       tokens,
     }),
     { prefix: "/api/v1" },

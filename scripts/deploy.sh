@@ -19,6 +19,7 @@ env_files=(
   packages/shell/.env.local
   packages/user-administrator/.env.local
   packages/vendor-administrator/.env.local
+  packages/insights/.env.local
 )
 
 compose=(docker compose -f docker-compose.yml -f docker-compose.deploy.yml)

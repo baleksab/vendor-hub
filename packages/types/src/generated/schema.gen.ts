@@ -3039,6 +3039,202 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/insights/vendors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    limit?: number;
+                    offset?: number;
+                    search?: string;
+                    relation?: "owned" | "operated";
+                    period?: "7d" | "30d" | "90d" | "12m" | "all";
+                    currency?: "EUR" | "RSD" | "USD";
+                    sort?: "revenue" | "orders" | "products" | "rating" | "name";
+                    order?: "asc" | "desc";
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["InsightsVendorListResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/insights/vendors/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    period?: "7d" | "30d" | "90d" | "12m" | "all";
+                    currency?: "EUR" | "RSD" | "USD";
+                };
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["VendorInsightsResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/insights/products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    period?: "7d" | "30d" | "90d" | "12m" | "all";
+                    currency?: "EUR" | "RSD" | "USD";
+                };
+                header?: never;
+                path: {
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Default Response */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProductInsightsResponse"];
+                    };
+                };
+                /** @description Default Response */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+                /** @description Default Response */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["ProblemResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3052,6 +3248,165 @@ export interface components {
             /** @constant */
             tokenType: "Bearer";
             expiresIn: number;
+        };
+        InsightsVendorRowInput: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            name: string;
+            /** @enum {string} */
+            viewerRole: "owner" | "operator";
+            productCount: number;
+            orderCount: number;
+            netMinor: number;
+            previousNetMinor: number | null;
+            ratingAvg: number;
+            ratingCount: number;
+        };
+        InsightsVendorListResponseInput: {
+            data: components["schemas"]["InsightsVendorRowInput"][];
+            meta: {
+                total: number;
+                limit: number;
+                offset: number;
+                /** @enum {string} */
+                period: "7d" | "30d" | "90d" | "12m" | "all";
+                /** @enum {string} */
+                currency: "EUR" | "RSD" | "USD";
+                currencies: ("EUR" | "RSD" | "USD")[];
+            };
+        };
+        VendorInsightsResponseInput: {
+            meta: {
+                /** @enum {string} */
+                period: "7d" | "30d" | "90d" | "12m" | "all";
+                /** @enum {string} */
+                currency: "EUR" | "RSD" | "USD";
+                currencies: ("EUR" | "RSD" | "USD")[];
+            };
+            vendor: {
+                /** Format: uuid */
+                id: string;
+                slug: string;
+                name: string;
+                /** @enum {string} */
+                viewerRole: "owner" | "operator";
+            };
+            kpis: {
+                netMinor: {
+                    value: number;
+                    previous: number | null;
+                };
+                grossMinor: {
+                    value: number;
+                    previous: number | null;
+                };
+                refundedMinor: {
+                    value: number;
+                    previous: number | null;
+                };
+                orders: {
+                    value: number;
+                    previous: number | null;
+                };
+                units: {
+                    value: number;
+                    previous: number | null;
+                };
+                averageOrderMinor: {
+                    value: number;
+                    previous: number | null;
+                };
+                refundRate: {
+                    value: number;
+                    previous: number | null;
+                };
+            };
+            revenueSeries: {
+                bucket: string;
+                netMinor: number;
+                orders: number;
+            }[];
+            ordersByStatus: {
+                /** @enum {string} */
+                status: "created" | "paid" | "delivered" | "closed" | "cancelled" | "return_requested" | "return_approved" | "return_rejected";
+                count: number;
+            }[];
+            topProducts: {
+                /** Format: uuid */
+                productId: string;
+                name: string;
+                unitsSold: number;
+                netMinor: number;
+                ratingAvg: number | null;
+                available: boolean;
+            }[];
+            topCountries: {
+                country: string;
+                orders: number;
+                netMinor: number;
+            }[];
+            catalog: {
+                productCount: number;
+                outOfStockCount: number;
+                ratingAvg: number;
+                ratingCount: number;
+            };
+        };
+        ProductInsightsResponseInput: {
+            meta: {
+                /** @enum {string} */
+                period: "7d" | "30d" | "90d" | "12m" | "all";
+                /** @enum {string} */
+                currency: "EUR" | "RSD" | "USD";
+                currencies: ("EUR" | "RSD" | "USD")[];
+            };
+            product: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                /** Format: uuid */
+                vendorId: string;
+                vendorName: string;
+                stock: number;
+                ratingAvg: number;
+                ratingCount: number;
+            };
+            kpis: {
+                netMinor: {
+                    value: number;
+                    previous: number | null;
+                };
+                grossMinor: {
+                    value: number;
+                    previous: number | null;
+                };
+                refundedMinor: {
+                    value: number;
+                    previous: number | null;
+                };
+                orders: {
+                    value: number;
+                    previous: number | null;
+                };
+                units: {
+                    value: number;
+                    previous: number | null;
+                };
+            };
+            salesSeries: {
+                bucket: string;
+                netMinor: number;
+                units: number;
+            }[];
+            ratingDistribution: {
+                rating: number;
+                count: number;
+            }[];
+            reviewsSeries: {
+                bucket: string;
+                count: number;
+            }[];
         };
         ProblemResponseInput: {
             type: string;
@@ -3546,6 +3901,165 @@ export interface components {
             /** @constant */
             tokenType: "Bearer";
             expiresIn: number;
+        };
+        InsightsVendorRow: {
+            /** Format: uuid */
+            id: string;
+            slug: string;
+            name: string;
+            /** @enum {string} */
+            viewerRole: "owner" | "operator";
+            productCount: number;
+            orderCount: number;
+            netMinor: number;
+            previousNetMinor: number | null;
+            ratingAvg: number;
+            ratingCount: number;
+        };
+        InsightsVendorListResponse: {
+            data: components["schemas"]["InsightsVendorRow"][];
+            meta: {
+                total: number;
+                limit: number;
+                offset: number;
+                /** @enum {string} */
+                period: "7d" | "30d" | "90d" | "12m" | "all";
+                /** @enum {string} */
+                currency: "EUR" | "RSD" | "USD";
+                currencies: ("EUR" | "RSD" | "USD")[];
+            };
+        };
+        VendorInsightsResponse: {
+            meta: {
+                /** @enum {string} */
+                period: "7d" | "30d" | "90d" | "12m" | "all";
+                /** @enum {string} */
+                currency: "EUR" | "RSD" | "USD";
+                currencies: ("EUR" | "RSD" | "USD")[];
+            };
+            vendor: {
+                /** Format: uuid */
+                id: string;
+                slug: string;
+                name: string;
+                /** @enum {string} */
+                viewerRole: "owner" | "operator";
+            };
+            kpis: {
+                netMinor: {
+                    value: number;
+                    previous: number | null;
+                };
+                grossMinor: {
+                    value: number;
+                    previous: number | null;
+                };
+                refundedMinor: {
+                    value: number;
+                    previous: number | null;
+                };
+                orders: {
+                    value: number;
+                    previous: number | null;
+                };
+                units: {
+                    value: number;
+                    previous: number | null;
+                };
+                averageOrderMinor: {
+                    value: number;
+                    previous: number | null;
+                };
+                refundRate: {
+                    value: number;
+                    previous: number | null;
+                };
+            };
+            revenueSeries: {
+                bucket: string;
+                netMinor: number;
+                orders: number;
+            }[];
+            ordersByStatus: {
+                /** @enum {string} */
+                status: "created" | "paid" | "delivered" | "closed" | "cancelled" | "return_requested" | "return_approved" | "return_rejected";
+                count: number;
+            }[];
+            topProducts: {
+                /** Format: uuid */
+                productId: string;
+                name: string;
+                unitsSold: number;
+                netMinor: number;
+                ratingAvg: number | null;
+                available: boolean;
+            }[];
+            topCountries: {
+                country: string;
+                orders: number;
+                netMinor: number;
+            }[];
+            catalog: {
+                productCount: number;
+                outOfStockCount: number;
+                ratingAvg: number;
+                ratingCount: number;
+            };
+        };
+        ProductInsightsResponse: {
+            meta: {
+                /** @enum {string} */
+                period: "7d" | "30d" | "90d" | "12m" | "all";
+                /** @enum {string} */
+                currency: "EUR" | "RSD" | "USD";
+                currencies: ("EUR" | "RSD" | "USD")[];
+            };
+            product: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                /** Format: uuid */
+                vendorId: string;
+                vendorName: string;
+                stock: number;
+                ratingAvg: number;
+                ratingCount: number;
+            };
+            kpis: {
+                netMinor: {
+                    value: number;
+                    previous: number | null;
+                };
+                grossMinor: {
+                    value: number;
+                    previous: number | null;
+                };
+                refundedMinor: {
+                    value: number;
+                    previous: number | null;
+                };
+                orders: {
+                    value: number;
+                    previous: number | null;
+                };
+                units: {
+                    value: number;
+                    previous: number | null;
+                };
+            };
+            salesSeries: {
+                bucket: string;
+                netMinor: number;
+                units: number;
+            }[];
+            ratingDistribution: {
+                rating: number;
+                count: number;
+            }[];
+            reviewsSeries: {
+                bucket: string;
+                count: number;
+            }[];
         };
         ProblemResponse: {
             type: string;

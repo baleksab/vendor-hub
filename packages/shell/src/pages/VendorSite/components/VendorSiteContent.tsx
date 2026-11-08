@@ -14,6 +14,7 @@ import { useT } from "../../../i18n/LocaleProvider";
 import { loginPath } from "../../../auth/safeRedirect";
 import { useSession } from "../../../hooks/useSession/useSession";
 import type { ProductFilters } from "../../../vendor/products/productFilters";
+import { insightsVendorPath } from "../../../vendor/insightsLink";
 import { manageVendorPath } from "../../../vendor/manageVendorsLink";
 import { VENDORS_PATH, vendorPath } from "../../../vendor/vendorPaths";
 import { ProductsTab } from "./ProductsTab";
@@ -59,10 +60,29 @@ export function VendorSiteContent({
           <Title order={1} fz={{ base: 32, sm: 44 }}>
             {vendor.name}
           </Title>
-          {canManage ? (
-            <Button component={Link} to={manageVendorPath(vendor.id)} variant="default" mih={44}>
-              {t("vendorSite.manage")}
-            </Button>
+          {canManage || isMember ? (
+            <Group gap="sm" wrap="wrap" justify="flex-end">
+              {isMember ? (
+                <Button
+                  component={Link}
+                  to={insightsVendorPath(vendor.id)}
+                  variant="default"
+                  mih={44}
+                >
+                  {t("vendorSite.insights")}
+                </Button>
+              ) : null}
+              {canManage ? (
+                <Button
+                  component={Link}
+                  to={manageVendorPath(vendor.id)}
+                  variant="default"
+                  mih={44}
+                >
+                  {t("vendorSite.manage")}
+                </Button>
+              ) : null}
+            </Group>
           ) : null}
         </Group>
         <Group gap="md">

@@ -7,6 +7,7 @@ export type ShellEnv = {
   origin: string;
   userAdministratorManifestUrl: string;
   vendorAdministratorManifestUrl: string;
+  insightsManifestUrl: string;
   apiUrl: string;
   sessionCookieName: string;
   sessionCookieSecure: boolean;
@@ -105,6 +106,7 @@ export function readShellEnv(source: Source): ShellEnv {
     origin: new URL(parseUrl(source, "SHELL_ORIGIN")).origin,
     userAdministratorManifestUrl: parseUrl(source, "USER_ADMINISTRATOR_MANIFEST_URL"),
     vendorAdministratorManifestUrl: parseUrl(source, "VENDOR_ADMINISTRATOR_MANIFEST_URL"),
+    insightsManifestUrl: parseUrl(source, "INSIGHTS_MANIFEST_URL"),
     apiUrl: new URL(parseUrl(source, "API_URL")).origin,
     sessionCookieName: required(source, "SESSION_COOKIE_NAME"),
     sessionCookieSecure: parseBoolean(source, "SESSION_COOKIE_SECURE"),

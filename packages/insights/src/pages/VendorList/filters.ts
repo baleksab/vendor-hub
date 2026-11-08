@@ -1,0 +1,101 @@
+import { readCurrency, readPeriod, DEFAULT_PERIOD, type Currency, type Period } from "../../period";
+
+export const PAGE_SIZES = [10, 20, 50] as const;
+export const DEFAULT_PAGE_SIZE = 20;
+
+export type SortField = "revenue" | "orders" | "products" | "rating" | "name";
+export type SortOrder = "asc" | "desc";
+export type Relation = "owned" | "operated";
+
+export type Filters = {
+  search: string;
+  relation: Relation | null;
+  sort: SortField;
+  order: SortOrder;
+  page: number;
+  pageSize: number;
+  period: Period;
+  currency: Currency | undefined;
+};
+
+const RELATIONS: readonly Relation[] = ["owned", "operated"];
+const SORT_FIELDS: readonly SortField[] = ["revenue", "orders", "products", "rating", "name"];
+const ORDERS: readonly SortOrder[] = ["asc", "desc"];
+const DEFAULT_SORT: SortField = "revenue";
+
+export function defaultOrder(sort: SortField): SortOrder {
+  return sort === "name" ? "asc" : "desc";
+}
+
+function readPositiveInteger(raw: string | null): number | null {
+  const value = Number(raw);
+
+  return raw !== null && Number.isInteger(value) && value >= 1 ? value : null;
+}
+
+export function readFilters(params: URLSearchParams): Filters {
+  const relation = params.get("relation");
+  const sort = SORT_FIELDS.find((candidate) => candidate === params.get("sort")) ?? DEFAULT_SORT;
+  const pageSize = readPositiveInteger(params.get("size"));
+
+  return {
+    search: params.get("q") ?? "",
+    relation: RELATIONS.find((candidate) => candidate === relation) ?? null,
+    sort,
+    order: ORDERS.find((candidate) => candidate === params.get("order")) ?? defaultOrder(sort),
+    page: readPositiveInteger(params.get("page")) ?? 1,
+    pageSize: PAGE_SIZES.find((candidate) => candidate === pageSize) ?? DEFAULT_PAGE_SIZE,
+    period: readPeriod(params.get("period")),
+    currency: readCurrency(params.get("currency")),
+  };
+}
+
+export function writeFilters(filters: Filters): URLSearchParams {
+  const params = new URLSearchParams();
+
+  if (filters.search !== "") {
+    params.set("q", filters.search);
+  }
+
+  if (filters.relation !== null) {
+    params.set("relation", filters.relation);
+  }
+
+  if (filters.sort !== DEFAULT_SORT) {
+    params.set("sort", filters.sort);
+  }
+
+  if (filters.order !== defaultOrder(filters.sort)) {
+    params.set("order", filters.order);
+  }
+
+  if (filters.period !== DEFAULT_PERIOD) {
+    params.set("period", filters.period);
+  }
+
+  if (filters.currency !== undefined) {
+    params.set("currency", filters.currency);
+  }
+
+  if (filters.pageSize !== DEFAULT_PAGE_SIZE) {
+    params.set("size", String(filters.pageSize));
+  }
+
+  if (filters.page !== 1) {
+    params.set("page", String(filters.page));
+  }
+
+  return params;
+}
+
+export function hasActiveFilters(filters: Filters): boolean {
+  return filters.search !== "" || filters.relation !== null;
+}
+
+export function nextSort(filters: Filters, field: SortField): Pick<Filters, "sort" | "order"> {
+  if (filters.sort === field) {
+    return { sort: field, order: filters.order === "asc" ? "desc" : "asc" };
+  }
+
+  return { sort: field, order: defaultOrder(field) };
+}

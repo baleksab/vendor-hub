@@ -72,3 +72,20 @@ export type VendorAdministratorProps = {
   apiBaseUrl: string;
   onUnauthorized: () => void;
 };
+
+export type InsightsProps = {
+  locale: Locale;
+  apiBaseUrl: string;
+  onUnauthorized: () => void;
+};
+
+export type InsightsVendorListResponse = Schemas["InsightsVendorListResponse"];
+export type InsightsVendorRow = Schemas["InsightsVendorRow"];
+export type VendorInsightsResponse = Schemas["VendorInsightsResponse"];
+export type ProductInsightsResponse = Schemas["ProductInsightsResponse"];
+export type InsightsVendorListQuery = NonNullable<
+  paths["/api/v1/insights/vendors"]["get"]["parameters"]["query"]
+>;
+export type InsightsDetailQuery = NonNullable<
+  paths["/api/v1/insights/vendors/{id}"]["get"]["parameters"]["query"]
+>;

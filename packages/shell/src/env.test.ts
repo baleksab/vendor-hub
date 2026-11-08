@@ -9,6 +9,7 @@ const base = {
   SHELL_ORIGIN: "http://shell.test",
   USER_ADMINISTRATOR_MANIFEST_URL: "http://admin.test/mf-manifest.json",
   VENDOR_ADMINISTRATOR_MANIFEST_URL: "http://manage.test/mf-manifest.json",
+  INSIGHTS_MANIFEST_URL: "http://insights.test/mf-manifest.json",
   API_URL: "http://api.test",
   SESSION_COOKIE_NAME: "session",
   SESSION_COOKIE_SECURE: "true",

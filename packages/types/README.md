@@ -1,6 +1,6 @@
 # @vendor-hub/types
 
-TypeScript types for the API, generated from the server's OpenAPI document. Types only, no runtime code and no build step. Besides the generated API types it holds a few hand-written, framework-agnostic types shared by the shell and remotes (`Locale`, `UserAdministratorProps`, `VendorAdministratorProps`).
+TypeScript types for the API, generated from the server's OpenAPI document. Types only, no runtime code and no build step. Besides the generated API types it holds a few hand-written, framework-agnostic types shared by the shell and remotes (`Locale`, `UserAdministratorProps`, `VendorAdministratorProps`, `InsightsProps`).
 
 ## Usage
 

@@ -2,4 +2,5 @@
 
 @import "tailwindcss";
 @import "@mantine/core/styles.layer.css";
+@import "@mantine/charts/styles.layer.css";
 @import "@vendor-hub/ui/tokens.css";

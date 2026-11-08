@@ -19,6 +19,7 @@ export default [
   route("sitemap.xml", "routes/sitemap.xml.ts"),
   route("admin/*", "pages/Admin/Admin.tsx"),
   route("manage/*", "pages/ManageVendors/ManageVendors.tsx"),
+  route("insights/*", "pages/Insights/Insights.tsx"),
   route("api/v1/*", "routes/apiProxy.ts"),
   route("*", "pages/NotFound/NotFound.tsx"),
 ] satisfies RouteConfig;

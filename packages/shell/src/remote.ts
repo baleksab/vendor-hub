@@ -10,7 +10,7 @@ const mantineVersion = MANTINE_VERSION;
 const reactRouterVersion = REACT_ROUTER_VERSION;
 const reactQueryVersion = REACT_QUERY_VERSION;
 
-export type RemoteName = "user-administrator" | "vendor-administrator";
+export type RemoteName = "user-administrator" | "vendor-administrator" | "insights";
 
 export type RemoteManifestUrls = Record<RemoteName, string>;
 
@@ -24,6 +24,7 @@ export function getFederation(manifestUrls: RemoteManifestUrls): ModuleFederatio
     remotes: [
       { name: "user-administrator", entry: manifestUrls["user-administrator"] },
       { name: "vendor-administrator", entry: manifestUrls["vendor-administrator"] },
+      { name: "insights", entry: manifestUrls.insights },
     ],
     shared: {
       react: {

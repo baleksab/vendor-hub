@@ -22,6 +22,7 @@ Closes #
 - [ ] `ui`
 - [ ] `user-administrator`
 - [ ] `vendor-administrator`
+- [ ] `insights`
 - [ ] `infra` (nginx, docker compose)
 - [ ] root / tooling
 

@@ -6,7 +6,13 @@ import { Link, useParams } from "react-router";
 import { RoleBadge } from "../../components/RoleBadge";
 import { useT } from "../../context/MessagesContext";
 import { useVendor } from "../../hooks/useVendor";
-import { VENDORS_PATH, ordersPath, productsPath, vendorSitePath } from "../../paths";
+import {
+  VENDORS_PATH,
+  insightsVendorPath,
+  ordersPath,
+  productsPath,
+  vendorSitePath,
+} from "../../paths";
 import { AddOperatorForm } from "./AddOperatorForm";
 import { DeleteVendor } from "./DeleteVendor";
 import { MembersTable } from "./MembersTable";
@@ -92,6 +98,23 @@ export default function VendorDetail() {
           </Button>
         </Group>
       </Paper>
+      {vendor.memberRole === null ? null : (
+        <Paper withBorder radius="md" p="lg">
+          <Group justify="space-between" align="center">
+            <div>
+              <Title order={2} size="h4">
+                {t("insights.view")}
+              </Title>
+              <Text size="sm" c="dimmed">
+                {t("insights.manageDescription")}
+              </Text>
+            </div>
+            <Button component={Link} to={insightsVendorPath(vendor.id)} variant="light" mih={44}>
+              {t("insights.view")}
+            </Button>
+          </Group>
+        </Paper>
+      )}
       <VendorForm vendor={vendor} />
       <MembersTable vendor={vendor} />
       <AddOperatorForm vendorId={vendor.id} />

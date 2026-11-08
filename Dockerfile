@@ -63,3 +63,16 @@ USER node
 WORKDIR /app/packages/vendor-administrator
 
 CMD ["vite", "preview"]
+
+FROM build AS insights
+
+ENV PATH="/app/packages/insights/node_modules/.bin:${PATH}"
+
+RUN mkdir -p /app/packages/insights/node_modules/.vite-temp \
+    && chown node /app/packages/insights/node_modules/.vite-temp
+
+USER node
+
+WORKDIR /app/packages/insights
+
+CMD ["vite", "preview"]
