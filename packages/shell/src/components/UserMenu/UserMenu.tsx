@@ -1,10 +1,20 @@
-import { Avatar, Button, Group, Menu, Text, UnstyledButton } from "@mantine/core";
+import {
+  Avatar,
+  Button,
+  Group,
+  Menu,
+  Paper,
+  SimpleGrid,
+  Stack,
+  Text,
+  UnstyledButton,
+} from "@mantine/core";
 import { Link, useNavigation, useSubmit } from "react-router";
 
 import { useSession } from "../../hooks/useSession/useSession";
 import { useT } from "../../i18n/LocaleProvider";
 
-export function UserMenu() {
+export function UserMenu({ variant = "bar" }: { variant?: "bar" | "drawer" }) {
   const t = useT();
   const { user } = useSession();
   const submit = useSubmit();
@@ -13,6 +23,19 @@ export function UserMenu() {
   const handleLogout = () => {
     void submit(null, { method: "post", action: "/logout" });
   };
+
+  if (user === null && variant === "drawer") {
+    return (
+      <SimpleGrid cols={2} spacing="xs">
+        <Button component={Link} to="/login" variant="default" size="md" h={48}>
+          {t("nav.login")}
+        </Button>
+        <Button component={Link} to="/register" size="md" h={48}>
+          {t("nav.register")}
+        </Button>
+      </SimpleGrid>
+    );
+  }
 
   if (user === null) {
     return (
@@ -28,6 +51,29 @@ export function UserMenu() {
   }
 
   const name = `${user.firstName} ${user.lastName}`;
+
+  if (variant === "drawer") {
+    return (
+      <Paper withBorder p="md" radius="lg">
+        <Stack gap="md">
+          <Group gap="sm" wrap="nowrap">
+            <Avatar name={name} color="brand" size={44} radius="xl" />
+            <Stack gap={0} miw={0}>
+              <Text fw={600} truncate>
+                {name}
+              </Text>
+              <Text size="sm" c="dimmed" truncate>
+                {user.email}
+              </Text>
+            </Stack>
+          </Group>
+          <Button variant="default" size="md" h={44} onClick={handleLogout} disabled={loggingOut}>
+            {t("nav.logout")}
+          </Button>
+        </Stack>
+      </Paper>
+    );
+  }
 
   return (
     <Menu position="bottom-end" width={200} withinPortal>

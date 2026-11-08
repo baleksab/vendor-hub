@@ -48,3 +48,8 @@
   padding: 13px;
   margin-left: -13px;
 }
+
+.drawerBody {
+  height: calc(100% - 68px);
+  padding-bottom: calc(var(--mantine-spacing-md) + env(safe-area-inset-bottom));
+}

@@ -100,16 +100,25 @@ export function AppLayout({ children }: { children: ReactNode }) {
         size="min(320px, 88vw)"
         title={<Brand />}
         closeButtonProps={{ "aria-label": t("nav.close"), size: "lg" }}
+        classNames={{ body: classes.drawerBody }}
       >
-        <Stack gap="lg">
+        <Stack h="100%" justify="space-between" gap="lg">
           <Stack component="nav" aria-label={t("nav.label")} gap={4}>
             {links.map((link) => (
               <NavLink key={link.to} {...link} variant="drawer" onNavigate={closeMobile} />
             ))}
           </Stack>
-          <Divider />
-          <LanguageSwitcher />
-          <UserMenu />
+
+          <Stack gap="md">
+            <Divider />
+            <Stack gap={6}>
+              <Text size="xs" fw={600} c="dimmed" tt="uppercase" lts={0.5}>
+                {t("language.label")}
+              </Text>
+              <LanguageSwitcher fullWidth />
+            </Stack>
+            <UserMenu variant="drawer" />
+          </Stack>
         </Stack>
       </Drawer>
 
