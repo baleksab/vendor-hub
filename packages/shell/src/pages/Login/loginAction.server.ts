@@ -17,9 +17,9 @@ export async function loginAction(request: Request) {
   }
 
   try {
-    const cookie = await signIn(credentials.data);
+    const headers = await signIn(request, credentials.data);
 
-    return redirect(redirectTarget(request), { headers: { "Set-Cookie": cookie } });
+    return redirect(redirectTarget(request), { headers });
   } catch (error) {
     return failed(error, "login", values);
   }

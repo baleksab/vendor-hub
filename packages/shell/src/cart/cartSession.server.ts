@@ -1,6 +1,7 @@
 import { createCookieSessionStorage, type Session } from "react-router";
 import { z } from "zod";
 
+import { getSession } from "../auth/session.server";
 import { getEnv } from "../env.server";
 import {
   countItems,
@@ -15,6 +16,7 @@ const MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 export const COOKIE_MAX_BYTES = 4096;
 
 type CartSessionData = {
+  owner: unknown;
   cart: unknown;
   checkout: unknown;
   checkoutKey: unknown;
@@ -46,8 +48,48 @@ export function cartLimits(): CartLimits {
   return { maxLines: env.cartMaxLines, maxQuantityPerLine: env.cartMaxQuantityPerLine };
 }
 
-export function getCartSession(request: Request): Promise<CartSession> {
+export function readOwner(session: CartSession): string | null {
+  const owner = z.string().min(1).safeParse(session.get("owner"));
+
+  return owner.success ? owner.data : null;
+}
+
+function bindToOwner(session: CartSession, userId: string | null): void {
+  const owner = readOwner(session);
+  const isGuestCartClaimedByUser = owner === null && userId !== null;
+
+  if (owner !== userId && !isGuestCartClaimedByUser) {
+    session.unset("cart");
+    session.unset("checkout");
+    session.unset("checkoutKey");
+  }
+
+  if (userId === null) {
+    session.unset("owner");
+  } else {
+    session.set("owner", userId);
+  }
+}
+
+export function loadCartSession(request: Request): Promise<CartSession> {
   return storage().getSession(request.headers.get("Cookie"));
+}
+
+export async function getCartSession(request: Request): Promise<CartSession> {
+  const session = await loadCartSession(request);
+  const { session: auth } = await getSession(request);
+
+  bindToOwner(session, auth?.user.id ?? null);
+
+  return session;
+}
+
+export async function claimCart(request: Request, userId: string): Promise<string> {
+  const session = await loadCartSession(request);
+
+  bindToOwner(session, userId);
+
+  return commitCart(session);
 }
 
 export function readLines(session: CartSession): CartLine[] {
@@ -97,12 +139,6 @@ export async function commitCart(session: CartSession): Promise<string> {
   }
 
   return cookie;
-}
-
-export async function clearCart(): Promise<string> {
-  const store = storage();
-
-  return store.destroySession(await store.getSession());
 }
 
 export async function cartItemCount(request: Request): Promise<number> {

@@ -34,9 +34,9 @@ export async function registerAction(request: Request) {
 
   try {
     const { email, password } = registration.data;
-    const cookie = await signIn({ email, password });
+    const headers = await signIn(request, { email, password });
 
-    return redirect(redirectTarget(request), { headers: { "Set-Cookie": cookie } });
+    return redirect(redirectTarget(request), { headers });
   } catch {
     return redirect("/login?registered=1");
   }

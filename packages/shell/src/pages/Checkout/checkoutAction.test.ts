@@ -84,7 +84,7 @@ describe("checkoutAction", () => {
       idempotencyKey: KEY,
     });
     expect(response.headers.get("Location")).toBe(`/orders/${ORDER}?placed=1`);
-    expect(cart).toEqual({ lines: [], checkout: null, hasKey: false });
+    expect(cart).toMatchObject({ lines: [], checkout: null, hasKey: false });
   });
 
   it("goes to the order list when several orders are created", async () => {
