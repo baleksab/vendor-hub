@@ -10,7 +10,7 @@ export function LanguageSwitcher() {
 
   return (
     <Form method="post" action="/locale" aria-label={t("language.label")}>
-      <Button.Group w="100%">
+      <Button.Group>
         {LOCALES.map((locale) => (
           <Button
             key={locale}
@@ -18,9 +18,10 @@ export function LanguageSwitcher() {
             name="locale"
             value={locale}
             size="compact-sm"
-            h={{ base: 44, sm: 28 }}
-            flex={1}
+            h={{ base: 44, md: 32 }}
+            px="sm"
             variant={locale === current ? "light" : "default"}
+            fw={600}
             aria-pressed={locale === current}
           >
             {locale.toUpperCase()}

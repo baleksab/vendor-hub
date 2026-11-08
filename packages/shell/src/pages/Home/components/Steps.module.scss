@@ -1,0 +1,14 @@
+.step {
+  background: var(--vh-surface-muted);
+}
+
+.number {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--mantine-color-brand-filled);
+  color: #fff;
+  font-weight: 700;
+}

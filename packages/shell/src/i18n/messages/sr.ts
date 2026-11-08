@@ -2,6 +2,7 @@ import type { Messages } from "../index";
 
 export const sr = {
   "app.title": "Vendor Hub",
+  "footer.tagline": "Nezavisne prodavnice, jedno mesto za kupovinu.",
   "nav.home": "Početna",
   "nav.vendors": "Prodavci",
   "nav.menu": "Otvori navigaciju",

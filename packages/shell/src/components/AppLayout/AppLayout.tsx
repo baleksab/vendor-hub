@@ -1,4 +1,4 @@
-import { Anchor, AppShell, Burger, Container, Group, Stack } from "@mantine/core";
+import { Anchor, Box, Burger, Container, Divider, Drawer, Group, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, type ReactNode } from "react";
 import { Link, useLocation } from "react-router";
@@ -11,12 +11,25 @@ import { LanguageSwitcher } from "../LanguageSwitcher/LanguageSwitcher";
 import type { NavIconName } from "../NavIcon/NavIcon";
 import { NavLink } from "../NavLink/NavLink";
 import { UserMenu } from "../UserMenu/UserMenu";
+import classes from "./AppLayout.module.scss";
 
-const SIDEBAR_WIDTH = 240;
-const TOP_BAR_HEIGHT = 56;
-const BURGER_ICON_SIZE = 18;
-const BURGER_TOUCH_PADDING = 13;
-const burgerStyle = { boxSizing: "content-box", padding: BURGER_TOUCH_PADDING } as const;
+const HEADER_HEIGHT = 64;
+const CONTAINER_SIZE = 1200;
+
+function Brand() {
+  const t = useT();
+
+  return (
+    <Anchor component={Link} to="/" c="inherit" underline="never" className={classes.brand}>
+      <span className={classes.brandMark} aria-hidden>
+        V
+      </span>
+      <Text component="span" fw={700} fz="lg" lh={1}>
+        {t("app.title")}
+      </Text>
+    </Anchor>
+  );
+}
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const t = useT();
@@ -47,81 +60,81 @@ export function AppLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AppShell
-      navbar={{
-        width: SIDEBAR_WIDTH,
-        breakpoint: "sm",
-        collapsed: { mobile: !mobileOpened },
-      }}
-      padding={0}
-    >
-      <AppShell.Navbar bg="light-dark(var(--mantine-color-white), var(--mantine-color-dark-8))">
-        <Group h={TOP_BAR_HEIGHT} px="md" wrap="nowrap" style={{ flexShrink: 0 }}>
-          <Burger
-            opened
-            onClick={closeMobile}
-            hiddenFrom="sm"
-            size={BURGER_ICON_SIZE}
-            style={burgerStyle}
-            aria-label={t("nav.close")}
-          />
-          <Anchor component={Link} to="/" fw={600} fz="lg" c="inherit" underline="never" px="xs">
-            {t("app.title")}
-          </Anchor>
-        </Group>
+    <Box className={classes.root}>
+      <Box component="header" className={classes.header} h={HEADER_HEIGHT}>
+        <Container size={CONTAINER_SIZE} px="md" h="100%">
+          <Group h="100%" wrap="nowrap" gap="md">
+            <Burger
+              opened={false}
+              onClick={openMobile}
+              hiddenFrom="md"
+              size={18}
+              aria-label={t("nav.menu")}
+              className={classes.burger}
+            />
+            <Brand />
 
-        <Stack component="nav" aria-label={t("nav.label")} gap={2} flex={1} px="md" pt="md">
-          {links.map((link) => (
-            <NavLink key={link.to} {...link} />
-          ))}
-        </Stack>
+            <Group component="nav" aria-label={t("nav.label")} gap={4} ml="lg" visibleFrom="md">
+              {links.map((link) => (
+                <NavLink key={link.to} {...link} />
+              ))}
+            </Group>
 
-        <Stack gap="xs" p="md">
-          <Group visibleFrom="sm">
-            <CartLink />
+            <Group ml="auto" gap="xs" wrap="nowrap">
+              <CartLink />
+              <Box visibleFrom="md">
+                <LanguageSwitcher />
+              </Box>
+              <Box visibleFrom="md">
+                <UserMenu />
+              </Box>
+            </Group>
           </Group>
+        </Container>
+      </Box>
+
+      <Drawer
+        opened={mobileOpened}
+        onClose={closeMobile}
+        hiddenFrom="md"
+        size="min(320px, 88vw)"
+        title={<Brand />}
+        closeButtonProps={{ "aria-label": t("nav.close"), size: "lg" }}
+      >
+        <Stack gap="lg">
+          <Stack component="nav" aria-label={t("nav.label")} gap={4}>
+            {links.map((link) => (
+              <NavLink key={link.to} {...link} variant="drawer" onNavigate={closeMobile} />
+            ))}
+          </Stack>
+          <Divider />
           <LanguageSwitcher />
           <UserMenu />
         </Stack>
-      </AppShell.Navbar>
+      </Drawer>
 
-      <AppShell.Main>
-        <Group
-          hiddenFrom="sm"
-          h={TOP_BAR_HEIGHT}
-          px="md"
-          wrap="nowrap"
-          pos="sticky"
-          top={0}
-          style={{ zIndex: 10, borderBottom: "1px solid var(--mantine-color-default-border)" }}
-          bg="var(--mantine-color-body)"
-        >
-          <Burger
-            opened={false}
-            onClick={openMobile}
-            size={BURGER_ICON_SIZE}
-            style={burgerStyle}
-            aria-label={t("nav.menu")}
-          />
-          <Anchor component={Link} to="/" fw={600} fz="lg" c="inherit" underline="never" px="xs">
-            {t("app.title")}
-          </Anchor>
-          <Group ml="auto">
-            <CartLink />
-          </Group>
-        </Group>
-
+      <Box component="main" className={classes.main}>
         <Container
-          size="md"
+          size={CONTAINER_SIZE}
           px="md"
-          py={{ base: "lg", sm: 56 }}
+          py={{ base: "lg", sm: 48 }}
           display="flex"
-          mih={{ base: `calc(100dvh - ${TOP_BAR_HEIGHT}px)`, sm: "100dvh" }}
-          style={{ flexDirection: "column" }}
+          style={{ flexDirection: "column", flex: 1 }}
         >
           {children}
         </Container>
-      </AppShell.Main>
-    </AppShell>
+      </Box>
+
+      <Box component="footer" className={classes.footer}>
+        <Container size={CONTAINER_SIZE} px="md" py="xl">
+          <Group justify="space-between" gap="md">
+            <Brand />
+            <Text size="sm" c="dimmed">
+              {t("footer.tagline")}
+            </Text>
+          </Group>
+        </Container>
+      </Box>
+    </Box>
   );
 }

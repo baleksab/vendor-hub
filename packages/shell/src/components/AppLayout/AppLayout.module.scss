@@ -1,0 +1,50 @@
+.root {
+  overflow-x: clip;
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid var(--mantine-color-default-border);
+  background: var(--vh-header-bg);
+  backdrop-filter: saturate(180%) blur(12px);
+}
+
+.main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.footer {
+  border-top: 1px solid var(--mantine-color-default-border);
+  background: var(--vh-surface-muted);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brandMark {
+  display: inline-grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--mantine-color-brand-5), var(--mantine-color-brand-8));
+  color: #fff;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.burger {
+  box-sizing: content-box;
+  padding: 13px;
+  margin-left: -13px;
+}

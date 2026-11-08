@@ -1,25 +1,37 @@
-import { NavLink as MantineNavLink } from "@mantine/core";
+import { Button } from "@mantine/core";
 import { Link, useMatch } from "react-router";
 
 import { NavIcon, type NavIconName } from "../NavIcon/NavIcon";
 
-type Props = { to: string; label: string; icon: NavIconName; onNavigate?: () => void };
+type Props = {
+  to: string;
+  label: string;
+  icon: NavIconName;
+  variant?: "bar" | "drawer";
+  onNavigate?: () => void;
+};
 
-export function NavLink({ to, label, icon, onNavigate }: Props) {
+export function NavLink({ to, label, icon, variant = "bar", onNavigate }: Props) {
   const active = useMatch({ path: to, end: to === "/" }) !== null;
+  const drawer = variant === "drawer";
 
   return (
-    <MantineNavLink
+    <Button
       component={Link}
       to={to}
-      label={label}
-      leftSection={<NavIcon name={icon} />}
-      active={active}
+      variant={active ? "light" : "subtle"}
+      color={active ? "brand" : "gray"}
+      c={active ? undefined : "var(--mantine-color-text)"}
+      justify={drawer ? "flex-start" : "center"}
+      fullWidth={drawer}
+      leftSection={drawer ? <NavIcon name={icon} /> : null}
       aria-current={active ? "page" : undefined}
       onClick={onNavigate}
-      mih={{ base: 44, sm: 34 }}
-      py={0}
-      w="auto"
-    />
+      h={drawer ? 48 : 36}
+      px="sm"
+      fw={active ? 600 : 500}
+    >
+      {label}
+    </Button>
   );
 }

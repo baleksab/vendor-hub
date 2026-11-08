@@ -16,9 +16,9 @@ const cards = [
   { x: 298, y: 184, highlighted: false },
 ];
 
-export function HeroIllustration() {
+export function HeroIllustration({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 480 320" role="presentation" aria-hidden width="100%" height="auto">
+    <svg className={className} viewBox="0 0 480 320" role="presentation" aria-hidden width="100%">
       <rect x="4" y="4" width="472" height="312" rx="12" style={surface} strokeWidth="1.5" />
       <path d="M4 44h472" style={{ stroke: surface.stroke }} strokeWidth="1.5" />
       {[26, 44, 62].map((cx) => (

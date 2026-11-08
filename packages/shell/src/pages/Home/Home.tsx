@@ -18,7 +18,7 @@ export function meta({ matches }: Route.MetaArgs) {
 
 export default function Home() {
   return (
-    <Stack gap={64}>
+    <Stack gap="calc(var(--mantine-spacing-xl) * 3)">
       <Hero />
       <Features />
       <Steps />
