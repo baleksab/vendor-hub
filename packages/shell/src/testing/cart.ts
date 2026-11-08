@@ -52,9 +52,10 @@ export function getRequest(url: string, cookies: string[] = []) {
 export async function readCartCookie(setCookie: string | null) {
   const session = await import("../cart/cartSession.server");
   const cookie = (setCookie ?? "").split(";")[0] ?? "";
-  const cart = await session.getCartSession(new Request(ORIGIN, { headers: { Cookie: cookie } }));
+  const cart = await session.loadCartSession(new Request(ORIGIN, { headers: { Cookie: cookie } }));
 
   return {
+    owner: session.readOwner(cart),
     lines: session.readLines(cart),
     checkout: session.readCheckout(cart),
     hasKey: cart.has("checkoutKey"),
