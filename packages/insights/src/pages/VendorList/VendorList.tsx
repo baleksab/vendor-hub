@@ -83,46 +83,41 @@ export default function VendorList() {
     );
 
   const filterBar = (
-    <Paper withBorder radius="md" p="md">
-      <Stack gap="md">
-        <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md" verticalSpacing="sm">
-          <TextInput
-            label={t("vendors.search.label")}
-            placeholder={t("vendors.search.placeholder")}
-            value={searchInput}
-            onChange={(event) => handleSearchChange(event.currentTarget.value)}
-            type="search"
-            autoComplete="off"
-          />
-          <Select
-            label={t("vendors.filter.relation")}
-            placeholder={t("vendors.filter.any")}
-            data={[
-              { value: "owned", label: t("vendors.filter.owned") },
-              { value: "operated", label: t("vendors.filter.operated") },
-            ]}
-            value={filters.relation}
-            onChange={(value) =>
-              applyFilters({
-                relation: value === "owned" || value === "operated" ? (value as Relation) : null,
-              })
-            }
-            clearable
-          />
-          <Group align="flex-end" justify="flex-end">
-            <Button
-              variant="default"
-              onClick={resetFilters}
-              disabled={!filtered && searchInput === ""}
-            >
-              {t("vendors.filter.reset")}
-            </Button>
-          </Group>
-        </SimpleGrid>
+    <Paper component="search" withBorder radius="md" p="md">
+      <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md" verticalSpacing="sm">
+        <TextInput
+          label={t("vendors.search.label")}
+          placeholder={t("vendors.search.placeholder")}
+          value={searchInput}
+          onChange={(event) => handleSearchChange(event.currentTarget.value)}
+          type="search"
+          autoComplete="off"
+        />
+        <Select
+          label={t("vendors.filter.relation")}
+          placeholder={t("vendors.filter.any")}
+          data={[
+            { value: "owned", label: t("vendors.filter.owned") },
+            { value: "operated", label: t("vendors.filter.operated") },
+          ]}
+          value={filters.relation}
+          onChange={(value) =>
+            applyFilters({
+              relation: value === "owned" || value === "operated" ? (value as Relation) : null,
+            })
+          }
+          clearable
+        />
         {data === undefined ? null : (
-          <InsightsBar meta={data.meta} onChange={(patch) => applyFilters(patch)} />
+          <InsightsBar fluid meta={data.meta} onChange={(patch) => applyFilters(patch)} />
         )}
-      </Stack>
+      </SimpleGrid>
+
+      <Group justify="flex-end" mt="md">
+        <Button variant="default" onClick={resetFilters} disabled={!filtered && searchInput === ""}>
+          {t("vendors.filter.reset")}
+        </Button>
+      </Group>
     </Paper>
   );
 

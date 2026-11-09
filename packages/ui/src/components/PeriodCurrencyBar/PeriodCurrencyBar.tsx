@@ -14,6 +14,7 @@ type Props = {
   currency: string;
   currencyLabel: string;
   onCurrencyChange: (currency: string) => void;
+  fluid?: boolean;
 };
 
 export function PeriodCurrencyBar({
@@ -25,16 +26,17 @@ export function PeriodCurrencyBar({
   currency,
   currencyLabel,
   onCurrencyChange,
+  fluid = false,
 }: Props) {
   return (
-    <Group gap="sm" align="flex-end">
+    <Group gap="sm" align="flex-end" grow={fluid} wrap="nowrap">
       <Select
         label={periodLabel}
         data={periods}
         value={period}
         onChange={(value) => value !== null && onPeriodChange(value)}
         allowDeselect={false}
-        w={SELECT_WIDTH}
+        w={fluid ? undefined : SELECT_WIDTH}
       />
       <Select
         label={currencyLabel}
@@ -43,7 +45,7 @@ export function PeriodCurrencyBar({
         onChange={(value) => value !== null && onCurrencyChange(value)}
         allowDeselect={false}
         disabled={currencies.length < 2}
-        w={CURRENCY_WIDTH}
+        w={fluid ? undefined : CURRENCY_WIDTH}
       />
     </Group>
   );
