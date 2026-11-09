@@ -8,6 +8,8 @@ import { cartController } from "./cart/cart.controller.ts";
 import type { CartService } from "./cart/cart.service.ts";
 import { categoriesController } from "./categories/categories.controller.ts";
 import { countriesController } from "./countries/countries.controller.ts";
+import { insightsController } from "./insights/insights.controller.ts";
+import type { InsightsService } from "./insights/insights.service.ts";
 import { ordersController } from "./orders/orders.controller.ts";
 import type { OrdersService } from "./orders/orders.service.ts";
 import { productsController, publicProductsController } from "./products/products.controller.ts";
@@ -27,6 +29,7 @@ export type V1Deps = {
   reviewsService: ReviewsService;
   cartService: CartService;
   ordersService: OrdersService;
+  insightsService: InsightsService;
   tokens: TokenService;
 };
 
@@ -52,6 +55,7 @@ export function v1(deps: V1Deps) {
       await protectedScope.register(productsController(deps.productsService));
       await protectedScope.register(reviewsController(deps.reviewsService));
       await protectedScope.register(ordersController(deps.ordersService));
+      await protectedScope.register(insightsController(deps.insightsService));
     });
   };
 }

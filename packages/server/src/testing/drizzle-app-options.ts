@@ -1,5 +1,6 @@
 import type { DatabaseHandle } from "../db/client.ts";
 import type { AppOptions } from "../app.ts";
+import { DrizzleInsightsRepository } from "../insights/insights.repository.ts";
 import { DrizzleOrdersRepository } from "../orders/orders.repository.ts";
 import { SimulatedPaymentGateway } from "../payments/simulated-payment-gateway.ts";
 import { DrizzleProductsRepository } from "../products/products.repository.ts";
@@ -20,6 +21,7 @@ export function drizzleAppOptions(handle: DatabaseHandle): AppOptions {
     imageStorage: new InMemoryImageStorage(),
     images: TEST_IMAGES,
     ordersRepository: new DrizzleOrdersRepository(handle.db),
+    insightsRepository: new DrizzleInsightsRepository(handle.db),
     paymentGateway: new SimulatedPaymentGateway(),
     cart: TEST_CART,
     orders: TEST_ORDERS,

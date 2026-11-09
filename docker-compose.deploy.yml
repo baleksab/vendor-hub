@@ -124,6 +124,33 @@ services:
       timeout: 3s
       retries: 10
 
+  insights:
+    build:
+      context: .
+      target: insights
+    image: vendor-hub-insights
+    restart: unless-stopped
+    env_file:
+      - packages/insights/.env
+      - packages/insights/.env.local
+    environment:
+      INSIGHTS_HOST: 0.0.0.0
+    ports:
+      - "${INSIGHTS_PORT:?}:${INSIGHTS_PORT:?}"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "/app/scripts/healthcheck.mjs",
+          "INSIGHTS_HOST",
+          "INSIGHTS_PORT",
+          "/mf-manifest.json",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   nginx:
     environment:
       SHELL_UPSTREAM: shell:${SHELL_PORT:?}
@@ -133,6 +160,8 @@ services:
       user-administrator:
         condition: service_healthy
       vendor-administrator:
+        condition: service_healthy
+      insights:
         condition: service_healthy
 
 volumes:

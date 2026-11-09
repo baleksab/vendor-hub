@@ -9,6 +9,7 @@ import { listProductReviews } from "../../api/endpoints/reviews.server";
 import { loginPath } from "../../auth/safeRedirect";
 import { AddToCartForm } from "../../components/AddToCartForm/AddToCartForm";
 import { ReviewSection } from "../../components/ReviewSection/ReviewSection";
+import { insightsProductPath } from "../../vendor/insightsLink";
 import { manageProductPath } from "../../vendor/manageVendorsLink";
 import { useSession } from "../../hooks/useSession/useSession";
 import { useLocale, useT } from "../../i18n/LocaleProvider";
@@ -119,15 +120,29 @@ export default function ProductPage({ loaderData, params }: Route.ComponentProps
             <Title order={1} fz={{ base: 28, sm: 36 }}>
               {product.name}
             </Title>
-            {canManage ? (
-              <Button
-                component={Link}
-                to={manageProductPath(product.vendorId, product.id)}
-                variant="default"
-                mih={44}
-              >
-                {t("product.manage")}
-              </Button>
+            {canManage || isMember ? (
+              <Group gap="sm" wrap="wrap" justify="flex-end">
+                {isMember ? (
+                  <Button
+                    component={Link}
+                    to={insightsProductPath(product.vendorId, product.id)}
+                    variant="default"
+                    mih={44}
+                  >
+                    {t("product.insights")}
+                  </Button>
+                ) : null}
+                {canManage ? (
+                  <Button
+                    component={Link}
+                    to={manageProductPath(product.vendorId, product.id)}
+                    variant="default"
+                    mih={44}
+                  >
+                    {t("product.manage")}
+                  </Button>
+                ) : null}
+              </Group>
             ) : null}
           </Group>
           <StarRating

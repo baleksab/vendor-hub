@@ -25,6 +25,9 @@ const AUTHENTICATED_ROUTES: readonly Omit<AllowedRoute, "access">[] = [
   { method: "DELETE", pattern: new RegExp(`^/api/v1/products/${UUID}/reviews/${UUID}$`) },
   { method: "GET", pattern: new RegExp(`^/api/v1/vendors/${UUID}/orders$`) },
   { method: "GET", pattern: new RegExp(`^/api/v1/orders/${UUID}$`) },
+  { method: "GET", pattern: /^\/api\/v1\/insights\/vendors$/ },
+  { method: "GET", pattern: new RegExp(`^/api/v1/insights/vendors/${UUID}$`) },
+  { method: "GET", pattern: new RegExp(`^/api/v1/insights/products/${UUID}$`) },
   { method: "POST", pattern: new RegExp(`^/api/v1/orders/${UUID}/deliver$`) },
   { method: "POST", pattern: new RegExp(`^/api/v1/orders/${UUID}/returns/(approve|reject)$`) },
 ];

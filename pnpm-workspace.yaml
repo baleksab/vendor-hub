@@ -19,6 +19,8 @@ catalog:
   "@mantine/core": 9.7.4
   "@mantine/hooks": 9.7.4
   "@mantine/form": 9.7.4
+  "@mantine/charts": 9.7.4
+  recharts: 3.10.1
   tailwindcss: 4.3.3
   "@tailwindcss/vite": 4.3.3
   "@module-federation/vite": 1.23.7

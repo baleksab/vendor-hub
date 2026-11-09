@@ -1,6 +1,7 @@
 import { loadServerEnv } from "../env.ts";
 import { buildApp } from "./app.ts";
 import { createDatabase } from "./db/client.ts";
+import { DrizzleInsightsRepository } from "./insights/insights.repository.ts";
 import { DrizzleOrdersRepository } from "./orders/orders.repository.ts";
 import { SimulatedPaymentGateway } from "./payments/simulated-payment-gateway.ts";
 import { FileSystemImageStorage } from "./products/image-storage.ts";
@@ -22,6 +23,7 @@ const app = await buildApp({
   imageStorage: new FileSystemImageStorage(env.images.directory),
   images: env.images,
   ordersRepository: new DrizzleOrdersRepository(db),
+  insightsRepository: new DrizzleInsightsRepository(db),
   paymentGateway: new SimulatedPaymentGateway(),
   cart: env.cart,
   orders: env.orders,

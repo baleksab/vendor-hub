@@ -43,6 +43,7 @@ The shared modules are the same as in `user-administrator`: `react`, `react-dom`
 - The list state (`q`, `relation`, `sort`, `order`, `size`, `page`) lives in the URL (`pages/VendorList/filters.ts`), search is debounced, and any filter change goes back to page 1. Filtering, sorting and paging happen on the API (`GET /vendors/managed`). The response `scope` (`all` or `mine`) picks the page title.
 - `viewerRole`, `memberRole` and `canDelete` come from the API. The role badge shows `memberRole`, and an administrator who is not a member of the vendor sees a gray "Not affiliated". The delete section renders only when `canDelete` is true, and the owner row has no remove button.
 - The list is a table from the `sm` breakpoint up and a stack of cards below it. A row opens the quick view drawer through a real button in the name cell, and the drawer links to the detail page.
+- Members (`memberRole` not null) see a **View insights** button on the vendor detail page and on the product form that links to the `insights` remote (`/insights/vendors/:id`, `.../products/:productId`). Administrators who are not members do not, because insights are membership only.
 - Delete asks the user to type the slug before the button enables. `404` on the detail shows the not-found state.
 
 ### Products

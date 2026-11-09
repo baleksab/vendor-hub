@@ -4,6 +4,7 @@ import { Link, redirect } from "react-router";
 import { useSession } from "../../hooks/useSession/useSession";
 import { useT } from "../../i18n/LocaleProvider";
 import { pageMeta } from "../../seo/pageMeta";
+import { hasInsights, INSIGHTS_PATH } from "../../vendor/insightsLink";
 import { MANAGE_VENDORS_PATH, manageVendorsLabelKey } from "../../vendor/manageVendorsLink";
 import { VENDORS_PATH } from "../../vendor/vendorPaths";
 import { listCategories } from "../../api/endpoints/products.server";
@@ -62,11 +63,18 @@ export default function Vendors({ loaderData }: Route.ComponentProps) {
     <Stack gap="lg">
       <Group justify="space-between" align="center" wrap="wrap">
         <Title order={1}>{t("vendors.title")}</Title>
-        {manageLabelKey === null ? null : (
-          <Button component={Link} to={MANAGE_VENDORS_PATH} mih={44}>
-            {t(manageLabelKey)}
-          </Button>
-        )}
+        <Group gap="sm">
+          {hasInsights(vendors) ? (
+            <Button component={Link} to={INSIGHTS_PATH} variant="default" mih={44}>
+              {t("vendors.insights")}
+            </Button>
+          ) : null}
+          {manageLabelKey === null ? null : (
+            <Button component={Link} to={MANAGE_VENDORS_PATH} mih={44}>
+              {t(manageLabelKey)}
+            </Button>
+          )}
+        </Group>
       </Group>
       <VendorFilterBar filters={loaderData.filters} categories={loaderData.categories} />
       <VendorList

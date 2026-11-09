@@ -3,6 +3,7 @@ import type { FastifyInstance } from "fastify";
 import type { CartEnv, JwtEnv, OrdersEnv } from "../../env.ts";
 import { buildApp } from "../app.ts";
 import { CartService } from "../cart/cart.service.ts";
+import { InMemoryInsightsRepository } from "./in-memory-insights.repository.ts";
 import { OrdersService } from "../orders/orders.service.ts";
 import { SimulatedPaymentGateway } from "../payments/simulated-payment-gateway.ts";
 import { InMemoryOrdersRepository } from "./in-memory-orders.repository.ts";
@@ -47,6 +48,7 @@ export type TestApp = {
   reviewsRepository: InMemoryReviewsRepository;
   imageStorage: InMemoryImageStorage;
   ordersRepository: InMemoryOrdersRepository;
+  insightsRepository: InMemoryInsightsRepository;
   ordersService: OrdersService;
   clock: TestClock;
 };
@@ -72,6 +74,7 @@ export async function buildTestApp(
     vendorsRepository,
     clock.now,
   );
+  const insightsRepository = new InMemoryInsightsRepository(vendorsRepository);
   const app = await buildApp({
     logger: false,
     jwt: TEST_JWT,
@@ -82,6 +85,7 @@ export async function buildTestApp(
     imageStorage,
     images: TEST_IMAGES,
     ordersRepository,
+    insightsRepository,
     paymentGateway: new SimulatedPaymentGateway(),
     cart: TEST_CART,
     orders: TEST_ORDERS,
@@ -109,6 +113,7 @@ export async function buildTestApp(
     reviewsRepository,
     imageStorage,
     ordersRepository,
+    insightsRepository,
     ordersService,
     clock,
   };

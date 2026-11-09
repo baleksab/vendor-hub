@@ -33,7 +33,7 @@ import { useProducts } from "../../hooks/useProducts";
 import { useUpdateProduct } from "../../hooks/useUpdateProduct";
 import { useVendor } from "../../hooks/useVendor";
 import { CURRENCIES, toMajor, toMinor } from "../../money";
-import { productPath, productsPath } from "../../paths";
+import { insightsProductPath, productPath, productsPath } from "../../paths";
 import { ImagesEditor } from "./ImagesEditor";
 import { ReviewsModeration } from "./ReviewsModeration";
 
@@ -337,9 +337,21 @@ export default function ProductForm() {
   return (
     <Stack gap="md">
       {back}
-      <Title order={1}>
-        {current === undefined ? t("product.form.titleNew") : t("product.form.titleEdit")}
-      </Title>
+      <Group justify="space-between" align="center" wrap="wrap">
+        <Title order={1}>
+          {current === undefined ? t("product.form.titleNew") : t("product.form.titleEdit")}
+        </Title>
+        {current === undefined || vendor.data?.memberRole == null ? null : (
+          <Button
+            component={Link}
+            to={insightsProductPath(id, current.id)}
+            variant="default"
+            mih={44}
+          >
+            {t("insights.view")}
+          </Button>
+        )}
+      </Group>
       {current === undefined ? (
         <Text size="sm" c="dimmed">
           {vendor.data?.name}

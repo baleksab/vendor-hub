@@ -8,15 +8,16 @@ projekat/
 │   ├── shell/          host app, React Router 8 framework mode, SSR
 │   ├── user-administrator/ remote with the admin user pages (TanStack Query, React Router routes)
 │   ├── vendor-administrator/ remote with the vendor management pages (list, quick view, detail)
+│   ├── insights/       remote with vendor and product analytics (tables, KPIs, charts)
 │   ├── server/         REST API, Fastify + Zod (not part of the microfrontend runtime)
 │   └── types/          API types generated from the server's OpenAPI document (@vendor-hub/types)
 │   ├── api-client/     shared typed fetch client, unwrap, ApiError (@vendor-hub/api-client)
 │   └── ui/             Mantine theme, design tokens, common components (@vendor-hub/ui)
 ├── infra/nginx/        nginx template for the site (docker compose service)
 ├── scripts/            deploy.sh (one-command deploy), healthcheck.mjs (container health probe)
-├── Dockerfile          one build stage, one target per app (server, shell, user-administrator, vendor-administrator)
+├── Dockerfile          one build stage, one target per app (server, shell, user-administrator, vendor-administrator, insights)
 ├── docker-compose.yml  Postgres and nginx (also used for local development)
-├── docker-compose.deploy.yml  overlay for the full stack: migrate, server, shell, user-administrator, vendor-administrator
+├── docker-compose.deploy.yml  overlay for the full stack: migrate, server, shell, user-administrator, vendor-administrator, insights
 ├── pnpm-workspace.yaml workspace + dependency catalog
 ├── tsconfig.base.json  shared compiler options
 ├── .oxlintrc.json      shared lint rules
@@ -42,6 +43,15 @@ browser --> nginx --> shell /api/v1/users  (proxy: adds Bearer from the HttpOnly
 The `vendor-administrator` remote is mounted at `manage/*` (`/manage/vendors` and `/manage/vendors/:id`). Its shell route only requires a logged-in user, because the API decides what each user can see: administrators every vendor, everybody else the vendors they own or operate. The proxy allowlist is a table of method and path pattern entries, with `vendors/managed` and the vendor ids (matched as uuids, so `/vendors/me` never matches) added next to `/users` and `GET /countries`.
 
 The `user-administrator` remote is mounted at `admin/*`. It calls the shell's own origin, and a resource route `api/v1/*` forwards an allowlisted set of paths (`/users` and the public `GET /countries`) to the API with the token from the cookie, so the JWT never reaches client JS and no CORS is needed. Authorization stays in the API.
+
+## Insights
+
+```
+browser --> shell /insights/vendors[/:id[/products/:productId]]  (loader: logged in) --> insights remote (client)
+browser --> shell /api/v1/insights/*  (proxy: adds Bearer from the HttpOnly cookie) --> API
+```
+
+The `insights` remote is mounted at `insights/*` and is read-only: a table of the vendors the user works for (search, relation filter, sorting by revenue, orders, products or rating, period and currency in the URL), a dive-in page per vendor (KPIs with a delta against the previous period, revenue over time, orders by status, top products and countries) and one per product (units and revenue over time, rating distribution). **Access is membership only, also for administrators**: the API (`src/insights`) answers from the caller's `vendor_members` rows, an administrator who is not an owner or operator sees an empty list and `404` on by-id routes. The shell shows **View insights** on `/vendors` when the session has an owned or operated vendor (`hasInsights`, no administrator branch), and on the vendor site, the product page and in the `vendor-administrator` vendor and product pages for members. Money is never summed across currencies, so every view has a currency switcher. Charts are `@mantine/charts`, whose stylesheet is imported by the shell (embedded remotes have no Mantine CSS) and by the remote's `main.tsx` when it runs standalone.
 
 ## Vendor sites
 

@@ -27,3 +27,6 @@ export {
 export { PaymentAttemptList } from "./components/PaymentAttemptList/PaymentAttemptList";
 export { QuantityStepper } from "./components/QuantityStepper/QuantityStepper";
 export { ShippingDetails } from "./components/ShippingDetails/ShippingDetails";
+export { KpiCard } from "./components/KpiCard/KpiCard";
+export { TimeSeriesChart } from "./components/TimeSeriesChart/TimeSeriesChart";
+export { PeriodCurrencyBar } from "./components/PeriodCurrencyBar/PeriodCurrencyBar";
