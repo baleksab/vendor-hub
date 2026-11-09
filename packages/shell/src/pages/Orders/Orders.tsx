@@ -6,6 +6,7 @@ import {
   NativeSelect,
   Pagination,
   Paper,
+  SimpleGrid,
   Stack,
   Text,
   Title,
@@ -56,6 +57,7 @@ export default function Orders({ loaderData }: Route.ComponentProps) {
   const { filters, orders } = loaderData;
   const dates = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
   const pages = orders === null ? 1 : Math.max(1, Math.ceil(orders.meta.total / ORDER_PAGE_SIZE));
+  const showFilters = orders === null || orders.data.length > 0 || filters.status !== null;
   const pagePath = (page: number) => `${ORDERS_PATH}${orderFiltersQuery({ ...filters, page })}`;
 
   return (
@@ -64,24 +66,41 @@ export default function Orders({ loaderData }: Route.ComponentProps) {
 
       {searchParams.has("placed") ? <Alert color="green">{t("orders.placedMany")}</Alert> : null}
 
-      <Form method="get">
-        <Group align="flex-end" gap="sm">
-          <NativeSelect
-            name="status"
-            label={t("orders.filter.status")}
-            defaultValue={filters.status ?? ""}
-            data={[
-              { value: "", label: t("orders.filter.all") },
-              ...ORDER_STATUSES.map((status) => ({ value: status, label: statusLabel(t, status) })),
-            ]}
-            size="md"
-            miw={220}
-          />
-          <Button type="submit" variant="default" mih={44}>
-            {t("orders.filter.apply")}
-          </Button>
-        </Group>
-      </Form>
+      {showFilters ? (
+        <Paper component="search" withBorder radius="md" p="md">
+          <Form method="get">
+            <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md" verticalSpacing="sm">
+              <NativeSelect
+                name="status"
+                label={t("orders.filter.status")}
+                defaultValue={filters.status ?? ""}
+                data={[
+                  { value: "", label: t("orders.filter.all") },
+                  ...ORDER_STATUSES.map((status) => ({
+                    value: status,
+                    label: statusLabel(t, status),
+                  })),
+                ]}
+              />
+            </SimpleGrid>
+
+            <Group justify="flex-end" mt="md">
+              {filters.status === null ? (
+                <Button variant="default" mih={44} disabled>
+                  {t("orders.filter.reset")}
+                </Button>
+              ) : (
+                <Button component={Link} to={ORDERS_PATH} variant="default" mih={44}>
+                  {t("orders.filter.reset")}
+                </Button>
+              )}
+              <Button type="submit" mih={44}>
+                {t("orders.filter.apply")}
+              </Button>
+            </Group>
+          </Form>
+        </Paper>
+      ) : null}
 
       {orders === null ? (
         <Alert color="red" role="alert">

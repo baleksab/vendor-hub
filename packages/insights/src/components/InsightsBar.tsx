@@ -9,13 +9,15 @@ type Meta = InsightsVendorListResponse["meta"];
 type Props = {
   meta: Pick<Meta, "period" | "currency" | "currencies">;
   onChange: (patch: { period?: Period; currency?: Currency }) => void;
+  fluid?: boolean;
 };
 
-export function InsightsBar({ meta, onChange }: Props) {
+export function InsightsBar({ meta, onChange, fluid }: Props) {
   const t = useT();
 
   return (
     <PeriodCurrencyBar
+      fluid={fluid}
       periods={PERIODS.map((period) => ({ value: period, label: t(periodLabelKey(period)) }))}
       period={meta.period}
       periodLabel={t("bar.period")}

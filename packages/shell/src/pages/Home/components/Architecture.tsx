@@ -54,8 +54,8 @@ export function Architecture() {
             <Text c="dimmed" size="xs">
               {t("home.architecture.modules")}
             </Text>
-            <SimpleGrid cols={2} spacing="xs">
-              {(["vendors", "users"] as const).map((module) => (
+            <SimpleGrid cols={{ base: 1, xs: 3 }} spacing="xs">
+              {(["vendors", "users", "insights"] as const).map((module) => (
                 <Paper
                   key={module}
                   p="sm"
