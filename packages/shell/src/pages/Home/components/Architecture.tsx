@@ -27,10 +27,17 @@ export function Architecture() {
       aria-labelledby="home-architecture"
     >
       <Stack gap="sm" justify="center">
-        <Title order={2} id="home-architecture">
+        <Title
+          order={2}
+          id="home-architecture"
+          fz={{ base: 28, sm: 36 }}
+          style={{ letterSpacing: "-0.02em" }}
+        >
           {t("home.architecture.title")}
         </Title>
-        <Text c="dimmed">{t("home.architecture.text")}</Text>
+        <Text c="dimmed" fz="lg">
+          {t("home.architecture.text")}
+        </Text>
       </Stack>
 
       <Stack gap={0} aria-hidden>

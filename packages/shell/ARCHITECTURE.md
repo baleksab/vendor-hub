@@ -92,9 +92,9 @@ Forms are a plain `<Form method="post">` with Mantine inputs. The action validat
 
 ## Layout and pages
 
-`AppLayout` wraps the `Outlet` in a Mantine `AppShell` with a left sidebar, like a chat app. The sidebar has the title, the `NavLink`s (active state from `useMatch`) and, at the bottom, the `LanguageSwitcher` and the `UserMenu` (log in / register buttons, or an avatar with the user name and a log out item). Below `sm` the sidebar is hidden and opens full width from a sticky top bar, closing again on navigation. Content sits in a centered `Container` that owns the page padding (`py` `lg`, `56` from `sm`), so pages do not add their own vertical padding.
+`AppLayout` has a sticky, blurred top header with the brand, the `NavLink`s (active state from `useMatch`), the `CartLink`, the `LanguageSwitcher` and the `UserMenu` (log in / register buttons, or an avatar with a menu containing the administration link for administrators and log out), and a footer. Below `lg` the burger sits at the right end of the header and opens a full screen `Drawer` (same header height, brand and icon position as the top bar) with the links, the language switcher and the account area, closing again on navigation. Content sits in a centered `Container` (1200px, always full width, so all pages are equally wide) that owns the page padding (`py` `lg`, `48` from `sm`), so pages do not add their own vertical padding. Layout styles are in `AppLayout.module.scss`.
 
-The theme (`@vendor-hub/ui`, `src/theme.ts`) follows the GitHub (Primer) design system: a blue primary color, GitHub gray and dark scales, the system font stack with 14px body text, weight 600 headings, a 6px radius and flat bordered cards. Sizes are compact from `sm` up (44px touch targets below). `cssVariablesResolver` sets the dark-scheme border color.
+The theme (`@vendor-hub/ui`, `src/theme.ts`) uses the Inter variable font (`@fontsource-variable/inter`, imported in `app.css`), an indigo `brand` primary color, zinc gray and dark scales, 15px body text, tight headings, 10 to 14px radii and soft shadows. `cssVariablesResolver` sets the body and border colors and the hero glow and header tokens (`--vh-*`) for both schemes. Components get their defaults (radius, input size, button weight) from `theme.components`.
 
 ## SEO
 
@@ -120,7 +120,7 @@ A new remote means: a new entry in `remotes` and `RemoteName` in `remote.ts`, a 
 
 ### Administration
 
-`Admin` (`/admin/*`) has a loader that calls `requireUser` and throws `403` when the user is not an administrator (`shouldRevalidate` is `false`, so navigating inside the remote does not call the API again). The component renders `user-administrator/UserAdministrator` with `locale`, `apiBaseUrl` (the shell origin) and `onUnauthorized`, which sends the user to `/login?redirectTo=...`. The "Administration" link in the sidebar is shown to administrators only. The authorization itself is enforced by the API.
+`Admin` (`/admin/*`) has a loader that calls `requireUser` and throws `403` when the user is not an administrator (`shouldRevalidate` is `false`, so navigating inside the remote does not call the API again). The component renders `user-administrator/UserAdministrator` with `locale`, `apiBaseUrl` (the shell origin) and `onUnauthorized`, which sends the user to `/login?redirectTo=...`. The "Administration" link (in the account menu on desktop, in the burger menu on mobile) is shown to administrators only. The authorization itself is enforced by the API.
 
 `ManageVendors` (`/manage/*`) has a loader that only calls `requireUser`, so any logged-in user can open it, and the API decides which vendors they see. It renders `vendor-administrator/VendorAdministrator` with the same props. The `/vendors` page shows a button to `/manage/vendors` ("Manage vendors" for administrators, "Manage your vendors" for owners and operators, nothing for everybody else), decided by `vendor/manageVendorsLink.ts` from the root loader data.
 

@@ -131,7 +131,7 @@ export function VendorSiteContent({
         </Tabs.Panel>
 
         <Tabs.Panel value="about" pt="lg">
-          <Stack gap="lg" maw={720}>
+          <Stack gap="lg">
             <Text c="dimmed" fz={{ base: "md", sm: "lg" }} style={{ whiteSpace: "pre-line" }}>
               {vendor.description}
             </Text>

@@ -56,7 +56,7 @@ export default function UserDetail() {
           <Badge
             size="lg"
             variant={user.role === "administrator" ? "filled" : "light"}
-            color={user.role === "administrator" ? "primer" : "gray"}
+            color={user.role === "administrator" ? "brand" : "gray"}
           >
             {t(`role.${user.role}`)}
           </Badge>

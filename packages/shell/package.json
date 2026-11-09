@@ -11,6 +11,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@fontsource-variable/inter": "catalog:",
     "@mantine/charts": "catalog:",
     "@mantine/core": "catalog:",
     "@mantine/hooks": "catalog:",
@@ -33,6 +34,7 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vendor-hub/types": "workspace:*",
+    "sass": "catalog:",
     "tailwindcss": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"

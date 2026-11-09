@@ -1,0 +1,40 @@
+.hero {
+  position: relative;
+  isolation: isolate;
+  padding-block: 8px;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -120px -10vw auto -10vw;
+  height: 560px;
+  background:
+    radial-gradient(520px 320px at 20% 30%, var(--vh-hero-glow-a), transparent 70%),
+    radial-gradient(480px 300px at 80% 20%, var(--vh-hero-glow-b), transparent 70%);
+  pointer-events: none;
+}
+
+.title {
+  letter-spacing: -0.03em;
+}
+
+.accent {
+  background: linear-gradient(90deg, var(--mantine-color-brand-6), #a855f7);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.illustration {
+  border-radius: var(--mantine-radius-xl);
+  box-shadow: var(--mantine-shadow-xl);
+  transform: perspective(1400px) rotateY(-6deg) rotateX(2deg);
+}
+
+@media (max-width: 62em) {
+  .illustration {
+    transform: none;
+  }
+}

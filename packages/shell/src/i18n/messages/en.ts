@@ -1,5 +1,6 @@
 export const en = {
   "app.title": "Vendor Hub",
+  "footer.tagline": "Independent stores, one place to shop.",
   "nav.home": "Home",
   "nav.vendors": "Vendors",
   "nav.menu": "Open navigation",

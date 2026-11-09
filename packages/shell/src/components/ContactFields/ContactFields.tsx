@@ -8,30 +8,50 @@ type Props = {
   countries: string[];
   values: Partial<Record<string, string>> | undefined;
   errors: Partial<Record<string, string>> | undefined;
+  flat?: boolean;
 };
 
-export function ContactFields({ countries, values, errors }: Props) {
+export function ContactFields({ countries, values, errors, flat = false }: Props) {
   const t = useT();
   const options = useCountryOptions(countries);
 
   return (
     <>
-      <SimpleGrid cols={{ base: 1, sm: 2 }}>
-        <FormField
-          name="firstName"
-          label={t("auth.firstName")}
-          autoComplete="given-name"
-          defaultValue={values?.firstName}
-          error={errors?.firstName}
-        />
-        <FormField
-          name="lastName"
-          label={t("auth.lastName")}
-          autoComplete="family-name"
-          defaultValue={values?.lastName}
-          error={errors?.lastName}
-        />
-      </SimpleGrid>
+      {flat ? (
+        <>
+          <FormField
+            name="firstName"
+            label={t("auth.firstName")}
+            autoComplete="given-name"
+            defaultValue={values?.firstName}
+            error={errors?.firstName}
+          />
+          <FormField
+            name="lastName"
+            label={t("auth.lastName")}
+            autoComplete="family-name"
+            defaultValue={values?.lastName}
+            error={errors?.lastName}
+          />
+        </>
+      ) : (
+        <SimpleGrid cols={{ base: 1, sm: 2 }}>
+          <FormField
+            name="firstName"
+            label={t("auth.firstName")}
+            autoComplete="given-name"
+            defaultValue={values?.firstName}
+            error={errors?.firstName}
+          />
+          <FormField
+            name="lastName"
+            label={t("auth.lastName")}
+            autoComplete="family-name"
+            defaultValue={values?.lastName}
+            error={errors?.lastName}
+          />
+        </SimpleGrid>
+      )}
 
       <FormField
         name="email"

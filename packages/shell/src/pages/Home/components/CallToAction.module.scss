@@ -1,0 +1,17 @@
+.band {
+  padding: 48px 24px;
+  border-radius: var(--mantine-radius-xl);
+  background:
+    radial-gradient(600px 240px at 85% 0%, rgba(168, 85, 247, 0.45), transparent 70%),
+    linear-gradient(135deg, var(--mantine-color-brand-7), var(--mantine-color-brand-9));
+}
+
+.title {
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 48em) {
+  .band {
+    padding: 72px 48px;
+  }
+}

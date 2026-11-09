@@ -1,4 +1,4 @@
-import { Alert, Button, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import { Alert, Button, Group, Paper, SimpleGrid, Stack, Text, Title } from "@mantine/core";
 import { ApiError } from "@vendor-hub/api-client";
 import type { OrderResponse } from "@vendor-hub/types";
 import { BackLink, formatPrice, orderNumber } from "@vendor-hub/ui";
@@ -61,7 +61,7 @@ export default function Payment({ loaderData, actionData }: Route.ComponentProps
   const errors = actionData !== undefined && "fields" in actionData ? actionData : null;
 
   return (
-    <Stack gap="lg" maw={560}>
+    <Stack gap="lg">
       <BackLink to={orderPath(order.id)} label={t("payment.backToOrder")} linkComponent={Link} />
       <Title order={1}>{t("payment.title", { number: orderNumber(order.id) })}</Title>
 
@@ -97,13 +97,15 @@ export default function Payment({ loaderData, actionData }: Route.ComponentProps
         <Paper withBorder radius="md" p="lg">
           <Form method="post" noValidate>
             <Stack gap="md">
-              <FormField
-                name="cardNumber"
-                label={t("payment.card")}
-                autoComplete="off"
-                maxLength={23}
-                error={errors?.fields.cardNumber}
-              />
+              <SimpleGrid cols={{ base: 1, md: 2 }}>
+                <FormField
+                  name="cardNumber"
+                  label={t("payment.card")}
+                  autoComplete="off"
+                  maxLength={23}
+                  error={errors?.fields.cardNumber}
+                />
+              </SimpleGrid>
               <FormAlert message={errors?.form} />
               <Group>
                 <Button
