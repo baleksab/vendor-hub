@@ -1,4 +1,4 @@
-import { Alert, Button, Group, Paper, Stack, Text, TextInput, Title } from "@mantine/core";
+import { Alert, Button, Group, Paper, Stack, Tabs, Text, TextInput, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { ApiError } from "@vendor-hub/api-client";
 import type { UpdateVendorRequest, VendorResponse } from "@vendor-hub/types";
@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import { SeoSection } from "../../components/SeoSection";
 import { useT } from "../../context/MessagesContext";
+import { useFormTab } from "../../hooks/useFormTab";
 import { useUpdateVendor } from "../../hooks/useUpdateVendor";
 import { vendorSitePath } from "../../paths";
 
@@ -59,6 +60,7 @@ function changedFields(vendor: VendorResponse, values: FormValues): UpdateVendor
 export function VendorForm({ vendor }: { vendor: VendorResponse }) {
   const t = useT();
   const mutation = useUpdateVendor(vendor.id);
+  const [tab, setTab] = useFormTab();
   const [alert, setAlert] = useState<string | null>(null);
   const [showSaved, setShowSaved] = useState(false);
   const form = useForm<FormValues>({ initialValues: toValues(vendor) });
@@ -90,6 +92,9 @@ export function VendorForm({ vendor }: { vendor: VendorResponse }) {
 
     if (error.kind === "validation" && Object.keys(error.fieldErrors).length > 0) {
       form.setErrors(error.fieldErrors);
+      setTab(
+        Object.keys(error.fieldErrors).every((key) => key.startsWith("seo")) ? "seo" : "details",
+      );
     } else if (error.kind === "validation") {
       setAlert(`${t("vendor.form.rejected")} ${error.detail}`.trim());
     } else if (error.kind !== "unauthorized") {
@@ -132,44 +137,65 @@ export function VendorForm({ vendor }: { vendor: VendorResponse }) {
     <form onSubmit={handleSubmit} noValidate>
       <Paper withBorder radius="md" p="lg">
         <Stack gap="md">
-          <div>
-            <Title order={2} size="h4">
-              {t("vendor.form.title")}
-            </Title>
-            <Text size="sm" c="dimmed">
-              {t("vendor.form.description")}
-            </Text>
-          </div>
+          <Tabs value={tab} onChange={setTab}>
+            <Tabs.List aria-label={t("formTabs.label")}>
+              <Tabs.Tab value="details" mih={44}>
+                {t("formTabs.details")}
+              </Tabs.Tab>
+              <Tabs.Tab value="seo" mih={44}>
+                {t("formTabs.seo")}
+              </Tabs.Tab>
+            </Tabs.List>
 
-          <TextInput
-            label={t("vendor.form.slug")}
-            description={t("vendor.form.slugHint")}
-            value={vendor.slug}
-            readOnly
-            size="md"
-          />
-          <FormField key={form.key("name")} label={t("vendor.form.name")} {...field("name")} />
-          <FormField
-            key={form.key("description")}
-            label={t("vendor.form.about")}
-            kind="textarea"
-            {...field("description")}
-          />
+            <Tabs.Panel value="details" pt="lg">
+              <Stack gap="md">
+                <div>
+                  <Title order={2} size="h4">
+                    {t("vendor.form.title")}
+                  </Title>
+                  <Text size="sm" c="dimmed">
+                    {t("vendor.form.description")}
+                  </Text>
+                </div>
 
-          <SeoSection
-            title={values.seoTitle}
-            description={values.seoDescription}
-            onTitleChange={(value) => form.setFieldValue("seoTitle", value)}
-            onDescriptionChange={(value) => form.setFieldValue("seoDescription", value)}
-            fallbackTitle={values.name.trim() === "" ? vendor.name : values.name.trim()}
-            fallbackDescription={values.description}
-            url={new URL(vendorSitePath(vendor.slug), window.location.origin).toString()}
-            siteName={vendor.name}
-            titleError={typeof errors.seoTitle === "string" ? errors.seoTitle : undefined}
-            descriptionError={
-              typeof errors.seoDescription === "string" ? errors.seoDescription : undefined
-            }
-          />
+                <TextInput
+                  label={t("vendor.form.slug")}
+                  description={t("vendor.form.slugHint")}
+                  value={vendor.slug}
+                  readOnly
+                  size="md"
+                />
+                <FormField
+                  key={form.key("name")}
+                  label={t("vendor.form.name")}
+                  {...field("name")}
+                />
+                <FormField
+                  key={form.key("description")}
+                  label={t("vendor.form.about")}
+                  kind="textarea"
+                  {...field("description")}
+                />
+              </Stack>
+            </Tabs.Panel>
+
+            <Tabs.Panel value="seo" pt="lg">
+              <SeoSection
+                title={values.seoTitle}
+                description={values.seoDescription}
+                onTitleChange={(value) => form.setFieldValue("seoTitle", value)}
+                onDescriptionChange={(value) => form.setFieldValue("seoDescription", value)}
+                fallbackTitle={values.name.trim() === "" ? vendor.name : values.name.trim()}
+                fallbackDescription={values.description}
+                url={new URL(vendorSitePath(vendor.slug), window.location.origin).toString()}
+                siteName={vendor.name}
+                titleError={typeof errors.seoTitle === "string" ? errors.seoTitle : undefined}
+                descriptionError={
+                  typeof errors.seoDescription === "string" ? errors.seoDescription : undefined
+                }
+              />
+            </Tabs.Panel>
+          </Tabs>
 
           {alert === null ? null : (
             <Alert color="red" role="alert">

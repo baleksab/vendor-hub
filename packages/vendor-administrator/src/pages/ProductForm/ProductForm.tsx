@@ -7,6 +7,7 @@ import {
   Select,
   Skeleton,
   Stack,
+  Tabs,
   Text,
   TextInput,
   Textarea,
@@ -29,6 +30,7 @@ import { useLocale } from "../../context/LocaleContext";
 import { useT } from "../../context/MessagesContext";
 import { useCategories } from "../../hooks/useCategories";
 import { useCreateProduct } from "../../hooks/useCreateProduct";
+import { useFormTab } from "../../hooks/useFormTab";
 import { useProduct } from "../../hooks/useProduct";
 import { useProducts } from "../../hooks/useProducts";
 import { useUpdateProduct } from "../../hooks/useUpdateProduct";
@@ -150,6 +152,7 @@ function ProductFields({
   const [alert, setAlert] = useState<string | null>(null);
   const [showSaved, setShowSaved] = useState(false);
   const pending = create.isPending || update.isPending;
+  const [tab, setTab] = useFormTab();
 
   const form = useForm<FormValues>({
     initialValues: product
@@ -202,6 +205,9 @@ function ProductFields({
     if (error instanceof ApiError && error.kind === "validation") {
       if (Object.keys(error.fieldErrors).length > 0) {
         form.setErrors(error.fieldErrors);
+        setTab(
+          Object.keys(error.fieldErrors).every((key) => key.startsWith("seo")) ? "seo" : "details",
+        );
       } else {
         setAlert(`${t("product.form.rejected")} ${error.detail}`.trim());
       }
@@ -210,124 +216,150 @@ function ProductFields({
     }
   };
 
-  const handleSubmit = form.onSubmit(async (values) => {
-    setAlert(null);
-    setShowSaved(false);
+  const handleSubmit = form.onSubmit(
+    async (values) => {
+      setAlert(null);
+      setShowSaved(false);
 
-    try {
-      if (product === undefined) {
-        const created = await create.mutateAsync(toRequest(values));
+      try {
+        if (product === undefined) {
+          const created = await create.mutateAsync(toRequest(values));
 
-        await navigate(productPath(vendorId, created.id));
+          await navigate(productPath(vendorId, created.id));
 
-        return;
+          return;
+        }
+
+        const body = changedFields(product, values);
+
+        if (Object.keys(body).length === 0) {
+          setAlert(t("product.form.noChanges"));
+
+          return;
+        }
+
+        const updated = await update.mutateAsync(body);
+
+        form.setInitialValues(toValues(updated));
+        form.reset();
+        setShowSaved(true);
+      } catch (error) {
+        handleError(error);
       }
-
-      const body = changedFields(product, values);
-
-      if (Object.keys(body).length === 0) {
-        setAlert(t("product.form.noChanges"));
-
-        return;
-      }
-
-      const updated = await update.mutateAsync(body);
-
-      form.setInitialValues(toValues(updated));
-      form.reset();
-      setShowSaved(true);
-    } catch (error) {
-      handleError(error);
-    }
-  });
+    },
+    () => setTab("details"),
+  );
 
   return (
     <form onSubmit={handleSubmit} noValidate>
       <Paper withBorder radius="md" p="lg">
         <Stack gap="md">
-          <Title order={2} size="h4">
-            {t("product.form.details")}
-          </Title>
+          <Tabs value={tab} onChange={setTab}>
+            <Tabs.List aria-label={t("formTabs.label")}>
+              <Tabs.Tab value="details" mih={44}>
+                {t("formTabs.details")}
+              </Tabs.Tab>
+              <Tabs.Tab value="seo" mih={44}>
+                {t("formTabs.seo")}
+              </Tabs.Tab>
+            </Tabs.List>
 
-          <TextInput label={t("product.form.name")} size="md" {...form.getInputProps("name")} />
-          <Textarea
-            label={t("product.form.description")}
-            minRows={4}
-            autosize
-            size="md"
-            {...form.getInputProps("description")}
-          />
-          <Select
-            label={t("product.form.category")}
-            placeholder={t("product.form.categoryPlaceholder")}
-            data={leafCategoryGroups(categories.data?.data ?? [], locale)}
-            searchable
-            size="md"
-            {...form.getInputProps("category")}
-          />
-          <Group grow align="flex-start">
-            <NumberInput
-              label={t("product.form.price")}
-              min={0}
-              decimalScale={2}
-              fixedDecimalScale
-              allowNegative={false}
-              size="md"
-              {...form.getInputProps("price")}
-            />
-            <Select
-              label={t("product.form.currency")}
-              data={[...CURRENCIES]}
-              allowDeselect={false}
-              size="md"
-              {...form.getInputProps("currency")}
-            />
-          </Group>
-          <NumberInput
-            label={t("product.form.stock")}
-            min={0}
-            allowDecimal={false}
-            allowNegative={false}
-            size="md"
-            {...form.getInputProps("stock")}
-          />
+            <Tabs.Panel value="details" pt="lg">
+              <Stack gap="md">
+                <Title order={2} size="h4">
+                  {t("product.form.details")}
+                </Title>
 
-          <SeoSection
-            title={values.seoTitle}
-            description={values.seoDescription}
-            onTitleChange={(value) => form.setFieldValue("seoTitle", value)}
-            onDescriptionChange={(value) => form.setFieldValue("seoDescription", value)}
-            fallbackTitle={t("seo.product.fallbackTitle", {
-              name: previewName,
-              vendor: vendorName,
-            })}
-            fallbackDescription={values.description.trim()}
-            url={new URL(
-              productSitePath(vendorSlug, product?.id ?? ""),
-              window.location.origin,
-            ).toString()}
-            siteName={vendorName}
-            imageUrl={previewImageId === undefined ? undefined : productImagePath(previewImageId)}
-            titleError={form.errors.seoTitle as string | undefined}
-            descriptionError={form.errors.seoDescription as string | undefined}
-            imageSlot={
-              <Select
-                label={t("seo.image.label")}
-                description={product === undefined ? t("seo.image.saveFirst") : undefined}
-                data={[
-                  { value: FIRST_IMAGE, label: t("seo.image.first") },
-                  ...(product?.images ?? []).map((image, index) => ({
-                    value: image.id,
-                    label: t("seo.image.option", { n: index + 1 }),
-                  })),
-                ]}
-                disabled={product === undefined || product.images.length === 0}
-                allowDeselect={false}
-                size="md"
-                {...form.getInputProps("seoImageId")}
+                <TextInput
+                  label={t("product.form.name")}
+                  size="md"
+                  {...form.getInputProps("name")}
+                />
+                <Textarea
+                  label={t("product.form.description")}
+                  minRows={4}
+                  autosize
+                  size="md"
+                  {...form.getInputProps("description")}
+                />
+                <Select
+                  label={t("product.form.category")}
+                  placeholder={t("product.form.categoryPlaceholder")}
+                  data={leafCategoryGroups(categories.data?.data ?? [], locale)}
+                  searchable
+                  size="md"
+                  {...form.getInputProps("category")}
+                />
+                <Group grow align="flex-start">
+                  <NumberInput
+                    label={t("product.form.price")}
+                    min={0}
+                    decimalScale={2}
+                    fixedDecimalScale
+                    allowNegative={false}
+                    size="md"
+                    {...form.getInputProps("price")}
+                  />
+                  <Select
+                    label={t("product.form.currency")}
+                    data={[...CURRENCIES]}
+                    allowDeselect={false}
+                    size="md"
+                    {...form.getInputProps("currency")}
+                  />
+                </Group>
+                <NumberInput
+                  label={t("product.form.stock")}
+                  min={0}
+                  allowDecimal={false}
+                  allowNegative={false}
+                  size="md"
+                  {...form.getInputProps("stock")}
+                />
+              </Stack>
+            </Tabs.Panel>
+
+            <Tabs.Panel value="seo" pt="lg">
+              <SeoSection
+                title={values.seoTitle}
+                description={values.seoDescription}
+                onTitleChange={(value) => form.setFieldValue("seoTitle", value)}
+                onDescriptionChange={(value) => form.setFieldValue("seoDescription", value)}
+                fallbackTitle={t("seo.product.fallbackTitle", {
+                  name: previewName,
+                  vendor: vendorName,
+                })}
+                fallbackDescription={values.description.trim()}
+                url={new URL(
+                  productSitePath(vendorSlug, product?.id ?? ""),
+                  window.location.origin,
+                ).toString()}
+                siteName={vendorName}
+                imageUrl={
+                  previewImageId === undefined ? undefined : productImagePath(previewImageId)
+                }
+                titleError={form.errors.seoTitle as string | undefined}
+                descriptionError={form.errors.seoDescription as string | undefined}
+                imageSlot={
+                  <Select
+                    label={t("seo.image.label")}
+                    description={product === undefined ? t("seo.image.saveFirst") : undefined}
+                    data={[
+                      { value: FIRST_IMAGE, label: t("seo.image.first") },
+                      ...(product?.images ?? []).map((image, index) => ({
+                        value: image.id,
+                        label: t("seo.image.option", { n: index + 1 }),
+                      })),
+                    ]}
+                    disabled={product === undefined || product.images.length === 0}
+                    allowDeselect={false}
+                    size="md"
+                    {...form.getInputProps("seoImageId")}
+                  />
+                }
               />
-            }
-          />
+            </Tabs.Panel>
+          </Tabs>
 
           {alert === null ? null : (
             <Alert color="red" role="alert">
