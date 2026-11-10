@@ -19,6 +19,9 @@ export type Product = {
   priceMinor: number;
   currency: Currency;
   stock: number;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  seoImageId: string | null;
   ratingAvg: number;
   ratingCount: number;
   images: ProductImage[];
@@ -46,9 +49,13 @@ export type NewProduct = {
   priceMinor: number;
   currency: Currency;
   stock: number;
+  seoTitle?: string | null | undefined;
+  seoDescription?: string | null | undefined;
 };
 
-export type ProductPatch = Partial<Omit<NewProduct, "vendorId">>;
+export type ProductPatch = Partial<Omit<NewProduct, "vendorId">> & {
+  seoImageId?: string | null;
+};
 
 export type ProductSort = "relevance" | "newest" | "priceAsc" | "priceDesc" | "rating" | "name";
 

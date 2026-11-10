@@ -30,3 +30,5 @@ export { ShippingDetails } from "./components/ShippingDetails/ShippingDetails";
 export { KpiCard } from "./components/KpiCard/KpiCard";
 export { TimeSeriesChart } from "./components/TimeSeriesChart/TimeSeriesChart";
 export { PeriodCurrencyBar } from "./components/PeriodCurrencyBar/PeriodCurrencyBar";
+export { SEO_DESCRIPTION_MAX, SEO_TITLE_MAX, SeoFields } from "./components/SeoFields/SeoFields";
+export { SeoPreview, type SeoPreviewLabels } from "./components/SeoPreview/SeoPreview";

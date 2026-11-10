@@ -141,6 +141,9 @@ export class DrizzleProductsRepository implements ProductsRepository {
         priceMinor: products.priceMinor,
         currency: products.currency,
         stock: products.stock,
+        seoTitle: products.seoTitle,
+        seoDescription: products.seoDescription,
+        seoImageId: products.seoImageId,
         ratingAvg: products.ratingAvg,
         ratingCount: products.ratingCount,
         createdAt: products.createdAt,
@@ -338,19 +341,30 @@ export class DrizzleProductsRepository implements ProductsRepository {
   }
 
   async removeImage(productId: string, imageId: string): Promise<boolean> {
-    const rows = await this.db
-      .update(productImages)
-      .set(SOFT_DELETE())
-      .where(
-        and(
-          eq(productImages.id, imageId),
-          eq(productImages.productId, productId),
-          notDeleted(productImages),
-        ),
-      )
-      .returning({ id: productImages.id });
+    return this.db.transaction(async (tx) => {
+      const rows = await tx
+        .update(productImages)
+        .set(SOFT_DELETE())
+        .where(
+          and(
+            eq(productImages.id, imageId),
+            eq(productImages.productId, productId),
+            notDeleted(productImages),
+          ),
+        )
+        .returning({ id: productImages.id });
 
-    return rows.length > 0;
+      if (rows.length === 0) {
+        return false;
+      }
+
+      await tx
+        .update(products)
+        .set({ seoImageId: null })
+        .where(and(eq(products.id, productId), eq(products.seoImageId, imageId)));
+
+      return true;
+    });
   }
 }
 

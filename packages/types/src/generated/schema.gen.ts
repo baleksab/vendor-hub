@@ -3438,6 +3438,8 @@ export interface components {
         UpdateVendorRequestInput: {
             name?: string;
             description?: string;
+            seoTitle?: string | null;
+            seoDescription?: string | null;
         };
         VendorResponseInput: {
             /** Format: uuid */
@@ -3445,6 +3447,8 @@ export interface components {
             slug: string;
             name: string;
             description: string;
+            seoTitle: string | null;
+            seoDescription: string | null;
             members: components["schemas"]["VendorMemberResponseInput"][];
             /** @enum {string} */
             viewerRole: "administrator" | "owner" | "operator";
@@ -3475,6 +3479,8 @@ export interface components {
             slug: string;
             name: string;
             description: string;
+            seoTitle: string | null;
+            seoDescription: string | null;
             members: components["schemas"]["PublicVendorMemberResponseInput"][];
         };
         VendorListItemResponseInput: {
@@ -3534,6 +3540,8 @@ export interface components {
             /** @enum {string} */
             currency: "EUR" | "RSD" | "USD";
             stock: number;
+            seoTitle?: string | null;
+            seoDescription?: string | null;
         };
         UpdateProductRequestInput: {
             name?: string;
@@ -3544,6 +3552,9 @@ export interface components {
             /** @enum {string} */
             currency?: "EUR" | "RSD" | "USD";
             stock?: number;
+            seoTitle?: string | null;
+            seoDescription?: string | null;
+            seoImageId?: string | null;
         };
         ProductImageResponseInput: {
             /** Format: uuid */
@@ -3567,6 +3578,9 @@ export interface components {
             /** @enum {string} */
             currency: "EUR" | "RSD" | "USD";
             stock: number;
+            seoTitle: string | null;
+            seoDescription: string | null;
+            seoImageId: string | null;
             ratingAvg: number;
             ratingCount: number;
             images: components["schemas"]["ProductImageResponseInput"][];
@@ -4092,6 +4106,8 @@ export interface components {
         UpdateVendorRequest: {
             name?: string;
             description?: string;
+            seoTitle?: unknown | null;
+            seoDescription?: unknown | null;
         };
         VendorResponse: {
             /** Format: uuid */
@@ -4099,6 +4115,8 @@ export interface components {
             slug: string;
             name: string;
             description: string;
+            seoTitle: string | null;
+            seoDescription: string | null;
             members: components["schemas"]["VendorMemberResponse"][];
             /** @enum {string} */
             viewerRole: "administrator" | "owner" | "operator";
@@ -4129,6 +4147,8 @@ export interface components {
             slug: string;
             name: string;
             description: string;
+            seoTitle: string | null;
+            seoDescription: string | null;
             members: components["schemas"]["PublicVendorMemberResponse"][];
         };
         VendorListItemResponse: {
@@ -4188,6 +4208,8 @@ export interface components {
             /** @enum {string} */
             currency: "EUR" | "RSD" | "USD";
             stock: number;
+            seoTitle?: unknown | null;
+            seoDescription?: unknown | null;
         };
         UpdateProductRequest: {
             name?: string;
@@ -4198,6 +4220,9 @@ export interface components {
             /** @enum {string} */
             currency?: "EUR" | "RSD" | "USD";
             stock?: number;
+            seoTitle?: unknown | null;
+            seoDescription?: unknown | null;
+            seoImageId?: string | null;
         };
         ProductImageResponse: {
             /** Format: uuid */
@@ -4221,6 +4246,9 @@ export interface components {
             /** @enum {string} */
             currency: "EUR" | "RSD" | "USD";
             stock: number;
+            seoTitle: string | null;
+            seoDescription: string | null;
+            seoImageId: string | null;
             ratingAvg: number;
             ratingCount: number;
             images: components["schemas"]["ProductImageResponse"][];

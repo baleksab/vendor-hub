@@ -5,15 +5,33 @@ import type { UpdateVendorRequest, VendorResponse } from "@vendor-hub/types";
 import { FormField } from "@vendor-hub/ui";
 import { useEffect, useState } from "react";
 
+import { SeoSection } from "../../components/SeoSection";
 import { useT } from "../../context/MessagesContext";
 import { useUpdateVendor } from "../../hooks/useUpdateVendor";
+import { vendorSitePath } from "../../paths";
 
 const SAVED_NOTICE_MS = 3000;
 
-type FormValues = { name: string; description: string };
+type FormValues = {
+  name: string;
+  description: string;
+  seoTitle: string;
+  seoDescription: string;
+};
 
 function toValues(vendor: VendorResponse): FormValues {
-  return { name: vendor.name, description: vendor.description };
+  return {
+    name: vendor.name,
+    description: vendor.description,
+    seoTitle: vendor.seoTitle ?? "",
+    seoDescription: vendor.seoDescription ?? "",
+  };
+}
+
+function seoValue(value: string): string | null {
+  const trimmed = value.trim();
+
+  return trimmed === "" ? null : trimmed;
 }
 
 function changedFields(vendor: VendorResponse, values: FormValues): UpdateVendorRequest {
@@ -27,6 +45,14 @@ function changedFields(vendor: VendorResponse, values: FormValues): UpdateVendor
     body.description = values.description;
   }
 
+  if (seoValue(values.seoTitle) !== vendor.seoTitle) {
+    body.seoTitle = seoValue(values.seoTitle);
+  }
+
+  if (seoValue(values.seoDescription) !== vendor.seoDescription) {
+    body.seoDescription = seoValue(values.seoDescription);
+  }
+
   return body;
 }
 
@@ -35,7 +61,9 @@ export function VendorForm({ vendor }: { vendor: VendorResponse }) {
   const mutation = useUpdateVendor(vendor.id);
   const [alert, setAlert] = useState<string | null>(null);
   const [showSaved, setShowSaved] = useState(false);
-  const form = useForm<FormValues>({ mode: "uncontrolled", initialValues: toValues(vendor) });
+  const form = useForm<FormValues>({ initialValues: toValues(vendor) });
+  const values = form.getValues();
+  const errors = form.errors;
 
   useEffect(() => {
     if (!showSaved) {
@@ -126,6 +154,21 @@ export function VendorForm({ vendor }: { vendor: VendorResponse }) {
             label={t("vendor.form.about")}
             kind="textarea"
             {...field("description")}
+          />
+
+          <SeoSection
+            title={values.seoTitle}
+            description={values.seoDescription}
+            onTitleChange={(value) => form.setFieldValue("seoTitle", value)}
+            onDescriptionChange={(value) => form.setFieldValue("seoDescription", value)}
+            fallbackTitle={values.name.trim() === "" ? vendor.name : values.name.trim()}
+            fallbackDescription={values.description}
+            url={new URL(vendorSitePath(vendor.slug), window.location.origin).toString()}
+            siteName={vendor.name}
+            titleError={typeof errors.seoTitle === "string" ? errors.seoTitle : undefined}
+            descriptionError={
+              typeof errors.seoDescription === "string" ? errors.seoDescription : undefined
+            }
           />
 
           {alert === null ? null : (

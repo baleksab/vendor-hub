@@ -55,6 +55,8 @@ export class InMemoryVendorsRepository implements VendorsRepository {
       slug: input.slug,
       name: input.name,
       description: input.description,
+      seoTitle: null,
+      seoDescription: null,
       ratingAvg: 0,
       ratingCount: 0,
       createdAt: new Date(),

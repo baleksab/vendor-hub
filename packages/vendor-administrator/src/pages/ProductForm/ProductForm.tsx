@@ -23,6 +23,7 @@ import { BackLink, EmptyState, ErrorAlert } from "@vendor-hub/ui";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
+import { SeoSection } from "../../components/SeoSection";
 import { leafCategoryGroups } from "../../categoryOptions";
 import { useLocale } from "../../context/LocaleContext";
 import { useT } from "../../context/MessagesContext";
@@ -33,7 +34,13 @@ import { useProducts } from "../../hooks/useProducts";
 import { useUpdateProduct } from "../../hooks/useUpdateProduct";
 import { useVendor } from "../../hooks/useVendor";
 import { CURRENCIES, toMajor, toMinor } from "../../money";
-import { insightsProductPath, productPath, productsPath } from "../../paths";
+import {
+  insightsProductPath,
+  productImagePath,
+  productPath,
+  productSitePath,
+  productsPath,
+} from "../../paths";
 import { ImagesEditor } from "./ImagesEditor";
 import { ReviewsModeration } from "./ReviewsModeration";
 
@@ -52,7 +59,12 @@ type FormValues = {
   price: number | string;
   currency: Currency;
   stock: number | string;
+  seoTitle: string;
+  seoDescription: string;
+  seoImageId: string;
 };
+
+const FIRST_IMAGE = "first";
 
 function toValues(product: ProductResponse): FormValues {
   return {
@@ -62,7 +74,16 @@ function toValues(product: ProductResponse): FormValues {
     price: toMajor(product.priceMinor),
     currency: product.currency,
     stock: product.stock,
+    seoTitle: product.seoTitle ?? "",
+    seoDescription: product.seoDescription ?? "",
+    seoImageId: product.seoImageId ?? FIRST_IMAGE,
   };
+}
+
+function seoValue(value: string): string | null {
+  const trimmed = value.trim();
+
+  return trimmed === "" ? null : trimmed;
 }
 
 function toRequest(values: FormValues): CreateProductRequest {
@@ -73,6 +94,8 @@ function toRequest(values: FormValues): CreateProductRequest {
     priceMinor: toMinor(Number(values.price)),
     currency: values.currency,
     stock: Number(values.stock),
+    seoTitle: seoValue(values.seoTitle),
+    seoDescription: seoValue(values.seoDescription),
   };
 }
 
@@ -86,6 +109,11 @@ function changedFields(product: ProductResponse, values: FormValues): UpdateProd
   if (next.priceMinor !== product.priceMinor) body.priceMinor = next.priceMinor;
   if (next.currency !== product.currency) body.currency = next.currency;
   if (next.stock !== product.stock) body.stock = next.stock;
+  if (next.seoTitle !== product.seoTitle) body.seoTitle = next.seoTitle;
+  if (next.seoDescription !== product.seoDescription) body.seoDescription = next.seoDescription;
+  const seoImageId = values.seoImageId === FIRST_IMAGE ? null : values.seoImageId;
+
+  if (seoImageId !== product.seoImageId) body.seoImageId = seoImageId;
 
   return body;
 }
@@ -102,10 +130,14 @@ function mostUsedCurrency(currencies: Currency[]): Currency {
 
 function ProductFields({
   vendorId,
+  vendorSlug,
+  vendorName,
   product,
   defaultCurrency,
 }: {
   vendorId: string;
+  vendorSlug: string;
+  vendorName: string;
   product: ProductResponse | undefined;
   defaultCurrency: Currency;
 }) {
@@ -129,6 +161,9 @@ function ProductFields({
           price: "",
           currency: defaultCurrency,
           stock: 0,
+          seoTitle: "",
+          seoDescription: "",
+          seoImageId: FIRST_IMAGE,
         },
     validate: {
       name: (value) =>
@@ -149,6 +184,11 @@ function ProductFields({
           : null,
     },
   });
+
+  const values = form.getValues();
+  const previewName = values.name.trim() === "" ? (product?.name ?? "") : values.name.trim();
+  const previewImageId =
+    product?.images.find((image) => image.id === values.seoImageId)?.id ?? product?.images[0]?.id;
 
   useEffect(() => {
     if (!showSaved) return;
@@ -250,6 +290,43 @@ function ProductFields({
             allowNegative={false}
             size="md"
             {...form.getInputProps("stock")}
+          />
+
+          <SeoSection
+            title={values.seoTitle}
+            description={values.seoDescription}
+            onTitleChange={(value) => form.setFieldValue("seoTitle", value)}
+            onDescriptionChange={(value) => form.setFieldValue("seoDescription", value)}
+            fallbackTitle={t("seo.product.fallbackTitle", {
+              name: previewName,
+              vendor: vendorName,
+            })}
+            fallbackDescription={values.description.trim()}
+            url={new URL(
+              productSitePath(vendorSlug, product?.id ?? ""),
+              window.location.origin,
+            ).toString()}
+            siteName={vendorName}
+            imageUrl={previewImageId === undefined ? undefined : productImagePath(previewImageId)}
+            titleError={form.errors.seoTitle as string | undefined}
+            descriptionError={form.errors.seoDescription as string | undefined}
+            imageSlot={
+              <Select
+                label={t("seo.image.label")}
+                description={product === undefined ? t("seo.image.saveFirst") : undefined}
+                data={[
+                  { value: FIRST_IMAGE, label: t("seo.image.first") },
+                  ...(product?.images ?? []).map((image, index) => ({
+                    value: image.id,
+                    label: t("seo.image.option", { n: index + 1 }),
+                  })),
+                ]}
+                disabled={product === undefined || product.images.length === 0}
+                allowDeselect={false}
+                size="md"
+                {...form.getInputProps("seoImageId")}
+              />
+            }
           />
 
           {alert === null ? null : (
@@ -364,6 +441,8 @@ export default function ProductForm() {
       <ProductFields
         key={current?.id ?? "new"}
         vendorId={id}
+        vendorSlug={vendor.data?.slug ?? ""}
+        vendorName={vendor.data?.name ?? ""}
         product={current}
         defaultCurrency={defaultCurrency}
       />
