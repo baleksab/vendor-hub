@@ -15,6 +15,7 @@ type Props = {
   label: string;
   errorText?: string;
   defaultValue?: string;
+  value?: string;
   kind?: "text" | "password" | "select" | "textarea";
   type?: "text" | "email" | "tel";
   autoComplete?: string;
@@ -35,6 +36,7 @@ export function FormField({
   label,
   errorText,
   defaultValue,
+  value,
   kind = "text",
   type = "text",
   autoComplete,
@@ -54,6 +56,7 @@ export function FormField({
     description,
     error: errorText,
     defaultValue,
+    value,
     autoComplete,
     withAsterisk,
     onChange,

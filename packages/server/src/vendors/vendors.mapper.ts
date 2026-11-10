@@ -16,6 +16,8 @@ export function toVendorResponse(
     slug: vendor.slug,
     name: vendor.name,
     description: vendor.description,
+    seoTitle: vendor.seoTitle,
+    seoDescription: vendor.seoDescription,
     members: vendor.members.map((member) => ({ ...member })),
     viewerRole: access.viewerRole,
     memberRole: access.memberRole,
@@ -32,6 +34,8 @@ export function toPublicVendorResponse(vendor: Vendor): PublicVendorResponse {
     slug: vendor.slug,
     name: vendor.name,
     description: vendor.description,
+    seoTitle: vendor.seoTitle,
+    seoDescription: vendor.seoDescription,
     members: vendor.members.map(({ firstName, lastName, role }) => ({
       firstName,
       lastName,

@@ -7,6 +7,8 @@ const owned = {
   slug: "acme",
   name: "Acme",
   description: "d",
+  seoTitle: null,
+  seoDescription: null,
   members: [],
   viewerRole: "owner" as const,
   memberRole: "owner" as const,

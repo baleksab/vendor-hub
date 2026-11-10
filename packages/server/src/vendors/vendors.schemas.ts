@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { FilterCategorySchema } from "../categories/categories.ts";
 import { PageMeta, PaginationQuery } from "../shared/pagination.ts";
+import { seoDescription, seoTitle } from "../shared/seo.ts";
 import { RESERVED_SLUGS } from "./reserved-slugs.ts";
 import { VENDOR_MEMBER_ROLES, VendorMemberRoleSchema } from "./vendor-member-role.ts";
 
@@ -37,7 +38,12 @@ export const VendorMemberResponse = z
 export const ViewerRoleSchema = z.enum(["administrator", ...VENDOR_MEMBER_ROLES]);
 
 export const UpdateVendorRequest = z
-  .object({ name: name.optional(), description: description.optional() })
+  .object({
+    name: name.optional(),
+    description: description.optional(),
+    seoTitle: seoTitle.optional(),
+    seoDescription: seoDescription.optional(),
+  })
   .refine((body) => Object.values(body).some((value) => value !== undefined), {
     message: "At least one field must be present",
   })
@@ -49,6 +55,8 @@ export const VendorResponse = z
     slug: z.string(),
     name: z.string(),
     description: z.string(),
+    seoTitle: z.string().nullable(),
+    seoDescription: z.string().nullable(),
     members: z.array(VendorMemberResponse),
     viewerRole: ViewerRoleSchema,
     memberRole: VendorMemberRoleSchema.nullable(),
@@ -84,6 +92,8 @@ export const PublicVendorResponse = z
     slug: z.string(),
     name: z.string(),
     description: z.string(),
+    seoTitle: z.string().nullable(),
+    seoDescription: z.string().nullable(),
     members: z.array(PublicVendorMemberResponse),
   })
   .meta({ id: "PublicVendorResponse" });

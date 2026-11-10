@@ -80,7 +80,14 @@ export class ProductsService {
   }
 
   async update(actor: Actor, id: string, request: UpdateProductRequest): Promise<Product> {
-    await this.requireManaged(actor, id);
+    const current = await this.requireManaged(actor, id);
+
+    if (
+      typeof request.seoImageId === "string" &&
+      !current.images.some((image) => image.id === request.seoImageId)
+    ) {
+      throw new BadRequestError("The SEO image must be one of the product's images");
+    }
 
     const product = await this.products.update(id, request);
 

@@ -26,6 +26,9 @@ export class InMemoryProductsRepository implements ProductsRepository {
   async create(input: NewProduct): Promise<Product> {
     const row: StoredProduct = {
       ...input,
+      seoTitle: input.seoTitle ?? null,
+      seoDescription: input.seoDescription ?? null,
+      seoImageId: null,
       id: crypto.randomUUID(),
       ratingAvg: 0,
       ratingCount: 0,
@@ -158,6 +161,12 @@ export class InMemoryProductsRepository implements ProductsRepository {
     }
 
     this.images.splice(index, 1);
+
+    const product = this.rows.find((row) => row.id === productId);
+
+    if (product?.seoImageId === imageId) {
+      product.seoImageId = null;
+    }
 
     return true;
   }

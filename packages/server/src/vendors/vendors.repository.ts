@@ -405,6 +405,8 @@ export class DrizzleVendorsRepository implements VendorsRepository {
         slug: vendors.slug,
         name: vendors.name,
         description: vendors.description,
+        seoTitle: vendors.seoTitle,
+        seoDescription: vendors.seoDescription,
         ratingAvg: vendors.ratingAvg,
         ratingCount: vendors.ratingCount,
         createdAt: vendors.createdAt,

@@ -7,6 +7,7 @@ import {
   Select,
   Skeleton,
   Stack,
+  Tabs,
   Text,
   TextInput,
   Textarea,
@@ -23,17 +24,25 @@ import { BackLink, EmptyState, ErrorAlert } from "@vendor-hub/ui";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 
+import { SeoSection } from "../../components/SeoSection";
 import { leafCategoryGroups } from "../../categoryOptions";
 import { useLocale } from "../../context/LocaleContext";
 import { useT } from "../../context/MessagesContext";
 import { useCategories } from "../../hooks/useCategories";
 import { useCreateProduct } from "../../hooks/useCreateProduct";
+import { useFormTab } from "../../hooks/useFormTab";
 import { useProduct } from "../../hooks/useProduct";
 import { useProducts } from "../../hooks/useProducts";
 import { useUpdateProduct } from "../../hooks/useUpdateProduct";
 import { useVendor } from "../../hooks/useVendor";
 import { CURRENCIES, toMajor, toMinor } from "../../money";
-import { insightsProductPath, productPath, productsPath } from "../../paths";
+import {
+  insightsProductPath,
+  productImagePath,
+  productPath,
+  productSitePath,
+  productsPath,
+} from "../../paths";
 import { ImagesEditor } from "./ImagesEditor";
 import { ReviewsModeration } from "./ReviewsModeration";
 
@@ -52,7 +61,12 @@ type FormValues = {
   price: number | string;
   currency: Currency;
   stock: number | string;
+  seoTitle: string;
+  seoDescription: string;
+  seoImageId: string;
 };
+
+const FIRST_IMAGE = "first";
 
 function toValues(product: ProductResponse): FormValues {
   return {
@@ -62,7 +76,16 @@ function toValues(product: ProductResponse): FormValues {
     price: toMajor(product.priceMinor),
     currency: product.currency,
     stock: product.stock,
+    seoTitle: product.seoTitle ?? "",
+    seoDescription: product.seoDescription ?? "",
+    seoImageId: product.seoImageId ?? FIRST_IMAGE,
   };
+}
+
+function seoValue(value: string): string | null {
+  const trimmed = value.trim();
+
+  return trimmed === "" ? null : trimmed;
 }
 
 function toRequest(values: FormValues): CreateProductRequest {
@@ -73,6 +96,8 @@ function toRequest(values: FormValues): CreateProductRequest {
     priceMinor: toMinor(Number(values.price)),
     currency: values.currency,
     stock: Number(values.stock),
+    seoTitle: seoValue(values.seoTitle),
+    seoDescription: seoValue(values.seoDescription),
   };
 }
 
@@ -86,6 +111,11 @@ function changedFields(product: ProductResponse, values: FormValues): UpdateProd
   if (next.priceMinor !== product.priceMinor) body.priceMinor = next.priceMinor;
   if (next.currency !== product.currency) body.currency = next.currency;
   if (next.stock !== product.stock) body.stock = next.stock;
+  if (next.seoTitle !== product.seoTitle) body.seoTitle = next.seoTitle;
+  if (next.seoDescription !== product.seoDescription) body.seoDescription = next.seoDescription;
+  const seoImageId = values.seoImageId === FIRST_IMAGE ? null : values.seoImageId;
+
+  if (seoImageId !== product.seoImageId) body.seoImageId = seoImageId;
 
   return body;
 }
@@ -102,10 +132,14 @@ function mostUsedCurrency(currencies: Currency[]): Currency {
 
 function ProductFields({
   vendorId,
+  vendorSlug,
+  vendorName,
   product,
   defaultCurrency,
 }: {
   vendorId: string;
+  vendorSlug: string;
+  vendorName: string;
   product: ProductResponse | undefined;
   defaultCurrency: Currency;
 }) {
@@ -118,6 +152,7 @@ function ProductFields({
   const [alert, setAlert] = useState<string | null>(null);
   const [showSaved, setShowSaved] = useState(false);
   const pending = create.isPending || update.isPending;
+  const [tab, setTab] = useFormTab();
 
   const form = useForm<FormValues>({
     initialValues: product
@@ -129,6 +164,9 @@ function ProductFields({
           price: "",
           currency: defaultCurrency,
           stock: 0,
+          seoTitle: "",
+          seoDescription: "",
+          seoImageId: FIRST_IMAGE,
         },
     validate: {
       name: (value) =>
@@ -150,6 +188,11 @@ function ProductFields({
     },
   });
 
+  const values = form.getValues();
+  const previewName = values.name.trim() === "" ? (product?.name ?? "") : values.name.trim();
+  const previewImageId =
+    product?.images.find((image) => image.id === values.seoImageId)?.id ?? product?.images[0]?.id;
+
   useEffect(() => {
     if (!showSaved) return;
 
@@ -162,6 +205,9 @@ function ProductFields({
     if (error instanceof ApiError && error.kind === "validation") {
       if (Object.keys(error.fieldErrors).length > 0) {
         form.setErrors(error.fieldErrors);
+        setTab(
+          Object.keys(error.fieldErrors).every((key) => key.startsWith("seo")) ? "seo" : "details",
+        );
       } else {
         setAlert(`${t("product.form.rejected")} ${error.detail}`.trim());
       }
@@ -170,87 +216,150 @@ function ProductFields({
     }
   };
 
-  const handleSubmit = form.onSubmit(async (values) => {
-    setAlert(null);
-    setShowSaved(false);
+  const handleSubmit = form.onSubmit(
+    async (values) => {
+      setAlert(null);
+      setShowSaved(false);
 
-    try {
-      if (product === undefined) {
-        const created = await create.mutateAsync(toRequest(values));
+      try {
+        if (product === undefined) {
+          const created = await create.mutateAsync(toRequest(values));
 
-        await navigate(productPath(vendorId, created.id));
+          await navigate(productPath(vendorId, created.id));
 
-        return;
+          return;
+        }
+
+        const body = changedFields(product, values);
+
+        if (Object.keys(body).length === 0) {
+          setAlert(t("product.form.noChanges"));
+
+          return;
+        }
+
+        const updated = await update.mutateAsync(body);
+
+        form.setInitialValues(toValues(updated));
+        form.reset();
+        setShowSaved(true);
+      } catch (error) {
+        handleError(error);
       }
-
-      const body = changedFields(product, values);
-
-      if (Object.keys(body).length === 0) {
-        setAlert(t("product.form.noChanges"));
-
-        return;
-      }
-
-      const updated = await update.mutateAsync(body);
-
-      form.setInitialValues(toValues(updated));
-      form.reset();
-      setShowSaved(true);
-    } catch (error) {
-      handleError(error);
-    }
-  });
+    },
+    () => setTab("details"),
+  );
 
   return (
     <form onSubmit={handleSubmit} noValidate>
       <Paper withBorder radius="md" p="lg">
         <Stack gap="md">
-          <Title order={2} size="h4">
-            {t("product.form.details")}
-          </Title>
+          <Tabs value={tab} onChange={setTab}>
+            <Tabs.List aria-label={t("formTabs.label")}>
+              <Tabs.Tab value="details" mih={44}>
+                {t("formTabs.details")}
+              </Tabs.Tab>
+              <Tabs.Tab value="seo" mih={44}>
+                {t("formTabs.seo")}
+              </Tabs.Tab>
+            </Tabs.List>
 
-          <TextInput label={t("product.form.name")} size="md" {...form.getInputProps("name")} />
-          <Textarea
-            label={t("product.form.description")}
-            minRows={4}
-            autosize
-            size="md"
-            {...form.getInputProps("description")}
-          />
-          <Select
-            label={t("product.form.category")}
-            placeholder={t("product.form.categoryPlaceholder")}
-            data={leafCategoryGroups(categories.data?.data ?? [], locale)}
-            searchable
-            size="md"
-            {...form.getInputProps("category")}
-          />
-          <Group grow align="flex-start">
-            <NumberInput
-              label={t("product.form.price")}
-              min={0}
-              decimalScale={2}
-              fixedDecimalScale
-              allowNegative={false}
-              size="md"
-              {...form.getInputProps("price")}
-            />
-            <Select
-              label={t("product.form.currency")}
-              data={[...CURRENCIES]}
-              allowDeselect={false}
-              size="md"
-              {...form.getInputProps("currency")}
-            />
-          </Group>
-          <NumberInput
-            label={t("product.form.stock")}
-            min={0}
-            allowDecimal={false}
-            allowNegative={false}
-            size="md"
-            {...form.getInputProps("stock")}
-          />
+            <Tabs.Panel value="details" pt="lg">
+              <Stack gap="md">
+                <Title order={2} size="h4">
+                  {t("product.form.details")}
+                </Title>
+
+                <TextInput
+                  label={t("product.form.name")}
+                  size="md"
+                  {...form.getInputProps("name")}
+                />
+                <Textarea
+                  label={t("product.form.description")}
+                  minRows={4}
+                  autosize
+                  size="md"
+                  {...form.getInputProps("description")}
+                />
+                <Select
+                  label={t("product.form.category")}
+                  placeholder={t("product.form.categoryPlaceholder")}
+                  data={leafCategoryGroups(categories.data?.data ?? [], locale)}
+                  searchable
+                  size="md"
+                  {...form.getInputProps("category")}
+                />
+                <Group grow align="flex-start">
+                  <NumberInput
+                    label={t("product.form.price")}
+                    min={0}
+                    decimalScale={2}
+                    fixedDecimalScale
+                    allowNegative={false}
+                    size="md"
+                    {...form.getInputProps("price")}
+                  />
+                  <Select
+                    label={t("product.form.currency")}
+                    data={[...CURRENCIES]}
+                    allowDeselect={false}
+                    size="md"
+                    {...form.getInputProps("currency")}
+                  />
+                </Group>
+                <NumberInput
+                  label={t("product.form.stock")}
+                  min={0}
+                  allowDecimal={false}
+                  allowNegative={false}
+                  size="md"
+                  {...form.getInputProps("stock")}
+                />
+              </Stack>
+            </Tabs.Panel>
+
+            <Tabs.Panel value="seo" pt="lg">
+              <SeoSection
+                title={values.seoTitle}
+                description={values.seoDescription}
+                onTitleChange={(value) => form.setFieldValue("seoTitle", value)}
+                onDescriptionChange={(value) => form.setFieldValue("seoDescription", value)}
+                fallbackTitle={t("seo.product.fallbackTitle", {
+                  name: previewName,
+                  vendor: vendorName,
+                })}
+                fallbackDescription={values.description.trim()}
+                url={new URL(
+                  productSitePath(vendorSlug, product?.id ?? ""),
+                  window.location.origin,
+                ).toString()}
+                siteName={vendorName}
+                imageUrl={
+                  previewImageId === undefined ? undefined : productImagePath(previewImageId)
+                }
+                titleError={form.errors.seoTitle as string | undefined}
+                descriptionError={form.errors.seoDescription as string | undefined}
+                imageSlot={
+                  <Select
+                    label={t("seo.image.label")}
+                    description={product === undefined ? t("seo.image.saveFirst") : undefined}
+                    data={[
+                      { value: FIRST_IMAGE, label: t("seo.image.first") },
+                      ...(product?.images ?? []).map((image, index) => ({
+                        value: image.id,
+                        label: t("seo.image.option", { n: index + 1 }),
+                      })),
+                    ]}
+                    disabled={product === undefined || product.images.length === 0}
+                    allowDeselect={false}
+                    size="md"
+                    {...form.getInputProps("seoImageId")}
+                  />
+                }
+              />
+            </Tabs.Panel>
+          </Tabs>
 
           {alert === null ? null : (
             <Alert color="red" role="alert">
@@ -364,6 +473,8 @@ export default function ProductForm() {
       <ProductFields
         key={current?.id ?? "new"}
         vendorId={id}
+        vendorSlug={vendor.data?.slug ?? ""}
+        vendorName={vendor.data?.name ?? ""}
         product={current}
         defaultCurrency={defaultCurrency}
       />

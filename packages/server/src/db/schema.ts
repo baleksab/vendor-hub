@@ -63,6 +63,8 @@ export const vendors = pgTable(
     slug: text("slug").notNull(),
     name: text("name").notNull(),
     description: text("description").notNull(),
+    seoTitle: text("seo_title"),
+    seoDescription: text("seo_description"),
     ratingAvg: numeric("rating_avg", { precision: 3, scale: 2, mode: "number" })
       .notNull()
       .default(0),
@@ -72,6 +74,8 @@ export const vendors = pgTable(
     uniqueIndex("vendors_slug_unique")
       .on(sql`lower(${table.slug})`)
       .where(sql`${table.isDeleted} = false`),
+    check("vendors_seo_title_not_blank", sql`btrim(${table.seoTitle}) <> ''`),
+    check("vendors_seo_description_not_blank", sql`btrim(${table.seoDescription}) <> ''`),
     baseEntityChecks("vendors", table),
   ],
 );
@@ -115,6 +119,9 @@ export const products = pgTable(
     priceMinor: integer("price_minor").notNull(),
     currency: char("currency", { length: 3 }).notNull(),
     stock: integer("stock").notNull(),
+    seoTitle: text("seo_title"),
+    seoDescription: text("seo_description"),
+    seoImageId: uuid("seo_image_id").references((): AnyPgColumn => productImages.id),
     ratingAvg: numeric("rating_avg", { precision: 3, scale: 2, mode: "number" })
       .notNull()
       .default(0),
@@ -128,6 +135,8 @@ export const products = pgTable(
     check("products_price_non_negative", sql`${table.priceMinor} >= 0`),
     check("products_stock_non_negative", sql`${table.stock} >= 0`),
     check("products_currency_format", sql`${table.currency} ~ '^[A-Z]{3}$'`),
+    check("products_seo_title_not_blank", sql`btrim(${table.seoTitle}) <> ''`),
+    check("products_seo_description_not_blank", sql`btrim(${table.seoDescription}) <> ''`),
     baseEntityChecks("products", table),
   ],
 );

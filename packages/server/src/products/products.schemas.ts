@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { FilterCategorySchema, ProductCategorySchema } from "../categories/categories.ts";
 import { PageMeta, PaginationQuery } from "../shared/pagination.ts";
+import { seoDescription, seoTitle } from "../shared/seo.ts";
 import { CURRENCIES } from "./currencies.ts";
 
 export const PRODUCT_SORTS = [
@@ -31,6 +32,8 @@ export const CreateProductRequest = z
     priceMinor,
     currency,
     stock,
+    seoTitle: seoTitle.optional(),
+    seoDescription: seoDescription.optional(),
   })
   .meta({ id: "CreateProductRequest" });
 
@@ -42,6 +45,9 @@ export const UpdateProductRequest = z
     priceMinor: priceMinor.optional(),
     currency: currency.optional(),
     stock: stock.optional(),
+    seoTitle: seoTitle.optional(),
+    seoDescription: seoDescription.optional(),
+    seoImageId: z.uuid().nullable().optional(),
   })
   .refine((body) => Object.values(body).some((value) => value !== undefined), {
     message: "At least one field must be present",
@@ -70,6 +76,9 @@ export const ProductResponse = z
     priceMinor: z.number().int(),
     currency: z.enum(CURRENCIES),
     stock: z.number().int(),
+    seoTitle: z.string().nullable(),
+    seoDescription: z.string().nullable(),
+    seoImageId: z.uuid().nullable(),
     ratingAvg: z.number(),
     ratingCount: z.number().int(),
     images: z.array(ProductImageResponse),

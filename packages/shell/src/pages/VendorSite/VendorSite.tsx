@@ -17,11 +17,11 @@ import {
 } from "../../vendor/products/productFilters";
 import { createPageMeta } from "../../seo/createMeta";
 import { pageMeta, readRootData } from "../../seo/pageMeta";
+import { resolveVendorSeo } from "../../seo/resolveSeo";
 import { vendorPath } from "../../vendor/vendorPaths";
 import type { Route } from "./+types/VendorSite";
 import { VENDOR_TABS, VendorSiteContent, type VendorTab } from "./components/VendorSiteContent";
 
-const DESCRIPTION_MAX = 160;
 const REVIEWS_LIMIT = 50;
 
 function readTab(value: string | null): VendorTab {
@@ -69,9 +69,11 @@ export function meta({ matches, loaderData, params }: Route.MetaArgs) {
   const root = readRootData(matches);
 
   if (vendor && root) {
+    const seo = resolveVendorSeo(vendor);
+
     return createPageMeta({
-      title: vendor.name,
-      description: vendor.description.slice(0, DESCRIPTION_MAX),
+      title: seo.title,
+      description: seo.description,
       path: vendorPath(params.slug),
       origin: root.origin,
       locale: root.locale,

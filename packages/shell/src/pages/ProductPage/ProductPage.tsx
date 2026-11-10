@@ -16,12 +16,12 @@ import { useLocale, useT } from "../../i18n/LocaleProvider";
 import { reviewAction } from "../../reviews/reviewAction.server";
 import { createPageMeta } from "../../seo/createMeta";
 import { pageMeta, readRootData } from "../../seo/pageMeta";
+import { resolveProductSeo } from "../../seo/resolveSeo";
 import { createT } from "../../i18n";
 import { productImagePath, productPath, vendorPath } from "../../vendor/vendorPaths";
 import type { Route } from "./+types/ProductPage";
 
 const REVIEWS_LIMIT = 50;
-const DESCRIPTION_MAX = 160;
 
 export async function loader({ params }: Route.LoaderArgs) {
   try {
@@ -54,16 +54,19 @@ export function meta({ matches, loaderData, params }: Route.MetaArgs) {
 
   if (product && root) {
     const t = createT(root.locale);
-    const cover = product.images[0];
+    const seo = resolveProductSeo(
+      product,
+      t("seo.product.title", { name: product.name, vendor: product.vendorName }),
+    );
 
     return createPageMeta({
-      title: t("seo.product.title", { name: product.name, vendor: product.vendorName }),
-      description: product.description.slice(0, DESCRIPTION_MAX),
+      title: seo.title,
+      description: seo.description,
       path,
       origin: root.origin,
       locale: root.locale,
       siteName: product.vendorName,
-      image: cover === undefined ? undefined : productImagePath(cover.id),
+      image: seo.imageId === undefined ? undefined : productImagePath(seo.imageId),
     });
   }
 

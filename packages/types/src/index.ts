@@ -21,7 +21,7 @@ export type UpdateUserRequest = Schemas["UpdateUserRequest"];
 export type UserListResponse = Schemas["UserListResponse"];
 export type UserListQuery = NonNullable<paths["/api/v1/users"]["get"]["parameters"]["query"]>;
 
-export type UpdateVendorRequest = Schemas["UpdateVendorRequest"];
+export type UpdateVendorRequest = Schemas["UpdateVendorRequestInput"];
 export type ManagedVendorListResponse = Schemas["ManagedVendorListResponse"];
 export type ManagedVendorListItemResponse = Schemas["ManagedVendorListItemResponse"];
 export type ManagedVendorListQuery = NonNullable<

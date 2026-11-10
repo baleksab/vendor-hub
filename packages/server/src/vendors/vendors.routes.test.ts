@@ -225,6 +225,8 @@ describe("vendors routes", () => {
       slug: "acme",
       name: "Acme Inc",
       description: "We sell everything you need.",
+      seoTitle: null,
+      seoDescription: null,
       members: [{ firstName: "Jane", lastName: "Doe", role: "owner" }],
     });
     expect(body).not.toMatch(/email|phone|address|userId|example\.com/i);

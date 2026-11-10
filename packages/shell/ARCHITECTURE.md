@@ -37,7 +37,7 @@ packages/shell/
 │   ├── testing/            shared helpers for action tests
 │   ├── vendor/             vendorPaths.ts (`/vendors` and `vendorPath(slug)`), myVendors.server.ts (per-request cache), vendorFilters.ts (`parseVendorFilters` and the vendor list URL and API query), vendorList.server.ts (vendor list page)
 │   ├── env.server.ts       cached env for server-only code
-│   ├── seo/                createPageMeta, pageMeta, buildRobots, buildSitemap, indexablePages
+│   ├── seo/                createPageMeta, pageMeta, resolveSeo, buildRobots, buildSitemap, indexablePages
 │   ├── proxy/              forwardApiRequest.server.ts, proxyAllowlist.ts
 │   ├── routes/             resource routes only: locale.ts, logout.ts, apiProxy.ts, robots.txt.ts, sitemap.xml.ts
 │   ├── i18n/               locales, messages (en, sr), createT, LocaleProvider, server-side resolveLocale
@@ -98,7 +98,7 @@ The theme (`@vendor-hub/ui`, `src/theme.ts`) uses the Inter variable font (`@fon
 
 ## SEO
 
-Every page exports `meta`. `pageMeta(matches, { titleKey, descriptionKey, path, noindex? })` reads locale and origin from the root loader data and calls `createPageMeta`, which builds `<title>`, `description`, the canonical link (skipped for `noindex` pages), Open Graph and Twitter tags. Titles and descriptions are i18n keys (`seo.*`). `routes/robots.txt.ts` and `routes/sitemap.xml.ts` are resource routes built from `SHELL_ORIGIN`; the sitemap lists `seo/indexablePages.ts`. `seo/pages.test.ts` fails if a page has no `meta` or an indexable path has no page.
+Every page exports `meta`. `pageMeta(matches, { titleKey, descriptionKey, path, noindex? })` reads locale and origin from the root loader data and calls `createPageMeta`, which builds `<title>`, `description`, the canonical link (skipped for `noindex` pages), Open Graph and Twitter tags. Titles and descriptions are i18n keys (`seo.*`). The vendor and product pages take custom values from the API (`seoTitle`, `seoDescription`, `seoImageId`) through `resolveVendorSeo` and `resolveProductSeo` (`seo/resolveSeo.ts`), which resolve each field on its own: a custom value is used as is (no site name appended), an empty one falls back to the name or `seo.product.title`, the description cut to 160 characters and the first product image. A `seoImageId` that is not one of the product's images falls back to the first image. `routes/robots.txt.ts` and `routes/sitemap.xml.ts` are resource routes built from `SHELL_ORIGIN`; the sitemap lists `seo/indexablePages.ts`. `seo/pages.test.ts` fails if a page has no `meta` or an indexable path has no page.
 
 ## Localization
 

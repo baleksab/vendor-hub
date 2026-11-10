@@ -12,6 +12,8 @@ export type Vendor = {
   slug: string;
   name: string;
   description: string;
+  seoTitle: string | null;
+  seoDescription: string | null;
   members: VendorMember[];
   ratingAvg: number;
   ratingCount: number;
@@ -43,6 +45,8 @@ export type VendorListItem = {
 export type VendorPatch = {
   name?: string;
   description?: string;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
 };
 
 export type VendorOwner = {

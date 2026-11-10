@@ -11,6 +11,9 @@ export const BECOME_VENDOR_PATH = "/become-vendor";
 
 export const vendorSitePath = (slug: string) => `/vendors/${slug}`;
 
+export const productSitePath = (slug: string, productId: string) =>
+  `${vendorSitePath(slug)}/products/${productId}`;
+
 export const productsPath = (vendorId: string) => `${vendorPath(vendorId)}/products`;
 
 export const newProductPath = (vendorId: string) => `${productsPath(vendorId)}/new`;
